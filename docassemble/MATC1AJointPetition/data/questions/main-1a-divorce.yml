@@ -1135,7 +1135,7 @@ attachment:
       - "children2_name_full_plus_birthdate": ${f"{children[1].name_full()} {children[1].birthdate.format()}"}
       - "children3_name_full_plus_birthdate": ${f"{ children[2].name_full() } { children[2].birthdate.format() }"}
       - "children4_name_full_plus_birthdate": ${f"{ children[3].name_full() } { children[3].birthdate.format() }"}
-      - "previous_action_detail": ${ divorcejointpetition_attachment.safe_value("previous_action_detail") }
+      - "previous_action_detail": ${ divorcejointpetition_attachment.safe_value(previous_action_detail) }
       - "marriage_breakdown_date": ${ marriage_breakdown_date.format() }
       - "request_divorce_nofault": ${ request_divorce_nofault }
       - "request_separation_agreement_approval": ${ request_separation_agreement_approval }
@@ -1165,7 +1165,7 @@ attachment:
       - "users1_petition_signer_phone_number": ${ users1_petition_signer_phone_number }
       - "users2_petition_signer_phone_number": ${ users2_petition_signer_phone_number }
       - "attorneys1_bbo_number": ${ attorneys1_bbo_number }
-      - "attorneys2_bbo_number": ${ attorneys1_bbo_number }
+      - "attorneys2_bbo_number": ${ attorneys2_bbo_number }
 ---
 code: |
   divorcejointpetition_attachment.overflow_fields["previous_action_detail"].overflow_trigger = 252
