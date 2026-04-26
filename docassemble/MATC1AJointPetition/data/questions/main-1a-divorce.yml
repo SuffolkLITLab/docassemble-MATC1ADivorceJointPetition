@@ -102,7 +102,7 @@ code: |
 ---
 objects:
   - users: ALPeopleList.using(ask_number=False, target_number=2)
-  - children: ALPeopleList.using(ask_number=False)
+  - children: ALPeopleList.using(ask_number=False, target_number= )
   - attorneys: ALPeopleList.using(ask_number=False)
   - marital_home: ALAddress
   - trial_court: MACourt
@@ -167,6 +167,7 @@ code: |
   
   nav.set_section("relationship_background")
   marriage_date
+  set_marriage_location
   
   previous_action
   if previous_action == True:
@@ -176,15 +177,9 @@ code: |
   marital_home.zip
   
   nav.set_section("party_information")  
-  if live_together == False:
-    if marital_home_occupied == True:
-      if marital_home_occupant == 0:
-        users[1].address.zip
-      elif marital_home_occupant == 1:
-        users[0].address.zip
-    else:
-      users[0].address.zip
-      users[1].address.zip
+  copy_marital_address_fields
+  users[0].address.address
+  users[1].address.address
   
   users.gather()
   set_parts(subtitle=str(users))
@@ -519,7 +514,9 @@ fields:
     input type: radio
     choices: 
       - "Create a separation agreement using this interview tool": interview
+        show if: not separation_agreement_documented
       - "Upload my complete, notarized separation agreement on the next screen": upload
+        show if: separation_agreement_documented
       - "File my complete, notarized separation agreement with the court registry later" : wait
       #- "Use online dispute resolution app": Link action
       # possible to hide options depending on separation_agreement_documented? (hide intervew and upload accordingly)
@@ -568,6 +565,13 @@ fields:
     default: |
       Irreconcilable differences have led to an irretrievable breakdown of the marriage.
 
+---
+code: |
+  if international_marriage:
+    marriage_location = f"{ marriage_location_city } { marriage_location_state } { marriage_location_country }"
+  else:
+    marriage_location = f"{ marriage_location_city } { marriage_location_state }"
+  set_marriage_location = True
 ---
 id: Previous actions
 question: |
@@ -635,19 +639,51 @@ fields:
       marital_home.address_fields(show_county=True)
 ---
 #if live together copy marital home address to users address fields
-depends on: live_together
 code: |
   if live_together: 
-    for user in users:
-      user.address.address = marital_home.address
-      user.address.unit = marital_home.unit
-      user.address.city = marital_home.city
-      user.address.state = marital_home.state
-      user.address.zip = marital_home.zip
-      user.address.county = marital_home.county
+    users[0].address.address = users[1].address.address = marital_home.address
+    users[0].address.unit = users[1].address.unit = marital_home.unit
+    users[0].address.city = users[1].address.city = marital_home.city
+    users[0].address.state = users[1].address.state = marital_home.state
+    users[0].address.zip = users[1].address.zip = marital_home.zip
+    users[0].address.county = users[1].address.county = marital_home.county
+  elif not live_together:
+    if marital_home_occupant == 0:
+      users[0].address.address = marital_home.address
+      users[0].address.unit = marital_home.unit
+      users[0].address.city = marital_home.city
+      users[0].address.state = marital_home.state
+      users[0].address.zip = marital_home.zip
+      users[0].address.county = marital_home.county
+    elif marital_home_occupant == 1:
+      users[1].address.address = marital_home.address
+      users[1].address.unit = marital_home.unit
+      users[1].address.city = marital_home.city
+      users[1].address.state = marital_home.state
+      users[1].address.zip = marital_home.zip
+      users[1].address.county = marital_home.county
+  copy_marital_address_fields = True
+---
+depends on: marital_home.address
+code: |
+  if marital_home_occupant == 0:
+    users[0].address.address = marital_home.address
+    users[0].address.unit = marital_home.unit
+    users[0].address.city = marital_home.city
+    users[0].address.state = marital_home.state
+    users[0].address.zip = marital_home.zip
+    users[0].address.county = marital_home.county
+  elif marital_home_occupant == 1:
+    users[1].address.address = marital_home.address
+    users[1].address.unit = marital_home.unit
+    users[1].address.city = marital_home.city
+    users[1].address.state = marital_home.state
+    users[1].address.zip = marital_home.zip
+    users[1].address.county = marital_home.county
 ---
 id: Party A home address
 sets:
+  - users[0].address.address
   - users[0].address.zip
 question: |
   Address: ${ users[0] }
@@ -659,6 +695,7 @@ fields:
 ---
 id: Party B home address
 sets:
+  - users[1].address.address
   - users[1].address.zip
 question: |
   Address: ${ users[1] }
@@ -689,7 +726,7 @@ question: |
 subquestion: | 
   A separation agreement that **survives** the divorce is a binding agreement between divorcing spouses that the court will not revisit or modify in the future. 
 
-  A separation agreement that **merges** with the divorce is not a separate contract. If the judge approves the agreement, it becomes part of the divorce judgement. 
+  A separation agreement that **merges** with the divorce is not a separate contract. If the judge approves the agreement, it becomes part of the divorce judgement. The divorce judgement can be revisited or modified in the future. 
 
   Any portion of a separation agreement related to the care and custody of minor children (e.g. child custody, visitation, and child support) will always merge. 
 
@@ -774,6 +811,9 @@ subquestion: |
 fields:
   - "Are there any {children of the marriage}?": children_of_marriage
     datatype: yesnoradio
+  - "How many children came from the marriage between ${ users[0].familiar() } and ${ users[1].familiar() }?": children_of_marriage_number
+    datatype: integer
+    show if: children_of_marriage
 ---
 id: Custodial children
 question: |
@@ -785,6 +825,15 @@ fields:
   - "${ users[1] } number of custodial children": users2_number_of_custodial_children
     datatype: integer
     default: ${ children_of_marriage_number }
+---
+id: Children details
+question: |
+   Information about your ${ordinal(i)} child
+fields:
+  - code: |
+      children[i].name_fields()  
+  - "birthdate": children[i].birthdate
+    datatype: date
 ---
 ####### Interview Order Curating Line #####
 ---
@@ -803,9 +852,7 @@ fields:
     datatype: ssn
 ---
 ####### Question Editing Line ######
----
-#id: Children Information
-# - for child in children, name and birthdate
+
 ---
 id: Petition Signers Information
 question: |
@@ -869,6 +916,10 @@ depends on:
 code: |
   children.there_are_any = children_of_marriage == True
 ---
+depends on: children_of_marriage_number
+code: |
+  children.target_number = children_of_marriage_number
+---
 depends on: 
   - divorce_affirm
 code: |
@@ -878,50 +929,56 @@ code: |
   docket_number = DAEmpty()
 ---
 code: |
-  attorneys1_bbo_number = DAEmpty()
----
-code: |
-  attorneys2_bbo_number = DAEmpty()
----
-code: |
   request_divorce_nofault = True
 ---
 code: |
   request_separation_agreement_approval = True
 ---
+#needs if statememt and logic
 code: |
   users1_petition_signer_name_full = DAEmpty()
 ---
+#needs if statememt and logic
 code: |
   users2_petition_signer_name_full = DAEmpty()
 ---
+#needs if statememt and logic
 code: |
   users1_petition_signer_address_address = DAEmpty()
 ---
+#needs if statememt and logic
 code: |
   users2_petition_signer_address_address = DAEmpty()
 ---
+#needs if statememt and logic
 code: |
   users1_petition_signer_address_city = DAEmpty()
 ---
+#needs if statememt and logic
 code: |
   users1_petition_signer_address_state = DAEmpty()
 ---
+#needs if statememt and logic
 code: |
   users1_petition_signer_address_zip = DAEmpty()
 ---
+#needs if statememt and logic
 code: |
   users2_petition_signer_address_city = DAEmpty()
 ---
+#needs if statememt and logic
 code: |
   users2_petition_signer_address_state = DAEmpty()
 ---
+#needs if statememt and logic
 code: |
   users2_petition_signer_address_zip = DAEmpty()
 ---
+#needs if statememt and logic
 code: |
   users1_petition_signer_phone_number = DAEmpty()
 ---
+#needs if statememt and logic
 code: |
   users2_petition_signer_phone_number = DAEmpty()
 ---
@@ -1105,13 +1162,8 @@ attachment:
       - "users2_address_city": ${ users[1].address.city }
       - "users2_address_state": ${ users[1].address.state }
       - "users2_address_zip": ${ users[1].address.zip }
-      - "marriage_location": |
-        % if international_marriage:
-        ${ marriage_location_city } ${ marriage_location_state } ${ marriage_location_country }
-        % else:
-        ${ marriage_location_city } ${ marriage_location_state }
-        % endif
-      - "marital_home_address_on_one_line": ${ marital_home_address_on_one_line }
+      - "marriage_location": ${  marriage_location  }
+      - "marital_home_address_on_one_line": ${f"{ marital_home.address.address }{  marital_home.address.city  }{  marital_home.address.state  }"}
       - "marriage_date": ${ marriage_date.format() }
       - "last_living_together_date": ${ last_living_together_date.format() }
       - "children1_name_full_plus_birthdate": ${f"{ children[0].name_full() } {children[0].birthdate.format()}"}
