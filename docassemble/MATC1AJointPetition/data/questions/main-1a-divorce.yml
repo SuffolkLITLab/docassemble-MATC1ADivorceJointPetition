@@ -102,7 +102,7 @@ code: |
 ---
 objects:
   - users: ALPeopleList.using(ask_number=False, target_number=2)
-  - children: ALPeopleList.using(ask_number=False, target_number=children_of_marriage_number)
+  - children: ALPeopleList.using(ask_number=False)
   - attorneys: ALPeopleList.using(ask_number=False)
   - marital_home: ALAddress
   - trial_court: MACourt
@@ -192,9 +192,8 @@ code: |
   nav.set_section("children_information")
   children_of_marriage
   if children_of_marriage:
-    users1_number_of_custodial_children
     children.gather()
-  
+    users1_number_of_custodial_children
   nav.set_section("court_requests")  
   request_merge_agreement
   users[0].name_change
@@ -627,6 +626,7 @@ fields:
 ---
 id: marital home address
 sets:
+  - marital_home.address
   - marital_home.zip
 question: |
   Marital home address
@@ -746,7 +746,7 @@ fields:
   - code: |
       attorneys[0].address_fields()
   - "Attorney phone number": attorneys[0].phone_number
-    datatype: 
+    datatype: tel
   - "Board of Bar Overseers (BBO) Number": attorneys[0].bbo_number
 ---
 id: Attorney information Party B
@@ -763,7 +763,7 @@ fields:
   - code: |
       attorneys[1].address_fields()
   - "Attorney phone number": attorneys[1].phone_number
-    datatype: integer
+    datatype: tel
   - "Board of Bar Overseers (BBO) Number": attorneys[1].bbo_number
 ---
 id: Children of the Marriage
@@ -774,9 +774,6 @@ subquestion: |
 fields:
   - "Are there any {children of the marriage}?": children_of_marriage
     datatype: yesnoradio
-  - "How many children came from the marriage between ${ users[0].familiar() } and ${ users[1].familiar() }?": children_of_marriage_number
-    datatype: integer
-    show if: children_of_marriage
 ---
 id: Custodial children
 question: |
@@ -808,9 +805,6 @@ fields:
 ####### Question Editing Line ######
 ---
 #id: Children Information
-#Ask children threshold questions
-# - Are there children of the marriage 
-# - If so, how many? 
 # - for child in children, name and birthdate
 ---
 id: Petition Signers Information
@@ -870,16 +864,15 @@ signature: users1_petition_signature
 code: |
   users.there_is_another = False
 ---
-# prevent asking for adding additional children since asking for number directly
+depends on:
+  - children_of_marriage
 code: |
- if defined('children_of_marriage'):
-    children.there_is_another = False
+  children.there_are_any = children_of_marriage == True
 ---
+depends on: 
+  - divorce_affirm
 code: |
-  if children_of_marriage: children.there_are_any = True
----
-code: |
-  request_separation_agreement_approval = DAEmpty()
+  request_separation_agreement_approval = divorce_affirm == True
 ---
 code: |
   docket_number = DAEmpty()
@@ -891,25 +884,10 @@ code: |
   attorneys2_bbo_number = DAEmpty()
 ---
 code: |
-  marital_home_address_on_one_line = DAEmpty()
+  request_divorce_nofault = True
 ---
 code: |
-  children1_name_full_plus_birthdate = DAEmpty()
----
-code: |
-  children2_name_full_plus_birthdate = DAEmpty()
----
-code: |
-  children3_name_full_plus_birthdate = DAEmpty()
----
-code: |
-  children4_name_full_plus_birthdate = DAEmpty()
----
-code: |
-  request_divorce_nofault = DAEmpty()
----
-code: |
-  request_separation_agreement_approval = DAEmpty()
+  request_separation_agreement_approval = True
 ---
 code: |
   users1_petition_signer_name_full = DAEmpty()
@@ -1127,7 +1105,12 @@ attachment:
       - "users2_address_city": ${ users[1].address.city }
       - "users2_address_state": ${ users[1].address.state }
       - "users2_address_zip": ${ users[1].address.zip }
-      - "marriage_location": ${ marriage_location }
+      - "marriage_location": |
+        % if international_marriage:
+        ${ marriage_location_city } ${ marriage_location_state } ${ marriage_location_country }
+        % else:
+        ${ marriage_location_city } ${ marriage_location_state }
+        % endif
       - "marital_home_address_on_one_line": ${ marital_home_address_on_one_line }
       - "marriage_date": ${ marriage_date.format() }
       - "last_living_together_date": ${ last_living_together_date.format() }
@@ -1164,8 +1147,8 @@ attachment:
       - "users2_petition_signer_address_zip": ${ users2_petition_signer_address_zip }
       - "users1_petition_signer_phone_number": ${ users1_petition_signer_phone_number }
       - "users2_petition_signer_phone_number": ${ users2_petition_signer_phone_number }
-      - "attorneys1_bbo_number": ${ attorneys1_bbo_number }
-      - "attorneys2_bbo_number": ${ attorneys2_bbo_number }
+      - "attorneys1_bbo_number": ${ attorneys[0].bbo_number }
+      - "attorneys2_bbo_number": ${ attorneys[1].bbo_number }
 ---
 code: |
   divorcejointpetition_attachment.overflow_fields["previous_action_detail"].overflow_trigger = 252
