@@ -36,7 +36,7 @@ metadata:
       a. child support guidelines worksheet (CJD 304)
       b. findings and determinations for child support and post-secondary education (CJD 305)
   when_you_are_finished: |
-    File any remaining paperwork with the court registry and
+    File any remaining paperwork with the court registry and you will receive a notice with next steps from the court in the mail. You can also check the status of your case at [masscourts.org](https://www.masscourts.org)
   efiling_enabled: False
   integrated_efiling: False
   integrated_email_filing: False
@@ -79,11 +79,12 @@ metadata:
   form_numbers:
     - CJ-D 101A
     - Affid. Irretrievable Breakdown
-    - r408
+    - R408
   fees:
-    - Filing fee: $215.00
+    - Divorce Filing fee: $200.00
+    - Divorce Surcharge: $15.00
   update_notes: |
-    Divorce Joint Petition v2.0 - Fresh joint petition (initial filings) interview file for EOY handoff
+    Divorce Joint Petition v2.0 - Joint petition (initial filings) interview file for spring 2026 handoff
 ---
 code: |
   # This controls the default country and list of states in address field questions
@@ -99,15 +100,25 @@ code: |
 code: |
   al_form_type = "starts_case" 
 ---
+objects:
+  - users: ALPeopleList.using(ask_number=False, target_number=2)
+  - children: ALPeopleList.using(ask_number=False, target_number=children_of_marriage_number)
+  - attorneys: ALPeopleList.using(ask_number=False)
+  - marital_home: ALAddress
+  - trial_court: MACourt
+--- 
 sections:
-  - people: Names & contacts
-  - case_details: Marriage & case details
-  - family_info: Children & personal requests
-  - addresses_court: Addresses & court information
-  - review_and_sign: Review & sign
-  - download: Download & next steps
-  - review_divorcejointpetition: Review your answers
+  - divorce_eligibility: Eligibility
+  - separation_agreement: Separation agreement
+  - relationship_background: Relationship background
+  - court_requests: Divorce action details 
+  - party_information: Party information
+  - children_information: Children
+  - additional_circumstances_and_filings: Special circumstances and additional filings
+  - review_and_sign: Review and sign
+  
 ---
+#################### Interview order #####################
 comment: |
   Controls order and branching logic for questions specific to this form
 id: interview_order_divorcejointpetition
@@ -116,37 +127,98 @@ code: |
   allowed_courts = ['Probate and Family Court']
   user_role = "plaintiff"
   user_ask_role = "plaintiff"
-  nav.set_section("people")
+  
+  nav.set_section("divorce_eligibility")
+  legal_marriage
+  if legal_marriage == False: 
+    cautionary_message_divorce
+  
+  marriage_certificate_upload
+  
+  massachusetts_residency
+  if massachusetts_residency == False:
+    couple_ever_lived_in_massachusetts
+    if couple_ever_lived_in_massachusetts == False: 
+      cautionary_message_jurisdiction
+    elif breakdown_in_massachusetts == False: 
+      cautionary_message_jurisdiction
+  
+  divorce_affirm
+  if divorce_affirm == False:
+    cautionary_message_divorce_type
+  elif joint_petition_affirm == False:
+    cautionary_message_divorce_type
+  elif notarize_affirm == False:
+    cautionary_message_divorce_type
+
+  nav.set_section("separation_agreement")
+  separation_agreement_reached
+  if separation_agreement_reached == True:
+    separation_agreement_documented
+  elif separation_agreement_reached == False:
+    parties_will_negotiate
+    if parties_will_negotiate == False:
+      cautionary_message_divorce_type
+  separation_agreement_format
+  if separation_agreement_format == "wait":
+    cautionary_message_delay_agreement
+  elif separation_agreement_format == "upload":
+    separation_agreement_upload
+  
+  nav.set_section("relationship_background")
+  marriage_date
+  
+  previous_action
+  if previous_action == True:
+    previous_action_detail
+
+  live_together
+  marital_home.zip
+  
+  nav.set_section("party_information")  
+  if live_together == False:
+    if marital_home_occupied == True:
+      if marital_home_occupant == 0:
+        users[1].address.zip
+      elif marital_home_occupant == 1:
+        users[0].address.zip
+    else:
+      users[0].address.zip
+      users[1].address.zip
+  
   users.gather()
   set_parts(subtitle=str(users))
-  nav.set_section("case_details")
-  marriage_location
-  children1_name_full_plus_birthdate
-  set_progress(12)
-  previous_action_detail
-  marriage_breakdown_date
-  request_divorce_nofault
-  set_progress(24)
-  users1_request_name_change
-  users1_petition_signer_name_full
-  users2_petition_signer_name_full
-  set_progress(36)
+  
+  nav.set_section("children_information")
+  children_of_marriage
+  if children_of_marriage:
+    users1_number_of_custodial_children
+    children.gather()
+  
+  nav.set_section("court_requests")  
+  request_merge_agreement
+  users[0].name_change
   additional_request
-  attorneys1_bbo_number
-  nav.set_section("addresses_court")
-  trial_court.address.address
-  nav.set_section("case_details")
-  set_progress(48)
-  docket_number
-  users[0].address.address
-  users[1].address.address
+  
+  set_progress(80)
+ 
+  nav.set_section("additional_circumstances_and_filings")
+  users[0].has_attorney
+  if users[0].has_attorney:
+    attorneys[0].name.first
+  elif users[1].has_attorney:
+    attorneys[1].name.first
+
+  set_progress(90)
   nav.set_section("review_and_sign")
-  set_progress(60)
   signature_date
-  users2_petition_signature
+  
   users1_petition_signature
+  users2_petition_signature
+  
   interview_order_divorcejointpetition = True
 ---
+###################### Main order ######################
 comment: |
   This block includes the logic for standalone interviews.
   Delete mandatory: True to include in another interview
@@ -170,103 +242,580 @@ code: |
   users1_petition_signature
   divorcejointpetition_download
 ---
-id: Joint1ADivorce
+terms:
+  separation agreement: |
+    A written document listing all things the parties agree on in their divorce, like child support, taxes, parenting time, and property division
+  notary: |
+    A notary or notary is authorized by the Commonwealth of Massachusetts to witnes signatures, among other possible duties. 
+  notarize: |
+    The process where a notary public witnesses signatures and places a seal on document to ensure authenticity
+  notarized: |
+    A document that has been signed in the presence of a notary public and the notary has placed their seal upon it
+  children of the marriage: |
+    Children of the marriage includes all children over whom the couple shares legal custody. This typically includes all children born to either spouse during the marriage and any other children legally adopted by one or both parents but not include step-children born or adopted to one spouse outside of the marriage and not legally adopted by the second spouse.
+  child support guidelines: |
+    Mathematical formula used by the court to determine an appropriate amount of child support  
+  marital home: |
+   The last residential address shared by divorcing parties
+  financial statement: |
+    A form summarizing a party's estimated income and expenses, assets, liabilities, and health insurance, etc. 
+  divorce absolute: |
+    The date a divorce becomes final
+  both: |
+    Some items or provisions will merge while others will survive. The separation agreement should clearly indicate which provisions will merge and which will survive. 
+---
+id: Joint 1A Divorce Intro
 continue button field: divorcejointpetition_intro
 question: |
-  Joint1ADivorce
+   **Joint petition for divorce under [G.L. c. 208, § 1A](https://malegislature.gov/Laws/GeneralLaws/PartII/TitleIII/Chapter208/Section1a)**
 subquestion: |
-  This interview will help you jointly ask the court for a no-fault divorce.
+    This interview will help you jointly ask the court for a no-fault divorce.
+
+    You should file for a 1A divorce when both spouses agree the marriage has irretrievably broken down and can't continue.
   
-  Before you get started, please gather:
+    **Before you get started, please gather:**
   
-  1. Certified Copy of Marriage Certificate
-  2. Notarized Separation Agreement (if already prepared) 
-  3. Names, birthdays, and addresses for both parties and all minor children of the marriage
-  4. Monthly budget or finance tracking information
-  5. Recent pay stubs 
+    1. Certified Copy of Marriage Certificate
+    2. Notarized Separation Agreement (if already prepared) 
+    3. Names, birthdays, and addresses for both parties and all minor children of the marriage
+    4. Monthly budget or finance tracking information
+    5. Recent pay stubs 
+    
+    **When you are finished, you will need to:**
   
-  When you are finished, you will need to:
-  
-  1. File Notarized Separation Agreement (unless complete) 
-  2. File Certified Copy of Marriage Certificate (unless complete) 
-  3. File financial statements for each petitioner
-  4. If child support is being addressed or waived:
-    a. child support guidelines worksheet (CJD 304)
-    b. findings and determinations for child support and post-secondary education (CJD 305)
+    1. File Notarized Separation Agreement (unless uploaded) 
+    2. File Certified Copy of Marriage Certificate (unless uploaded) 
+    3. File financial statements for each petitioner (unless completed)
+     
+    If child support is being addressed or waived:
+    
+    1. File child support guidelines worksheet (CJ-D 304)
+    2. File findings and determinations for child support and post-secondary education (CJ-D 305)
+
 ---
-id: Marriage Details
+id: Party B name
+sets:
+  users[1].name.first
 question: |
-  Marriage Details
+  Spouse name
 subquestion: |
-  Please have the marriage location and date ready.
+  Who is married to ${  users[0].name_full()  }?
 fields:
-  - "Where marriage took place": marriage_location
-  - "Marriage date": marriage_date
+  - code: |
+      users[1].name_fields()  
+---
+id: legal marriage
+question: |
+  Confirm legal marriage
+fields: 
+  - "Are ${  users[0].name_full()  } and ${  users[1].name_full()  } legally married?" : legal_marriage
+    datatype: yesnoradio
+---
+id: upload marriage proof
+question: |
+  Upload marriage certificate
+subquestion: |
+  Submitting a certified copy of your marriage certificate is strongly encouraged at the time of initial filing. Upload a copy here to include it with your filings. Keep any original copies as the court may ask for a physical certified copy. 
+  
+fields:
+  - "Upload marriage certificate": marriage_certificate_upload
+    datatype: file
+    required: False
+under: |
+  This document will likely need to be filed before the court can give you a hearing date or hear your case.
+---
+id: cautionary message legal marriage
+question: Legal marriage
+subquestion: |
+  You must be legally married in order to be granted a divorce in Massachusetts. 
+
+sets: cautionary_message_divorce
+buttons: 
+  - Keep going: 
+      code: |
+        cautionary_message_divorce = True
+  - Restart: restart
+  - Exit: exit
+---
+id: Confirm Massachusetts jurisdiction A
+question: |
+  Massachusetts jurisdiction confirmation
+fields:
+  - "Have either or both ${ users[0] } and ${ users[1] } lived in Massachusetts for at least one year?": massachusetts_residency
+    datatype: yesnoradio
+---
+id: Confirm Massachusetts jurisdiction B
+question: |
+  Massachusetts jurisdiction confirmation
+fields:
+  - "Did ${ users[0] } and ${ users[1] } ever live in Massachusetts while you were married?": couple_ever_lived_in_massachusetts
+    datatype: yesnoradio
+  - "Did the cause for the divorce happen in Massachusetts?": breakdown_in_massachusetts
+    datatype: yesnoradio
+---
+id: Cautionary message jurisdiction
+question: |
+  Eligibility for Divorce in Massachusetts
+subquestion: |
+  You can file for divorce in Massachusetts if:
+  
+  * You've lived in the state for 1 year, or;
+  * The reason the marriage ended happened in Massachusetts and you've lived in the state as a couple
+  
+  If you remain unsure whether you are eligible for divorce in Massachusetts, you may wish to speak to an attorney licensed to practice in Massachusetts to discuss your options. 
+sets: cautionary_message_jurisdiction  
+buttons: 
+  - Keep going: 
+      code: |
+        cautionary_message_jurisdiction = True
+  - Restart: restart
+  - Exit: exit
+---
+id: Divorce type
+question: |
+ Joint petition for divorce under [G.L. c. 208, § 1 A](https://malegislature.gov/Laws/GeneralLaws/PartII/TitleIII/Chapter208/Section1a)
+subquestion: | 
+  In Massachusetts, a divorce can be filed as *no-fault* or *fault*, and can be *contested* or *uncontested*.
+
+  A joint petition for divorce, informally called a "1A," is an *uncontested no-fault* divorce filed when: 
+  
+  * the parties agree they want a divorce; and 
+  * the parties agree or want to work together on how to resolve the major issues in the divorce. 
+  
+  Do **both** ${  users[0].name_full()  } and ${  users[1].name_full()  } **agree** that you want to:
+fields:
+  - "Get divorced": divorce_affirm
+    datatype: yesnoradio
+  - "File together (jointly)": joint_petition_affirm
+    datatype: yesnoradio
+    show if: divorce_affirm
+  - "File a complete, notarized separation agreement at the time of filing or within 90 days thereafter": notarize_affirm
+    datatype: yesnoradio
+    show if: joint_petition_affirm 
+under: |
+ [**Which type of divorce should I file?**](https://www.mass.gov/decision-tree/which-type-of-divorce-should-i-file)
+---
+id: Cautionary message divorce type 
+question: |
+  Confirm divorce type:
+  Joint petition for divorce under [G.L. c. 208, § 1 A](https://malegislature.gov/Laws/GeneralLaws/PartII/TitleIII/Chapter208/Section1a)
+subquestion: |
+  A joint uncontested (1A) divorce petition is one of several different types of divorce in Massachusetts.
+  
+  You may file for a 1A divorce when both spouses **agree** the marriage has irretrievably broken down and cannot continue.
+
+  When you file for divorce under Section 1A you must file a complete, notarized separation agreement at the time of filing or within 90 days thereafter. You are highly encouraged to file the separation agreement when you file.  
+  
+  In Massachusetts, a divorce can be filed as “no-fault” or “fault,” and can be contested or uncontested. 
+
+sets: cautionary_message_divorce_type
+buttons: 
+  - Keep going: 
+      code: |
+        cautionary_message_divorce_type = True
+  - Restart: restart
+  - Exit: exit
+under: |
+      [**Which type of divorce should I file?**](https://www.mass.gov/decision-tree/which-type-of-divorce-should-i-file)
+---
+id: Cautionary message jurisdiction
+question: |
+  Eligibility for Divorce in Massachusetts
+subquestion: |
+  You can file for divorce in Massachusetts if:
+  
+  * You've lived in the state for 1 year, or;
+  * The reason the marriage ended happened in Massachusetts and you've lived in the state as a couple
+  
+  If you remain unsure whether you are eligible for divorce in Massachusetts, you may wish to speak to an attorney licensed to practice in Massachusetts to discuss your options. 
+
+sets: cautionary_message_jurisdiction
+buttons: 
+  - Keep going: 
+      code: |
+        cautionary_message_jurisdiction = True
+  - Restart: restart
+  - Exit: exit
+---
+id: Agreement on major issues
+question: | 
+  Agreement on major issues
+subquestion: |
+  You will need to explain to the court how you will handle any issues related to your divorce. 
+  These issues may include:
+  
+  
+  * Child support
+  * Parenting time
+  * Child custody
+  * Alimony
+  * Dividing shared property (marital assets)
+  * Health insurance 
+  
+  **Do ${  users[0].name_full()  } and ${  users[1].name_full()  } agree on how to resolve all major issues, such as property division, child custody, and child support?**
+fields: 
+  - "We agree on the major issues": separation_agreement_reached
+    datatype: yesnoradio
+---
+id: Willing to negotiate agreement
+question: |
+  Willingness to negotiate agreement
+subquestion: |
+  Are ${  users[0].name_full()  } and ${  users[1].name_full()  } willing to work together to come to agreement on how you will handle any issues related to your divorce? 
+
+  These issues may include:
+  
+  * Child support
+  * Parenting time
+  * Child custody
+  * Alimony
+  * Dividing shared property (marital assets)
+  * Health insurance 
+
+    There are different ways to reach an agreement. Some negotiate on their own while others hire lawyers. Some use mediators to help settle the issues. 
+  
+  [Alternative Dispute Resolution](https://www.mass.gov/alternative-dispute-resolution) options may be available. 
+  
+fields: 
+  - "We will work together to come to agreement": parties_will_negotiate
+    datatype: yesnoradio
+under: |  
+  You may prepare an agreement later in the interview if the parties are willing to work together to come to agreement. 
+---
+depends on: 
+  - separation_agreement_reached
+code: |
+  if separation_agreement_reached == False:
+    separation_agreement_documented = False
+---
+id: Separation agreement status
+question: |
+  Separation agreement
+subquestion: |
+  You will need to file a {separation agreement}. 
+  
+  Your Separation agreement tells the court how you will handle all issues related to your divorce.
+
+  Both parties must sign the agreement in the presence of a {notary}, who will mark the document to validate your signatures. 
+ 
+  A complete, {notarized} separation agreement is strongly encouraged at the time of filing.
+  
+fields: 
+  - "We have already prepared a detailed written separation agreement that fully captures our agreement on all relevant issues": separation_agreement_documented
+    datatype: yesnoradio
+under: |
+      If you do not already have a complete written separation agreement you will be able to create one using this tool.
+---
+id: Separation agreement format
+question: |
+  Separation agreement format
+subquestion: |
+  Anyone filing a joint petition for divorce must file a separation agreement within 90 days of initial filing. 
+  
+  The separation agreement must be {notarized} and should completely address all major issues such as property division, child custody, and child support. 
+  
+  You are highly encouraged to submit a complete, notarized agreement with initial filing. 
+fields: 
+  - "How would you like to file your separation agreement?": separation_agreement_format
+    input type: radio
+    choices: 
+      - "Create a separation agreement using this interview tool": interview
+      - "Upload my complete, notarized separation agreement on the next screen": upload
+      - "File my complete, notarized separation agreement with the court registry later" : wait
+      #- "Use online dispute resolution app": Link action
+      # possible to hide options depending on separation_agreement_documented? (hide intervew and upload accordingly)
+---
+id: Upload agreement
+question: |
+  Upload separation agreement
+fields:
+  - "Upload agreement": separation_agreement_upload
+    datatype: file
+---
+id: Cautionary message notarized separation agreement
+continue button field: cautionary_message_delay_agreement
+question: |
+  Confirm information
+subquestion: |
+  You have indicated that you will file your notarized separation agreement later. Confirm that you understand:
+  
+  * You must file a separation agreement within 90 days of filing a joint petition for divorce (1A)
+  * Your separation agreement must be notarized
+  * Your separation agreement should address all issues such as property division, child custody, and child support
+---
+id: Relationship background
+question: |
+  Relationship background
+subquestion: |
+  ${  users[0].name_full()  } and ${  users[1].name_full()  }
+fields:
+  - "When were you married?": marriage_date
     datatype: date
-  - "Last living together date": last_living_together_date
+  - "Did you get married in the United States of America?": international_marriage
+    datatype: noyesradio
+  - "Location of marriage: City": marriage_location_city
+    maxlength: 54
+  - "Location of marriage: State": marriage_location_state
+    required: False
+  - "Country of marriage": marriage_location_country
+    show if: international_marriage
+    required: False
+  - "When did the marriage breakdown occur?": marriage_breakdown_date
     datatype: date
-  - "Marital home address": marital_home_address_on_one_line
----
-id: Children Information
-question: |
-  Children Information
-subquestion: |
-  Please list the names and birthdates of your children.
-fields:
-  - "Child 1 name and birthdate": children1_name_full_plus_birthdate
-  - "Child 2 name and birthdate": children2_name_full_plus_birthdate
-  - "Child 3 name and birthdate": children3_name_full_plus_birthdate
-  - "Child 4 name and birthdate": children4_name_full_plus_birthdate
----
-id: Previous Actions
-question: |
-  Previous Actions
-subquestion: |
-  If there were any previous legal actions, please provide details.
-fields:
-  - "Details of previous actions": previous_action_detail
+  - "Briefly explain what caused the marriage breakdown": marriage_breakdown_justification
     input type: area
+    maxlength: 810
+    help: Keep your summary brief. You do not need to go into specific detail but make it clear to the court why you want a divorce.
+    default: |
+      Irreconcilable differences have led to an irretrievable breakdown of the marriage.
+
 ---
-id: Marriage Breakdown
+id: Previous actions
 question: |
-  Marriage Breakdown
+  Previous actions
 subquestion: |
-  Please provide the date of the marriage breakdown.
+  Have ${  users[0].familiar()  } and ${  users[1].familiar()  } filed any previous action(s) for:
+  
+  * divorce, annulment or affirmation of marriage, 
+  * separate support,
+  * desertion, 
+  * living apart for justifiable cause, **or** 
+  * custody of child(ren)?
+
 fields:
-  - "Date of marriage breakdown": marriage_breakdown_date
+  - "We have filed one or more previous actions": previous_action
+    datatype: yesnoradio
+---
+id: Previous action details
+question: |
+  Previous action details
+subquestion: |
+  Petitioners certify that no previous action for divorce, annulment or affirmation of marriage, separate support, desertion, living apart for justifiable cause, or custody of child(ren) has been brought by either party against the other except:
+fields:
+  - "List details for all previous actions": previous_action_detail
+    input type: area
+    maxlength: 252
+    required: False 
+---
+id: Living arrangements
+question: |
+  Living arrangements
+fields: 
+  - "Do ${  users[0]  } and ${  users[1]  } currently live together?": live_together
+    datatype: radio
+    choices: 
+      - We live together: True
+      - We live in separate households: False
+  - "When did ${  users[0].familiar()  } and ${  users[1].familiar()  } last live together?": last_living_together_date
     datatype: date
+    show if:
+      variable: live_together
+      is: False
+  - "Does either ${  users[0]  } or ${  users[1]  } live in the {marital home}?": marital_home_occupied
+    datatype: yesnoradio
+    show if:
+      variable: live_together
+      is: False
+  - "Who lives in the marital home?": marital_home_occupant
+    datatype: radio
+    show if:
+      variable: marital_home_occupied
+      is: True
+    choices: 
+      - "${  users[0]  }": 0
+      - "${  users[1]  }": 1
 ---
-id: Divorce Requests
+id: marital home address
+sets:
+  - marital_home.zip
 question: |
-  Divorce Requests
-subquestion: |
-  Please have your requests for the divorce agreement ready.
-fields:
-  - "Request no-fault divorce": request_divorce_nofault
-    datatype: yesno
-  - "Request to approve agreement": request_separation_agreement_approval
-    datatype: yesno
-  - "Request to merge agreement": request_merge_agreement
-    datatype: yesno
-  - "Request to keep agreement": request_survive_agreement
-    datatype: yesno
+  Marital home address
+fields: 
+  - code: |
+      marital_home.address_fields(show_county=True)
 ---
-id: Name Change Requests
+#if live together copy marital home address to users address fields
+depends on: live_together
+code: |
+  if live_together: 
+    for user in users:
+      user.address.address = marital_home.address
+      user.address.unit = marital_home.unit
+      user.address.city = marital_home.city
+      user.address.state = marital_home.state
+      user.address.zip = marital_home.zip
+      user.address.county = marital_home.county
+---
+id: Party A home address
+sets:
+  - users[0].address.zip
 question: |
-  Name Change Requests
+  Address: ${ users[0] }
 subquestion: |
-  If you want to change names, please provide your former names.
+  What is ${ users[0].familiar() }'s address?
 fields:
-  - "User 1 wants name change": users1_request_name_change
-    datatype: yesno
-  - "User 1 former last name": users1_former_name_last
-  - "User 2 wants name change": users2_request_name_change
-    datatype: yesno
-  - "User 2 former last name": users2_former_name_last
+  - code: |
+      users[0].address_fields(show_county=True)
+---
+id: Party B home address
+sets:
+  - users[1].address.zip
+question: |
+  Address: ${ users[1] }
+subquestion: |
+  What is ${ users[1].familiar() }'s address?
+fields:
+  - code: |
+      users[1].address_fields(show_county=True)
+---
+id: Name change requests
+question: |
+  Name change requests
+fields:
+  - "Does ${  users[0].familiar()  } want to change their last name to their former last name?": users[0].name_change
+    datatype: yesnoradio
+  - "${  users[0].familiar()  }'s last name before marriage": users[0].former_name_last
+    maxlength: 48
+    show if: users[0].name_change
+  - "Does ${  users[1].familiar()  } want to change their last name to their former last name?": users[1].name_change
+    datatype: yesnoradio
+  - "${  users[1]  }'s last name before marriage'": users[1].former_name_last
+    maxlength: 48
+    show if: users[1].name_change
+---
+id: merger survival
+question: | 
+  Merger or survival of separation agreement
+subquestion: | 
+  A separation agreement that **survives** the divorce is a binding agreement between divorcing spouses that the court will not revisit or modify in the future. 
+
+  A separation agreement that **merges** with the divorce is not a separate contract. If the judge approves the agreement, it becomes part of the divorce judgement. 
+
+  Any portion of a separation agreement related to the care and custody of minor children (e.g. child custody, visitation, and child support) will always merge. 
+
+  **Do you want your separation agreement to merge, survive, or {both}?**
+  
+fields:
+  - "Request merge agreement": request_merge_agreement
+    datatype: yesnoradio
+    required: False
+  - "Request survive agreement": request_survive_agreement
+    datatype: yesnoradio
+    required: False  
+
+---
+id: Additional requests
+question: |
+  Additional requests
+subquestion: | 
+  Do you have any additonal requests for the court that you would like to add to your joint petition? This is _**rare**_.
+
+fields: 
+  - "Do you have any additional requests for the court?": additional_request
+    datatype: yesnoradio
+    hint: This is unlikely unless...
+  - "Additonal request detail": additonal_request_detail
+    maxlength: 84
+    required: False
+    show if: additional_request
+---
+id: Attorneys involved
+question: |
+  Attorneys
+subquestion: |
+  Does either ${ users[0].name_full() } or ${ users[1].name_full() } have a lawyer in this divorce?
+fields:
+  - "${ users[0] } has a lawyer": users[0].has_attorney
+    datatype: yesnoradio
+  - "${ users[1] } has a lawyer": users[1].has_attorney
+    datatype: yesnoradio
+---
+id: Attorney information Party A
+sets: 
+  attorneys[0].name.first
+  attorneys[0].address.address
+  attorneys[0].phone_number
+  attorneys[0].bbo_number  
+question: |
+  Attorney for ${ users[0] }
+subquestion: |  
+  Attorney for ${ users[0] }
+fields: 
+  - code: |
+      attorneys[0].name_fields()
+  - code: |
+      attorneys[0].address_fields()
+  - "Attorney phone number": attorneys[0].phone_number
+    datatype: 
+  - "Board of Bar Overseers (BBO) Number": attorneys[0].bbo_number
+---
+id: Attorney information Party B
+sets: 
+  attorneys[1].name.first
+  attorneys[1].address.address
+  attorneys[1].phone_number
+  attorneys[1].bbo_number  
+question: |
+  Attorney for ${ users[1] }
+fields: 
+  - code: |
+      attorneys[1].name_fields()
+  - code: |
+      attorneys[1].address_fields()
+  - "Attorney phone number": attorneys[1].phone_number
+    datatype: integer
+  - "Board of Bar Overseers (BBO) Number": attorneys[1].bbo_number
+---
+id: Children of the Marriage
+question: |
+  Children of the Marriage
+subquestion: |
+  Were any children born or adopted during the marriage between ${  users[0]  } and ${  users[1]  }?
+fields:
+  - "Are there any {children of the marriage}?": children_of_marriage
+    datatype: yesnoradio
+  - "How many children came from the marriage between ${ users[0].familiar() } and ${ users[1].familiar() }?": children_of_marriage_number
+    datatype: integer
+    show if: children_of_marriage
+---
+id: Custodial children
+question: |
+  Custodial Children
+fields:
+  - "${ users[0] } number of custodial children": users1_number_of_custodial_children
+    datatype: integer
+    default: ${ children_of_marriage_number }
+  - "${ users[1] } number of custodial children": users2_number_of_custodial_children
+    datatype: integer
+    default: ${ children_of_marriage_number }
+---
+####### Interview Order Curating Line #####
+---
+id: Social security numbers
+sets: 
+  - users[0].ssn
+  - users[1].ssn
+question: |
+  Social security numbers
+subquestion: |
+  r408 asks for social security number as required by statute
+fields:
+  - "${  users[0]  } Social Security Number (ssn)": users[0].ssn
+    datatype: ssn
+  - "${  users[1]  } Social Security Number (ssn)": users[1].ssn
+    datatype: ssn
+---
+####### Question Editing Line ######
+---
+#id: Children Information
+#Ask children threshold questions
+# - Are there children of the marriage 
+# - If so, how many? 
+# - for child in children, name and birthdate
 ---
 id: Petition Signers Information
 question: |
-  Petition Signers Information
+  Petition Signers Information Party A
 subquestion: |
   Please have the names and addresses of the signers ready.
 fields:
@@ -277,7 +826,7 @@ fields:
   - "User 1 signer zip code": users1_petition_signer_address_zip
   - "User 1 signer phone number": users1_petition_signer_phone_number
 ---
-id: Petitioner B Information
+id: Petition Singers Information Party B
 question: |
   Petitioner B Information
 subquestion: |
@@ -290,26 +839,7 @@ fields:
   - "User 2 signer zip code": users2_petition_signer_address_zip
   - "User 2 signer phone number": users2_petition_signer_phone_number
 ---
-id: Additional Requests
-question: |
-  Additional Requests
-subquestion: |
-  If you have any other requests, please provide details.
-fields:
-  - "Any additional requests": additional_request
-    datatype: yesno
-  - "Details of additional request": additonal_request_detail
----
-id: Attorney Information
-question: |
-  Attorney Information
-subquestion: |
-  Please provide the BBO numbers for your attorneys.
-fields:
-  - "Attorney 1 BBO number": attorneys1_bbo_number
-  - "Attorney 2 BBO number": attorneys2_bbo_number
----
-id: preview divorcejointpetition
+id: preview divorce joint petition
 question: |
   Preview your form before you sign it
 subquestion: |
@@ -336,8 +866,29 @@ question: |
   Users1 petition signature, sign below
 signature: users1_petition_signature
 ---
+# set users.there_is_another to False to prevent triggering possibility of adding more than 2 users. 
 code: |
-  marriage_location = DAEmpty()
+  users.there_is_another = False
+---
+# prevent asking for adding additional children since asking for number directly
+code: |
+ if defined('children_of_marriage'):
+    children.there_is_another = False
+---
+code: |
+  if children_of_marriage: children.there_are_any = True
+---
+code: |
+  request_separation_agreement_approval = DAEmpty()
+---
+code: |
+  docket_number = DAEmpty()
+---
+code: |
+  attorneys1_bbo_number = DAEmpty()
+---
+code: |
+  attorneys2_bbo_number = DAEmpty()
 ---
 code: |
   marital_home_address_on_one_line = DAEmpty()
@@ -403,7 +954,7 @@ code: |
   [user.address.address for user in users.complete_elements()]
   addresses_to_search = [user.address for user in users.complete_elements()]
 ---
-id: divorcejointpetition review screen
+id: divorce joint petition review screen
 event: review_divorcejointpetition
 question: |
   Review your answers
@@ -517,7 +1068,7 @@ edit:
 confirm: True
 
 ---
-id: download divorcejointpetition
+id: download divorce joint petition
 event: divorcejointpetition_download
 question: |
   All done
@@ -558,7 +1109,7 @@ attachment:
   tagged pdf: True
 ---
 attachment:
-  name: divorcejointpetition
+  name: Divorce Joint Petition
   filename: divorcejointpetition
   variable name: divorcejointpetition_attachment[i]
   skip undefined: True
@@ -584,7 +1135,7 @@ attachment:
       - "children2_name_full_plus_birthdate": ${f"{children[1].name_full()} {children[1].birthdate.format()}"}
       - "children3_name_full_plus_birthdate": ${f"{ children[2].name_full() } { children[2].birthdate.format() }"}
       - "children4_name_full_plus_birthdate": ${f"{ children[3].name_full() } { children[3].birthdate.format() }"}
-      - "previous_action_detail": ${ divorcejointpetition_attachment.safe_value("previous_action_detail") }
+      - "previous_action_detail": ${ divorcejointpetition_attachment.safe_value(previous_action_detail) }
       - "marriage_breakdown_date": ${ marriage_breakdown_date.format() }
       - "request_divorce_nofault": ${ request_divorce_nofault }
       - "request_separation_agreement_approval": ${ request_separation_agreement_approval }
@@ -613,13 +1164,12 @@ attachment:
       - "users2_petition_signer_address_zip": ${ users2_petition_signer_address_zip }
       - "users1_petition_signer_phone_number": ${ users1_petition_signer_phone_number }
       - "users2_petition_signer_phone_number": ${ users2_petition_signer_phone_number }
-      - "attorneys1_bbo_number": ${ "{:,.2f}".format(attorneys1_bbo_number) }
-      - "attorneys2_bbo_number": ${ "{:,.2f}".format(attorneys2_bbo_number) }
+      - "attorneys1_bbo_number": ${ attorneys1_bbo_number }
+      - "attorneys2_bbo_number": ${ attorneys2_bbo_number }
 ---
 code: |
-  divorcejointpetition.overflow_fields["previous_action_detail"].overflow_trigger = 252
-  divorcejointpetition.overflow_fields["previous_action_detail"].label = "List details for all previous actions"
-  divorcejointpetition.overflow_fields.gathered = True
-
+  divorcejointpetition_attachment.overflow_fields["previous_action_detail"].overflow_trigger = 252
+  divorcejointpetition_attachment.overflow_fields["previous_action_detail"].label = "List details for all previous actions"
+  divorcejointpetition_attachment.overflow_fields.gathered = True
 
 
