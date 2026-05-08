@@ -177,10 +177,16 @@ code: |
   copy_marital_address_fields
   
   nav.set_section("party_information") 
-  
+  users[0].birthdate
+  users[0].gender_male
+  users[0].gender_female
   users[0].address.address
-  users[1].address.address
   users[0].phone_number
+  
+  users[1].birthdate
+  users[1].gender_male
+  users[1].gender_female
+  users[1].address.address
   users[1].phone_number
 
   users.gather()
@@ -189,6 +195,7 @@ code: |
   nav.set_section("children_information")
   children_of_marriage
   if children_of_marriage:
+    children_of_marriage_number
     children.gather()
     set_parts(subtitle=str(children))
     users1_number_of_custodial_children
@@ -722,11 +729,25 @@ fields:
     maxlength: 48
     show if: users[1].name_change
 ---
+depends on: users[0].name_change
+code: |
+    if users[0].name_change == True:
+      users1_name_last_upon_divorce = users[0].former_name_last
+    else:
+      users1_name_last_upon_divorce = users[0].name.last
+---
+depends on: users[1].name_change
+code: |
+    if users[1].name_change == True:
+      users2_name_last_upon_divorce = users[1].former_name_last
+    else:
+      users2_name_last_upon_divorce = users[1].name.last
+---
 id: merger survival
 question: | 
   Merger or survival of separation agreement
 subquestion: | 
-  A separation agreement that **survives** the divorce is a binding agreement between divorcing spouses that the court will not revisit or modify in the future. 
+  A separation agreement that **survives** the divorce is a binding agreement between divorcing spouses that the probate and family court will not revisit or modify in the future. 
 
   A separation agreement that **merges** with the divorce is not a separate contract. If the judge approves the agreement, it becomes part of the divorce judgement. The divorce judgement can be revisited or modified in the future. 
 
@@ -741,7 +762,6 @@ fields:
   - "Request survive agreement": request_survive_agreement
     datatype: yesnoradio
     required: False  
-
 ---
 id: Additional requests
 question: |
@@ -911,6 +931,12 @@ code: |
 ---
 code: |
   docket_number = DAEmpty()
+---
+code: |
+   judgment_divorce = DAEmpty()
+---
+code: |
+    judgment_annulment = DAEmpty()
 ---
 code: |
   request_divorce_nofault = True
