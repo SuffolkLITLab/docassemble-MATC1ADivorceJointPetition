@@ -102,7 +102,7 @@ code: |
 ---
 objects:
   - users: ALPeopleList.using(ask_number=False, target_number=2)
-  - children: ALPeopleList.using(ask_number=False, target_number=children_of_marriage_number)
+  - children: ALPeopleList.using(ask_number=False)
   - attorneys: ALPeopleList.using(ask_number=False)
   - marital_home: ALAddress
   - trial_court: MACourt
@@ -116,7 +116,6 @@ sections:
   - children_information: Children
   - additional_circumstances_and_filings: Special circumstances and additional filings
   - review_and_sign: Review and sign
-  
 ---
 #################### Interview order #####################
 comment: |
@@ -167,6 +166,7 @@ code: |
   
   nav.set_section("relationship_background")
   marriage_date
+  set_marriage_location
   
   previous_action
   if previous_action == True:
@@ -174,27 +174,24 @@ code: |
 
   live_together
   marital_home.zip
+  copy_marital_address_fields
   
-  nav.set_section("party_information")  
-  if live_together == False:
-    if marital_home_occupied == True:
-      if marital_home_occupant == 0:
-        users[1].address.zip
-      elif marital_home_occupant == 1:
-        users[0].address.zip
-    else:
-      users[0].address.zip
-      users[1].address.zip
+  nav.set_section("party_information") 
   
+  users[0].address.address
+  users[1].address.address
+  users[0].phone_number
+  users[1].phone_number
+
   users.gather()
   set_parts(subtitle=str(users))
   
   nav.set_section("children_information")
   children_of_marriage
   if children_of_marriage:
-    users1_number_of_custodial_children
     children.gather()
-  
+    set_parts(subtitle=str(children))
+    users1_number_of_custodial_children
   nav.set_section("court_requests")  
   request_merge_agreement
   users[0].name_change
@@ -203,18 +200,12 @@ code: |
   set_progress(80)
  
   nav.set_section("additional_circumstances_and_filings")
-  users[0].has_attorney
-  if users[0].has_attorney:
-    attorneys[0].name.first
-  elif users[1].has_attorney:
-    attorneys[1].name.first
+
 
   set_progress(90)
   nav.set_section("review_and_sign")
-  signature_date
-  
-  users1_petition_signature
-  users2_petition_signature
+
+  set_default_petition_values
   
   interview_order_divorcejointpetition = True
 ---
@@ -238,8 +229,11 @@ code: |
   )
   divorcejointpetition_preview_question
   basic_questions_signature_flow    
+  users1_signature
+  users2_signature
   users2_petition_signature
   users1_petition_signature
+
   divorcejointpetition_download
 ---
 terms:
@@ -303,6 +297,24 @@ subquestion: |
 fields:
   - code: |
       users[1].name_fields()  
+---
+id: Party A Phone number 
+sets:  
+  users[0].phone_number
+question: |
+  What is ${  users[0]  }'s phone number?'
+fields: 
+  - "${ users[0]  } phone number": users[0].phone_number
+    datatype: tel
+---
+id: Party B Phone number 
+sets:  
+  users[1].phone_number
+question: |
+  What is ${  users[1]  }'s phone number?'
+fields: 
+  - "${ users[1]  } phone number": users[1].phone_number
+    datatype: tel
 ---
 id: legal marriage
 question: |
@@ -520,7 +532,9 @@ fields:
     input type: radio
     choices: 
       - "Create a separation agreement using this interview tool": interview
+        show if: not separation_agreement_documented
       - "Upload my complete, notarized separation agreement on the next screen": upload
+        show if: separation_agreement_documented
       - "File my complete, notarized separation agreement with the court registry later" : wait
       #- "Use online dispute resolution app": Link action
       # possible to hide options depending on separation_agreement_documented? (hide intervew and upload accordingly)
@@ -569,6 +583,13 @@ fields:
     default: |
       Irreconcilable differences have led to an irretrievable breakdown of the marriage.
 
+---
+code: |
+  if international_marriage:
+    marriage_location = f"{ marriage_location_city } { marriage_location_state } { marriage_location_country }"
+  else:
+    marriage_location = f"{ marriage_location_city } { marriage_location_state }"
+  set_marriage_location = True
 ---
 id: Previous actions
 question: |
@@ -627,6 +648,7 @@ fields:
 ---
 id: marital home address
 sets:
+  - marital_home.address
   - marital_home.zip
 question: |
   Marital home address
@@ -635,19 +657,35 @@ fields:
       marital_home.address_fields(show_county=True)
 ---
 #if live together copy marital home address to users address fields
-depends on: live_together
 code: |
   if live_together: 
-    for user in users:
-      user.address.address = marital_home.address
-      user.address.unit = marital_home.unit
-      user.address.city = marital_home.city
-      user.address.state = marital_home.state
-      user.address.zip = marital_home.zip
-      user.address.county = marital_home.county
+    users[0].address.address = users[1].address.address = marital_home.address
+    users[0].address.unit = users[1].address.unit = marital_home.unit
+    users[0].address.city = users[1].address.city = marital_home.city
+    users[0].address.state = users[1].address.state = marital_home.state
+    users[0].address.zip = users[1].address.zip = marital_home.zip
+    users[0].address.county = users[1].address.county = marital_home.county
+  else:
+    if marital_home_occupied:
+      if marital_home_occupant == 0:
+        users[0].address.address = marital_home.address
+        users[0].address.unit = marital_home.unit
+        users[0].address.city = marital_home.city
+        users[0].address.state = marital_home.state
+        users[0].address.zip = marital_home.zip
+        users[0].address.county = marital_home.county
+      elif marital_home_occupant == 1:
+        users[1].address.address = marital_home.address
+        users[1].address.unit = marital_home.unit
+        users[1].address.city = marital_home.city
+        users[1].address.state = marital_home.state
+        users[1].address.zip = marital_home.zip
+        users[1].address.county = marital_home.county
+  copy_marital_address_fields = True
 ---
 id: Party A home address
 sets:
+  - users[0].address.address
   - users[0].address.zip
 question: |
   Address: ${ users[0] }
@@ -659,6 +697,7 @@ fields:
 ---
 id: Party B home address
 sets:
+  - users[1].address.address
   - users[1].address.zip
 question: |
   Address: ${ users[1] }
@@ -689,7 +728,7 @@ question: |
 subquestion: | 
   A separation agreement that **survives** the divorce is a binding agreement between divorcing spouses that the court will not revisit or modify in the future. 
 
-  A separation agreement that **merges** with the divorce is not a separate contract. If the judge approves the agreement, it becomes part of the divorce judgement. 
+  A separation agreement that **merges** with the divorce is not a separate contract. If the judge approves the agreement, it becomes part of the divorce judgement. The divorce judgement can be revisited or modified in the future. 
 
   Any portion of a separation agreement related to the care and custody of minor children (e.g. child custody, visitation, and child support) will always merge. 
 
@@ -746,7 +785,7 @@ fields:
   - code: |
       attorneys[0].address_fields()
   - "Attorney phone number": attorneys[0].phone_number
-    datatype: 
+    datatype: tel
   - "Board of Bar Overseers (BBO) Number": attorneys[0].bbo_number
 ---
 id: Attorney information Party B
@@ -763,7 +802,7 @@ fields:
   - code: |
       attorneys[1].address_fields()
   - "Attorney phone number": attorneys[1].phone_number
-    datatype: integer
+    datatype: tel
   - "Board of Bar Overseers (BBO) Number": attorneys[1].bbo_number
 ---
 id: Children of the Marriage
@@ -789,6 +828,15 @@ fields:
     datatype: integer
     default: ${ children_of_marriage_number }
 ---
+id: Children details
+question: |
+   Information about your ${ordinal(i)} child
+fields:
+  - code: |
+      children[i].name_fields()  
+  - "birthdate": children[i].birthdate
+    datatype: date
+---
 ####### Interview Order Curating Line #####
 ---
 id: Social security numbers
@@ -807,38 +855,6 @@ fields:
 ---
 ####### Question Editing Line ######
 ---
-#id: Children Information
-#Ask children threshold questions
-# - Are there children of the marriage 
-# - If so, how many? 
-# - for child in children, name and birthdate
----
-id: Petition Signers Information
-question: |
-  Petition Signers Information Party A
-subquestion: |
-  Please have the names and addresses of the signers ready.
-fields:
-  - "User 1 signer full name": users1_petition_signer_name_full
-  - "User 1 signer address": users1_petition_signer_address_address
-  - "User 1 signer city": users1_petition_signer_address_city
-  - "User 1 signer state": users1_petition_signer_address_state
-  - "User 1 signer zip code": users1_petition_signer_address_zip
-  - "User 1 signer phone number": users1_petition_signer_phone_number
----
-id: Petition Singers Information Party B
-question: |
-  Petitioner B Information
-subquestion: |
-  Please have the details for the second petitioner ready.
-fields:
-  - "User 2 signer full name": users2_petition_signer_name_full
-  - "User 2 signer address": users2_petition_signer_address_address
-  - "User 2 signer city": users2_petition_signer_address_city
-  - "User 2 signer state": users2_petition_signer_address_state
-  - "User 2 signer zip code": users2_petition_signer_address_zip
-  - "User 2 signer phone number": users2_petition_signer_phone_number
----
 id: preview divorce joint petition
 question: |
   Preview your form before you sign it
@@ -856,96 +872,84 @@ subquestion: |
 continue button field: divorcejointpetition_preview_question    
 ---
 code: |
-  signature_fields = ['users2_petition_signature', 'users1_petition_signature']
+  signature_fields = ['users[0].signature', 'users[1].signature']
+---
+#code: |
+#  if users[0].has_attorney:
+#    users1_petition_signature = users[0].signature
+#  elif users[1].has_attorney:
+#   users2_petition_signature = users[1].signature
+#  set_petition_signatures = True
 ---
 question: |
-  Users2 petition signature, sign below
-signature: users2_petition_signature
+  ${  users[0]  }, sign below
+signature: users[0].signature
 ---
 question: |
-  Users1 petition signature, sign below
-signature: users1_petition_signature
+  ${  users[1]  }, sign below
+signature: users[1].signature
 ---
-# set users.there_is_another to False to prevent triggering possibility of adding more than 2 users. 
+question: |
+  ${  attorneys[0]  }, sign below
+signature: users[0].signature
+---
+question: |
+  ${  attorneys[1]  }, sign below
+signature: users[1].signature
+---
 code: |
   users.there_is_another = False
 ---
-# prevent asking for adding additional children since asking for number directly
+depends on:
+  - children_of_marriage
 code: |
- if defined('children_of_marriage'):
-    children.there_is_another = False
+  children.there_are_any = children_of_marriage == True
 ---
+depends on: children_of_marriage_number
 code: |
-  if children_of_marriage: children.there_are_any = True
----
-code: |
-  request_separation_agreement_approval = DAEmpty()
+  children.target_number = children_of_marriage_number
 ---
 code: |
   docket_number = DAEmpty()
 ---
 code: |
-  attorneys1_bbo_number = DAEmpty()
+  request_divorce_nofault = True
+  request_separation_agreement_approval = True
+  set_default_petition_values = True
 ---
-code: |
-  attorneys2_bbo_number = DAEmpty()
+#code: |
+#  if  users[0].has_attorney:
+#    users1_petition_signer_name_full = attorneys[0]
+#    users1_petition_signer_address_address = attorneys[0].address.address
+#    users1_petition_signer_address_city = attorneys[0].address.city
+#    users1_petition_signer_address_state = attorneys[0].address.state
+#    users1_petition_signer_address_zip = attorneys[0].address.zip
+#    users1_petition_signer_phone_number = attorneys[0].phone_number
+#  else:
+#    users1_petition_signer_name_full = users[0]
+#    users1_petition_signer_address_address = users[0].address.address
+#    users1_petition_signer_address_city = users[0].address.city
+#    users1_petition_signer_address_state = users[0].address.state
+#    users1_petition_signer_address_zip = users[0].address.zip
+#    users1_petition_signer_phone_number = attorneys[0].phone_number
+#  set_petition_signatory_party_a = True
 ---
-code: |
-  marital_home_address_on_one_line = DAEmpty()
----
-code: |
-  children1_name_full_plus_birthdate = DAEmpty()
----
-code: |
-  children2_name_full_plus_birthdate = DAEmpty()
----
-code: |
-  children3_name_full_plus_birthdate = DAEmpty()
----
-code: |
-  children4_name_full_plus_birthdate = DAEmpty()
----
-code: |
-  request_divorce_nofault = DAEmpty()
----
-code: |
-  request_separation_agreement_approval = DAEmpty()
----
-code: |
-  users1_petition_signer_name_full = DAEmpty()
----
-code: |
-  users2_petition_signer_name_full = DAEmpty()
----
-code: |
-  users1_petition_signer_address_address = DAEmpty()
----
-code: |
-  users2_petition_signer_address_address = DAEmpty()
----
-code: |
-  users1_petition_signer_address_city = DAEmpty()
----
-code: |
-  users1_petition_signer_address_state = DAEmpty()
----
-code: |
-  users1_petition_signer_address_zip = DAEmpty()
----
-code: |
-  users2_petition_signer_address_city = DAEmpty()
----
-code: |
-  users2_petition_signer_address_state = DAEmpty()
----
-code: |
-  users2_petition_signer_address_zip = DAEmpty()
----
-code: |
-  users1_petition_signer_phone_number = DAEmpty()
----
-code: |
-  users2_petition_signer_phone_number = DAEmpty()
+#code: |
+#  if  users[1].has_attorney:
+#    users2_petition_signer_name_full = attorneys[1]
+#    users2_petition_signer_address_address = attorneys[1].address.address
+#    users2_petition_signer_address_city = attorneys[1].address.city
+#    users2_petition_signer_address_state = attorneys[1].address.state
+#    users2_petition_signer_address_zip = attorneys[1].address.zip
+#    users2_petition_signer_phone_number = attorneys[1].phone_number
+#  else:
+#    users2_petition_signer_name_full = users[1]
+#    users2_petition_signer_address_address = users[1].address.address
+#    users2_petition_signer_address_city: users[1].address.city
+#    users2_petition_signer_address_state = users[1].address.state
+#    users2_petition_signer_address_zip = users[1].address.zip
+#    users2_petition_signer_phone_number = attorneys[1].phone_number
+#  set_petition_signatory_party_b = True
 ---
 code: |
   # This is a placeholder for the addresses that will be searched
@@ -1091,11 +1095,12 @@ progress: 100
 objects:
   - divorcejointpetition_Post_interview_instructions: ALDocument.using(title="Instructions", filename="divorcejointpetition_next_steps.docx", enabled=True, has_addendum=False)
   - divorcejointpetition_attachment: ALDocument.using(title="Joint1ADivorce", filename="divorcejointpetition", enabled=True, has_addendum=True, default_overflow_message=AL_DEFAULT_OVERFLOW_MESSAGE)
+  - affidavit_attachment: ALDocument.using(title="Affidavit", filename="affidavit", enabled=True, has_addendum=False, )
 ---
 # Bundles group the ALDocuments into separate downloads, such as for court and for the user
 objects:
-  - al_user_bundle: ALDocumentBundle.using(elements=[divorcejointpetition_Post_interview_instructions, divorcejointpetition_attachment], filename="divorcejointpetition", title="All forms to download for your records", enabled=True)
-  - al_court_bundle: ALDocumentBundle.using(elements=[divorcejointpetition_attachment],  filename="divorcejointpetition", title="All forms to deliver to court", enabled=True)
+  - al_user_bundle: ALDocumentBundle.using(elements=[divorcejointpetition_Post_interview_instructions, divorcejointpetition_attachment, affidavit_attachment], filename="divorcejointpetition", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[divorcejointpetition_attachment, affidavit_attachment],  filename="divorcejointpetition", title="All forms to deliver to court", enabled=True)
 ---
 # Each attachment defines a key in an ALDocument. We use `i` as the placeholder here so the same template is 
 # used for "preview" and "final" keys, and logic in the template checks the value of 
@@ -1127,8 +1132,8 @@ attachment:
       - "users2_address_city": ${ users[1].address.city }
       - "users2_address_state": ${ users[1].address.state }
       - "users2_address_zip": ${ users[1].address.zip }
-      - "marriage_location": ${ marriage_location }
-      - "marital_home_address_on_one_line": ${ marital_home_address_on_one_line }
+      - "marriage_location": ${  marriage_location  }
+      - "marital_home_address_on_one_line": ${ marital_home.on_one_line() }
       - "marriage_date": ${ marriage_date.format() }
       - "last_living_together_date": ${ last_living_together_date.format() }
       - "children1_name_full_plus_birthdate": ${f"{ children[0].name_full() } {children[0].birthdate.format()}"}
@@ -1153,23 +1158,48 @@ attachment:
       # It's a signature: test which file version this is; leave empty unless it's the final version)
       - "users1_petition_signature": ${ users[0].signature if i == "final" else '' }
       - "users1_petition_signer_name_full": ${ users[0] }
-      - "users2_petition_signer_name_full": ${ users2_petition_signer_name_full }
-      - "users1_petition_signer_address_address": ${ users1_petition_signer_address_address }
-      - "users2_petition_signer_address_address": ${ users2_petition_signer_address_address }
-      - "users1_petition_signer_address_city": ${ users1_petition_signer_address_city }
-      - "users1_petition_signer_address_state": ${ users1_petition_signer_address_state }
-      - "users1_petition_signer_address_zip": ${ users1_petition_signer_address_zip }
-      - "users2_petition_signer_address_city": ${ users2_petition_signer_address_city }
-      - "users2_petition_signer_address_state": ${ users2_petition_signer_address_state }
-      - "users2_petition_signer_address_zip": ${ users2_petition_signer_address_zip }
-      - "users1_petition_signer_phone_number": ${ users1_petition_signer_phone_number }
-      - "users2_petition_signer_phone_number": ${ users2_petition_signer_phone_number }
-      - "attorneys1_bbo_number": ${ attorneys1_bbo_number }
-      - "attorneys2_bbo_number": ${ attorneys2_bbo_number }
+      - "users2_petition_signer_name_full": ${ users[1] }
+      - "users1_petition_signer_address_address": ${ users[0].address.address }
+      - "users2_petition_signer_address_address": ${ users[1].address.address }
+      - "users1_petition_signer_address_city": ${ users[0].address.city }
+      - "users1_petition_signer_address_state": ${ users[0].address.state }
+      - "users1_petition_signer_address_zip": ${ users[0].address.zip }
+      - "users2_petition_signer_address_city": ${ users[1].address.city }
+      - "users2_petition_signer_address_state": ${ users[1].address.state }
+      - "users2_petition_signer_address_zip": ${ users[1].address.zip }
+      - "users1_petition_signer_phone_number": ${ users[0].phone_number }
+      - "users2_petition_signer_phone_number": ${ users[1].phone_number }
+      - "attorneys1_bbo_number": ${ attorneys[0].bbo_number }
+      - "attorneys2_bbo_number": ${ attorneys[1].bbo_number }
+---
+attachment:
+  name: affidavit
+  filename: affidavit
+  variable name: affidavit_attachment[i]
+  skip undefined: True
+  pdf template file: affidirretrievablebreakdown.pdf
+  fields:
+      - "trial_court_county": ${ trial_court.address.county }
+      - "docket_number": ${ docket_number }
+      - "users1_name_full": ${ users[0] }
+      - "users2_name_full": ${ users[1] }
+      - "marriage_breakdown_date": ${ marriage_breakdown_date }
+      - "marriage_breakdown_justification": ${ marriage_breakdown_justification }
+      - "signature_date": ${ signature_date }
+      - "users1_signature": ${ users[0].signature_if_final(i) }
+      - "users2_signature": ${ users[1].signature_if_final(i) }
+      - "users1_name_full_1": ${ users[0] }
+      - "users2_name_full_1": ${ users[1] }
+      - "users1_address_address": ${ users[0].address.address }
+      - "users2_address_address": ${ users[1].address.address }
+      - "users1_address_city": ${ users[0].address.city }
+      - "users1_address_state": ${ users[0].address.state }
+      - "users1_address_zip": ${ users[0].address.zip }
+      - "users2_address_city": ${ users[1].address.city }
+      - "users2_address_state": ${ users[1].address.state }
+      - "users2_address_zip": ${ users[1].address.zip }
 ---
 code: |
   divorcejointpetition_attachment.overflow_fields["previous_action_detail"].overflow_trigger = 252
   divorcejointpetition_attachment.overflow_fields["previous_action_detail"].label = "List details for all previous actions"
   divorcejointpetition_attachment.overflow_fields.gathered = True
-
-
