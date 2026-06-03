@@ -1,5 +1,5 @@
 include README.md
-graft docassemble/MATC1AJointPetition/data
+graft docassemble/MATC1ADivorceJointPetition/data
 recursive-exclude * *.egg-info
 recursive-exclude .git *
 recursive-exclude venv *

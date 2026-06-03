@@ -95,7 +95,7 @@ code: |
   AL_DEFAULT_STATE = "MA"
 ---
 code: |
-  github_repo_name =  'docassemble-MATC1AJointPetition'
+  github_repo_name =  'docassemble-MATC1ADivorceJointPetition'
 ---
 code: |
   al_form_type = "starts_case" 
