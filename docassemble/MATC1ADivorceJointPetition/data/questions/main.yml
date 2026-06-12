@@ -3,6 +3,7 @@ include:
   - docassemble.AssemblyLine:assembly_line.yml
   - docassemble.ALMassachusetts:al_massachusetts.yml
   - docassemble.MassAccess:massaccess.yml
+  - ma1a_portable_schema.yml
   #- 209A_affidavit_disclosing_care_or_custody_proceedings.yml
   #- Financial statement interview
   #- Separation agreement interview
@@ -101,6 +102,7 @@ code: |
   al_form_type = "starts_case" 
 ---
 objects:
+  - petitioners: ALPeopleList.using(ask_number=False, target_number=2)
   - users: ALPeopleList.using(ask_number=False, target_number=2)
   - children: ALPeopleList.using(ask_number=False)
   - attorneys: ALPeopleList.using(ask_number=False)
@@ -126,6 +128,7 @@ code: |
   allowed_courts = ['Probate and Family Court']
   user_role = "plaintiff"
   user_ask_role = "plaintiff"
+  ma1a_apply_portable_schema
   
   nav.set_section("divorce_eligibility")
   legal_marriage
@@ -206,6 +209,7 @@ code: |
   nav.set_section("review_and_sign")
 
   set_default_petition_values
+  ma1a_export_portable_schema
   
   interview_order_divorcejointpetition = True
 ---
