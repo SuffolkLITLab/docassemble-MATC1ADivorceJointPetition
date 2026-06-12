@@ -1,0 +1,167 @@
+---
+comment: |
+  Adapter between the package-level MA 1A / Portable schema and this
+  interview's existing local variables.
+
+  The canonical party objects for the shared 1A package are:
+    - petitioners[0]
+    - petitioners[1]
+
+  This interview already uses users[0] and users[1] internally. Keep that
+  stable for the interview and PDF mappings, while accepting and exporting
+  the canonical petitioner objects at the package boundary.
+---
+code: |
+  # Import package-level aliases when Portable or a parent interview pre-fills
+  # canonical values.
+  if defined("petitioners[0].name.first") and not defined("users[0].name.first"):
+    users[0].name.first = petitioners[0].name.first
+  if defined("petitioners[0].name.middle") and not defined("users[0].name.middle"):
+    users[0].name.middle = petitioners[0].name.middle
+  if defined("petitioners[0].name.last") and not defined("users[0].name.last"):
+    users[0].name.last = petitioners[0].name.last
+  if defined("petitioners[0].name.suffix") and not defined("users[0].name.suffix"):
+    users[0].name.suffix = petitioners[0].name.suffix
+  if defined("petitioners[0].address.address") and not defined("users[0].address.address"):
+    users[0].address.address = petitioners[0].address.address
+  if defined("petitioners[0].address.unit") and not defined("users[0].address.unit"):
+    users[0].address.unit = petitioners[0].address.unit
+  if defined("petitioners[0].address.city") and not defined("users[0].address.city"):
+    users[0].address.city = petitioners[0].address.city
+  if defined("petitioners[0].address.state") and not defined("users[0].address.state"):
+    users[0].address.state = petitioners[0].address.state
+  if defined("petitioners[0].address.zip") and not defined("users[0].address.zip"):
+    users[0].address.zip = petitioners[0].address.zip
+  if defined("petitioners[0].address.county") and not defined("users[0].address.county"):
+    users[0].address.county = petitioners[0].address.county
+  if defined("petitioners[0].phone_number") and not defined("users[0].phone_number"):
+    users[0].phone_number = petitioners[0].phone_number
+  if defined("petitioners[0].email") and not defined("users[0].email"):
+    users[0].email = petitioners[0].email
+  if defined("petitioners[0].birthdate") and not defined("users[0].birthdate"):
+    users[0].birthdate = petitioners[0].birthdate
+  if defined("petitioners[0].ssn") and not defined("users[0].ssn"):
+    users[0].ssn = petitioners[0].ssn
+  if defined("petitioners[0].name_change") and not defined("users[0].name_change"):
+    users[0].name_change = petitioners[0].name_change
+  if defined("petitioners[0].former_name_last") and not defined("users[0].former_name_last"):
+    users[0].former_name_last = petitioners[0].former_name_last
+  if defined("petitioners[0].has_attorney") and not defined("users[0].has_attorney"):
+    users[0].has_attorney = petitioners[0].has_attorney
+
+  if defined("petitioners[1].name.first") and not defined("users[1].name.first"):
+    users[1].name.first = petitioners[1].name.first
+  if defined("petitioners[1].name.middle") and not defined("users[1].name.middle"):
+    users[1].name.middle = petitioners[1].name.middle
+  if defined("petitioners[1].name.last") and not defined("users[1].name.last"):
+    users[1].name.last = petitioners[1].name.last
+  if defined("petitioners[1].name.suffix") and not defined("users[1].name.suffix"):
+    users[1].name.suffix = petitioners[1].name.suffix
+  if defined("petitioners[1].address.address") and not defined("users[1].address.address"):
+    users[1].address.address = petitioners[1].address.address
+  if defined("petitioners[1].address.unit") and not defined("users[1].address.unit"):
+    users[1].address.unit = petitioners[1].address.unit
+  if defined("petitioners[1].address.city") and not defined("users[1].address.city"):
+    users[1].address.city = petitioners[1].address.city
+  if defined("petitioners[1].address.state") and not defined("users[1].address.state"):
+    users[1].address.state = petitioners[1].address.state
+  if defined("petitioners[1].address.zip") and not defined("users[1].address.zip"):
+    users[1].address.zip = petitioners[1].address.zip
+  if defined("petitioners[1].address.county") and not defined("users[1].address.county"):
+    users[1].address.county = petitioners[1].address.county
+  if defined("petitioners[1].phone_number") and not defined("users[1].phone_number"):
+    users[1].phone_number = petitioners[1].phone_number
+  if defined("petitioners[1].email") and not defined("users[1].email"):
+    users[1].email = petitioners[1].email
+  if defined("petitioners[1].birthdate") and not defined("users[1].birthdate"):
+    users[1].birthdate = petitioners[1].birthdate
+  if defined("petitioners[1].ssn") and not defined("users[1].ssn"):
+    users[1].ssn = petitioners[1].ssn
+  if defined("petitioners[1].name_change") and not defined("users[1].name_change"):
+    users[1].name_change = petitioners[1].name_change
+  if defined("petitioners[1].former_name_last") and not defined("users[1].former_name_last"):
+    users[1].former_name_last = petitioners[1].former_name_last
+  if defined("petitioners[1].has_attorney") and not defined("users[1].has_attorney"):
+    users[1].has_attorney = petitioners[1].has_attorney
+
+  if defined("has_children_of_marriage") and not defined("children_of_marriage"):
+    children_of_marriage = has_children_of_marriage
+
+  ma1a_apply_portable_schema = True
+---
+code: |
+  # Export the local interview values back to canonical package names.
+  if defined("users[0].name.first") and not defined("petitioners[0].name.first"):
+    petitioners[0].name.first = users[0].name.first
+  if defined("users[0].name.middle") and not defined("petitioners[0].name.middle"):
+    petitioners[0].name.middle = users[0].name.middle
+  if defined("users[0].name.last") and not defined("petitioners[0].name.last"):
+    petitioners[0].name.last = users[0].name.last
+  if defined("users[0].name.suffix") and not defined("petitioners[0].name.suffix"):
+    petitioners[0].name.suffix = users[0].name.suffix
+  if defined("users[0].address.address") and not defined("petitioners[0].address.address"):
+    petitioners[0].address.address = users[0].address.address
+  if defined("users[0].address.unit") and not defined("petitioners[0].address.unit"):
+    petitioners[0].address.unit = users[0].address.unit
+  if defined("users[0].address.city") and not defined("petitioners[0].address.city"):
+    petitioners[0].address.city = users[0].address.city
+  if defined("users[0].address.state") and not defined("petitioners[0].address.state"):
+    petitioners[0].address.state = users[0].address.state
+  if defined("users[0].address.zip") and not defined("petitioners[0].address.zip"):
+    petitioners[0].address.zip = users[0].address.zip
+  if defined("users[0].address.county") and not defined("petitioners[0].address.county"):
+    petitioners[0].address.county = users[0].address.county
+  if defined("users[0].phone_number") and not defined("petitioners[0].phone_number"):
+    petitioners[0].phone_number = users[0].phone_number
+  if defined("users[0].email") and not defined("petitioners[0].email"):
+    petitioners[0].email = users[0].email
+  if defined("users[0].birthdate") and not defined("petitioners[0].birthdate"):
+    petitioners[0].birthdate = users[0].birthdate
+  if defined("users[0].ssn") and not defined("petitioners[0].ssn"):
+    petitioners[0].ssn = users[0].ssn
+  if defined("users[0].name_change") and not defined("petitioners[0].name_change"):
+    petitioners[0].name_change = users[0].name_change
+  if defined("users[0].former_name_last") and not defined("petitioners[0].former_name_last"):
+    petitioners[0].former_name_last = users[0].former_name_last
+  if defined("users[0].has_attorney") and not defined("petitioners[0].has_attorney"):
+    petitioners[0].has_attorney = users[0].has_attorney
+
+  if defined("users[1].name.first") and not defined("petitioners[1].name.first"):
+    petitioners[1].name.first = users[1].name.first
+  if defined("users[1].name.middle") and not defined("petitioners[1].name.middle"):
+    petitioners[1].name.middle = users[1].name.middle
+  if defined("users[1].name.last") and not defined("petitioners[1].name.last"):
+    petitioners[1].name.last = users[1].name.last
+  if defined("users[1].name.suffix") and not defined("petitioners[1].name.suffix"):
+    petitioners[1].name.suffix = users[1].name.suffix
+  if defined("users[1].address.address") and not defined("petitioners[1].address.address"):
+    petitioners[1].address.address = users[1].address.address
+  if defined("users[1].address.unit") and not defined("petitioners[1].address.unit"):
+    petitioners[1].address.unit = users[1].address.unit
+  if defined("users[1].address.city") and not defined("petitioners[1].address.city"):
+    petitioners[1].address.city = users[1].address.city
+  if defined("users[1].address.state") and not defined("petitioners[1].address.state"):
+    petitioners[1].address.state = users[1].address.state
+  if defined("users[1].address.zip") and not defined("petitioners[1].address.zip"):
+    petitioners[1].address.zip = users[1].address.zip
+  if defined("users[1].address.county") and not defined("petitioners[1].address.county"):
+    petitioners[1].address.county = users[1].address.county
+  if defined("users[1].phone_number") and not defined("petitioners[1].phone_number"):
+    petitioners[1].phone_number = users[1].phone_number
+  if defined("users[1].email") and not defined("petitioners[1].email"):
+    petitioners[1].email = users[1].email
+  if defined("users[1].birthdate") and not defined("petitioners[1].birthdate"):
+    petitioners[1].birthdate = users[1].birthdate
+  if defined("users[1].ssn") and not defined("petitioners[1].ssn"):
+    petitioners[1].ssn = users[1].ssn
+  if defined("users[1].name_change") and not defined("petitioners[1].name_change"):
+    petitioners[1].name_change = users[1].name_change
+  if defined("users[1].former_name_last") and not defined("petitioners[1].former_name_last"):
+    petitioners[1].former_name_last = users[1].former_name_last
+  if defined("users[1].has_attorney") and not defined("petitioners[1].has_attorney"):
+    petitioners[1].has_attorney = users[1].has_attorney
+
+  if defined("children_of_marriage") and not defined("has_children_of_marriage"):
+    has_children_of_marriage = children_of_marriage
+
+  ma1a_export_portable_schema = True
