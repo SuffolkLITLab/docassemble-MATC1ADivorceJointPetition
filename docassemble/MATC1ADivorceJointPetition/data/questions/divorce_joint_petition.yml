@@ -308,25 +308,6 @@ buttons:
 under: |
       [**Which type of divorce should I file?**](https://www.mass.gov/decision-tree/which-type-of-divorce-should-i-file)
 ---
-id: Cautionary message jurisdiction
-question: |
-  Eligibility for Divorce in Massachusetts
-subquestion: |
-  You can file for divorce in Massachusetts if:
-  
-  * You've lived in the state for 1 year, or;
-  * The reason the marriage ended happened in Massachusetts and you've lived in the state as a couple
-  
-  If you remain unsure whether you are eligible for divorce in Massachusetts, you may wish to speak to an attorney licensed to practice in Massachusetts to discuss your options. 
-
-sets: cautionary_message_jurisdiction
-buttons: 
-  - Keep going: 
-      code: |
-        cautionary_message_jurisdiction = True
-  - Restart: restart
-  - Exit: exit
----
 id: Agreement on major issues
 question: | 
   Agreement on major issues
@@ -759,18 +740,22 @@ code: |
 #   users2_petition_signature = users[1].signature
 #  set_petition_signatures = True
 ---
+id: sign party A
 question: |
   ${  users[0]  }, sign below
 signature: users[0].signature
 ---
+id: sign party B
 question: |
   ${  users[1]  }, sign below
 signature: users[1].signature
 ---
+id: sign attorney A
 question: |
   ${  attorneys[0]  }, sign below
 signature: users[0].signature
 ---
+id: sign attorney B
 question: |
   ${  attorneys[1]  }, sign below
 signature: users[1].signature
