@@ -975,11 +975,6 @@ objects:
   - divorcejointpetition_attachment: ALDocument.using(title="Joint1ADivorce", filename="divorcejointpetition", has_addendum=True, default_overflow_message=AL_DEFAULT_OVERFLOW_MESSAGE)
   - affidavit_attachment: ALDocument.using(title="Affidavit", filename="affidavit", has_addendum=False, )
 ---
-code: |
-  divorcejointpetition_Post_interview_instructions.enabled = True
-  divorcejointpetition_attachment.enabled = True
-  affidavit_attachment.enabled = True
----
 # Each attachment defines a key in an ALDocument. We use `i` as the placeholder here so the same template is 
 # used for "preview" and "final" keys, and logic in the template checks the value of 
 # `i` to show or hide the user's signature

@@ -1,0 +1,258 @@
+---
+include:
+  - divorce_joint_petition.yml
+  - docassemble.MATCFinancialStatement:financial_statement.yml
+  - docassemble.MATCSeparationAgreement:separation_agreement.yml
+---
+code: |
+  github_repo_name =  'docassemble-MATC1ADivorceJointPetition'
+---
+code: |
+  al_form_type = "starts_case" 
+---
+objects:
+  - other_parties: ALPeopleList.using(ask_number=False, target_number=1)
+---
+code: |
+  divorcejointpetition_Post_interview_instructions.enabled = True
+  divorcejointpetition_attachment.enabled = True
+  affidavit_attachment.enabled = True
+
+  if include_financial_statement:
+    fs_short.enabled = financial_form_type == "short"
+    fs_long.enabled = financial_form_type == "long"
+    fs_schedule_a.enabled = defined("has_self_employment_income") and has_self_employment_income
+    fs_schedule_b.enabled = defined("has_rental_income") and has_rental_income
+  else:
+    fs_short.enabled = False
+    fs_long.enabled = False
+    fs_schedule_a.enabled = False
+    fs_schedule_b.enabled = False
+
+  a_divorce_agreement_Post_interview_instructions.enabled = include_separation_agreement
+  a_divorce_agreement_attachment.enabled = include_separation_agreement
+---
+# Bundles group the ALDocuments into separate downloads, such as for court and for the user
+objects:
+  - al_user_bundle: ALDocumentBundle.using(elements=[divorcejointpetition_Post_interview_instructions, divorcejointpetition_attachment, affidavit_attachment, fs_short, fs_long, fs_schedule_a, fs_schedule_b, a_divorce_agreement_Post_interview_instructions, a_divorce_agreement_attachment], filename="joint_petition_divorce_packet", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[divorcejointpetition_attachment, affidavit_attachment, fs_short, fs_long, fs_schedule_a, fs_schedule_b, a_divorce_agreement_attachment], filename="joint_petition_divorce_packet", title="All forms to deliver to court", enabled=True)
+---
+metadata:
+  title: >-
+    Joint1ADivorce
+  short title: >-
+    Joint1ADivorce
+  description: |-
+    This interview helps married people in Massachusetts jointly ask the court for a no-fault divorce.
+  can_I_use_this_form: |
+    If you are a married person in Massachusetts, you can use this interview (with your spouse) to jointly ask the court for a no-fault divorce.
+  before_you_start: |
+    This interview will help you jointly ask the court for a no-fault divorce.
+    
+    Before you get started, please gather:
+    
+    1. Certified Copy of Marriage Certificate
+    2. Notarized Separation Agreement (if already prepared) 
+    3. Names, birthdays, and addresses for both parties and all minor children of the marriage
+    4. Monthly budget or finance tracking information
+    5. Recent pay stubs 
+    
+    When you are finished, you will need to:
+    
+    1. File Notarized Separation Agreement (unless complete) 
+    2. File Certified Copy of Marriage Certificate (unless complete) 
+    3. File financial statements for each petitioner
+    4. If child support is being addressed or waived:
+      a. child support guidelines worksheet (CJD 304)
+      b. findings and determinations for child support and post-secondary education (CJD 305)
+  when_you_are_finished: |
+    File any remaining paperwork with the court registry and you will receive a notice with next steps from the court in the mail. You can also check the status of your case at [masscourts.org](https://www.masscourts.org)
+  efiling_enabled: False
+  integrated_efiling: False
+  integrated_email_filing: False
+  requires_notarization: False
+  unlisted: False
+  landing_page_url: >-
+    https://www.mass.gov/guides/get-a-no-fault-1a-divorce
+  maturity: production
+  estimated_completion_minutes: 30
+  estimated_completion_delta: 5
+  LIST_topics:
+    - "FA-00-00-00-00"
+    - "FA-06-00-00-00"
+  tags:
+    - "FA-00-00-00-00"
+    - "FA-06-00-00-00"
+  # Keep legacy tags behavior for compatibility with downstream tools.
+  authors:
+    - KP Hunsinger
+  original_form:
+    - https://www.mass.gov/info-details/probate-and-family-court-joint-petition-for-divorce-pursuant-to-gl-c208-ss-1a-cjd-101a
+  original_form_published_on: ""
+  help_page_url: >-
+    https://www.mass.gov/guides/get-a-no-fault-1a-divorce
+  help_page_title: >-
+    Get a no-fault 1A divorce - Mass.gov
+  allowed_courts: 
+    - "Probate and Family Court"
+  typical_role: "plaintiff"
+  al_weaver_version: "2.1.0"
+  generated_on: "2026-04-20"
+  languages:
+    - en
+  jurisdiction: "NAM-US-US+MA"
+  review_date: 2026-04-20
+  form_titles:
+    - Joint Petiton for Divorce 1A
+    - Affidavit of Irretrievable Breakdown
+    - Report of Absolute Divorce or Annulment
+  form_numbers:
+    - CJ-D 101A
+    - Affid. Irretrievable Breakdown
+    - R408
+  fees:
+    - Divorce Filing fee: $200.00
+    - Divorce Surcharge: $15.00
+  update_notes: |
+    Divorce Joint Petition v2.0 - Joint petition (initial filings) interview file for spring 2026 handoff
+---
+sections:
+  - packet_options: Forms to include
+  - divorce_eligibility: Eligibility
+  - separation_agreement: Separation agreement
+  - relationship_background: Relationship background
+  - court_requests: Divorce action details 
+  - party_information: Party information
+  - children_information: Children
+  - additional_circumstances_and_filings: Special circumstances and additional filings
+  - financial_statement: Financial statement
+  - introduction: Financial statement introduction
+  - eligibility: Financial statement eligibility
+  - court_and_parties: Financial statement court and parties
+  - personal_information: Financial statement personal information
+  - cadence: Financial statement cadence
+  - income: Financial statement income
+  - deductions: Financial statement deductions
+  - expenses: Financial statement expenses
+  - assets: Financial statement assets
+  - liabilities: Financial statement liabilities
+  - review: Financial statement review
+  - download: Financial statement download
+  - parties: Agreement parties
+  - children_overview: Agreement children
+  - child_info: Agreement child information
+  - child_custody: Agreement custody
+  - parenting_time: Agreement parenting time
+  - adult_health_insurance: Agreement health insurance
+  - child_health_insurance: Agreement children's health insurance
+  - education: Agreement education costs
+  - taxes: Agreement taxes
+  - child_tax: Agreement child tax claim
+  - life_insurance: Agreement life insurance
+  - alimony: Agreement alimony
+  - real_estate: Agreement real estate
+  - personal_property: Agreement personal property
+  - debts: Agreement debts and liabilities
+  - retirement: Agreement retirement
+  - merger: Agreement merger / survival
+  - court_info: Agreement court and signatures
+  - review_a_divorce_agreement: Agreement review
+  - review_and_sign: Review and sign
+---
+code: |
+  enable_al_nav_sections = True
+  al_nav_sections = [
+    {"packet_options": "Forms to include"},
+    {"divorce_eligibility": "Eligibility"},
+    {"separation_agreement": "Separation agreement"},
+    {"relationship_background": "Relationship background"},
+    {"court_requests": "Divorce action details"},
+    {"party_information": "Party information"},
+    {"children_information": "Children"},
+    {"additional_circumstances_and_filings": "Special circumstances and additional filings"},
+    {"financial_statement": "Financial statement"},
+    {"introduction": "Financial statement introduction"},
+    {"eligibility": "Financial statement eligibility"},
+    {"court_and_parties": "Financial statement court and parties"},
+    {"personal_information": "Financial statement personal information"},
+    {"cadence": "Financial statement cadence"},
+    {"income": "Financial statement income"},
+    {"deductions": "Financial statement deductions"},
+    {"expenses": "Financial statement expenses"},
+    {"assets": "Financial statement assets"},
+    {"liabilities": "Financial statement liabilities"},
+    {"review": "Financial statement review"},
+    {"download": "Financial statement download"},
+    {"parties": "Agreement parties"},
+    {"children_overview": "Agreement children"},
+    {"child_info": "Agreement child information"},
+    {"child_custody": "Agreement custody"},
+    {"parenting_time": "Agreement parenting time"},
+    {"adult_health_insurance": "Agreement health insurance"},
+    {"child_health_insurance": "Agreement children's health insurance"},
+    {"education": "Agreement education costs"},
+    {"taxes": "Agreement taxes"},
+    {"child_tax": "Agreement child tax claim"},
+    {"life_insurance": "Agreement life insurance"},
+    {"alimony": "Agreement alimony"},
+    {"real_estate": "Agreement real estate"},
+    {"personal_property": "Agreement personal property"},
+    {"debts": "Agreement debts and liabilities"},
+    {"retirement": "Agreement retirement"},
+    {"merger": "Agreement merger / survival"},
+    {"court_info": "Agreement court and signatures"},
+    {"review_a_divorce_agreement": "Agreement review"},
+    {"review_and_sign": "Review and sign"},
+  ]
+---
+id: choose forms to include
+question: |
+  Which forms do you want to prepare now?
+fields:
+  - Prepare a financial statement: include_financial_statement
+    datatype: yesnoradio
+  - Prepare a separation agreement: include_separation_agreement
+    datatype: yesnoradio
+---
+id: joint petition interview order
+code: |
+  nav.set_section("packet_options")
+  include_financial_statement
+  include_separation_agreement
+
+  interview_order_divorcejointpetition
+
+  if include_financial_statement:
+    nav.set_section("financial_statement")
+    interview_order_financial_statement
+
+  if include_separation_agreement:
+    interview_order_a_divorce_agreement
+
+  joint_petition_interview_order = True
+---
+###################### Main order ######################
+comment: |
+  This block includes the logic for the standalone joint petition packet interview.
+mandatory: True
+code: |
+  al_intro_screen
+  divorcejointpetition_intro
+  joint_petition_interview_order
+  signature_date
+  # Store anonymous data for analytics / statistics
+  store_variables_snapshot(
+      persistent=True,
+      data={
+          "zip": showifdef("users[0].address.zip"),
+          "reached_interview_end": True,
+      },
+  )
+  divorcejointpetition_preview_question
+  basic_questions_signature_flow
+  users1_signature
+  users2_signature
+  users2_petition_signature
+  users1_petition_signature
+
+  divorcejointpetition_download
