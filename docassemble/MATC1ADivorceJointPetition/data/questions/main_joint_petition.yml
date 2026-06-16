@@ -15,31 +15,48 @@ code: |
   users[1].party_label = "Party B"
   users[0].separation_agreement_role = "party_a"
   users[1].separation_agreement_role = "party_b"
-  users[0].financial_statement_role = "filer"
-  users[1].financial_statement_role = "other_spouse"
 
   divorcejointpetition_Post_interview_instructions.enabled = True
   divorcejointpetition_attachment.enabled = True
   affidavit_attachment.enabled = True
 
-  if include_financial_statement:
-    fs_short.enabled = financial_form_type == "short"
-    fs_long.enabled = financial_form_type == "long"
-    fs_schedule_a.enabled = defined("has_self_employment_income") and has_self_employment_income
-    fs_schedule_b.enabled = defined("has_rental_income") and has_rental_income
-  else:
-    fs_short.enabled = False
-    fs_long.enabled = False
-    fs_schedule_a.enabled = False
-    fs_schedule_b.enabled = False
+  for user in users:
+    user.financial_statement_short_attachment.enabled = (
+      include_financial_statement
+      and defined(f"{user.instanceName}.making_statement_for")
+      and user.making_statement_for
+      and defined(f"{user.instanceName}.financial_form_type")
+      and user.financial_form_type == "short"
+    )
+    user.financial_statement_long_attachment.enabled = (
+      include_financial_statement
+      and defined(f"{user.instanceName}.making_statement_for")
+      and user.making_statement_for
+      and defined(f"{user.instanceName}.financial_form_type")
+      and user.financial_form_type == "long"
+    )
+    user.financial_statement_schedule_a_attachment.enabled = (
+      include_financial_statement
+      and defined(f"{user.instanceName}.making_statement_for")
+      and user.making_statement_for
+      and defined(f"{user.instanceName}.has_self_employment_income")
+      and user.has_self_employment_income
+    )
+    user.financial_statement_schedule_b_attachment.enabled = (
+      include_financial_statement
+      and defined(f"{user.instanceName}.making_statement_for")
+      and user.making_statement_for
+      and defined(f"{user.instanceName}.has_rental_income")
+      and user.has_rental_income
+    )
 
   a_divorce_agreement_Post_interview_instructions.enabled = include_separation_agreement
   a_divorce_agreement_attachment.enabled = include_separation_agreement
 ---
 # Bundles group the ALDocuments into separate downloads, such as for court and for the user
 objects:
-  - al_user_bundle: ALDocumentBundle.using(elements=[divorcejointpetition_Post_interview_instructions, divorcejointpetition_attachment, affidavit_attachment, fs_short, fs_long, fs_schedule_a, fs_schedule_b, a_divorce_agreement_Post_interview_instructions, a_divorce_agreement_attachment], filename="joint_petition_divorce_packet", title="All forms to download for your records", enabled=True)
-  - al_court_bundle: ALDocumentBundle.using(elements=[divorcejointpetition_attachment, affidavit_attachment, fs_short, fs_long, fs_schedule_a, fs_schedule_b, a_divorce_agreement_attachment], filename="joint_petition_divorce_packet", title="All forms to deliver to court", enabled=True)
+  - al_user_bundle: ALDocumentBundle.using(elements=[divorcejointpetition_Post_interview_instructions, divorcejointpetition_attachment, affidavit_attachment, users[0].financial_statement_short_attachment, users[0].financial_statement_long_attachment, users[0].financial_statement_schedule_a_attachment, users[0].financial_statement_schedule_b_attachment, users[1].financial_statement_short_attachment, users[1].financial_statement_long_attachment, users[1].financial_statement_schedule_a_attachment, users[1].financial_statement_schedule_b_attachment, a_divorce_agreement_Post_interview_instructions, a_divorce_agreement_attachment], filename="joint_petition_divorce_packet", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[divorcejointpetition_attachment, affidavit_attachment, users[0].financial_statement_short_attachment, users[0].financial_statement_long_attachment, users[0].financial_statement_schedule_a_attachment, users[0].financial_statement_schedule_b_attachment, users[1].financial_statement_short_attachment, users[1].financial_statement_long_attachment, users[1].financial_statement_schedule_a_attachment, users[1].financial_statement_schedule_b_attachment, a_divorce_agreement_attachment], filename="joint_petition_divorce_packet", title="All forms to deliver to court", enabled=True)
 ---
 metadata:
   title: >-
