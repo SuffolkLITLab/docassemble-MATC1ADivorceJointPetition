@@ -10,10 +10,14 @@ code: |
 code: |
   al_form_type = "starts_case" 
 ---
-objects:
-  - other_parties: ALPeopleList.using(ask_number=False, target_number=1)
----
 code: |
+  users[0].party_label = "Party A"
+  users[1].party_label = "Party B"
+  users[0].separation_agreement_role = "party_a"
+  users[1].separation_agreement_role = "party_b"
+  users[0].financial_statement_role = "filer"
+  users[1].financial_statement_role = "other_spouse"
+
   divorcejointpetition_Post_interview_instructions.enabled = True
   divorcejointpetition_attachment.enabled = True
   affidavit_attachment.enabled = True
