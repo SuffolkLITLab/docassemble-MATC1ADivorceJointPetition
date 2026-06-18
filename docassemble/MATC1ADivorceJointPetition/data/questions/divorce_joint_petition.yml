@@ -3,6 +3,7 @@ include:
   - docassemble.AssemblyLine:assembly_line.yml
   - docassemble.ALMassachusetts:al_massachusetts.yml
   - docassemble.MassAccess:massaccess.yml
+  - docassemble.ALAffidavitOfIndigency:affidavit_body.yml
   #- 209A_affidavit_disclosing_care_or_custody_proceedings.yml
   #- Financial statement interview
   #- Separation agreement interview
@@ -343,7 +344,7 @@ subquestion: |
   * Dividing shared property (marital assets)
   * Health insurance 
 
-    There are different ways to reach an agreement. Some negotiate on their own while others hire lawyers. Some use mediators to help settle the issues. 
+  There are different ways to reach an agreement. Some negotiate on their own while others hire lawyers. Some use mediators to help settle the issues.
   
   [Alternative Dispute Resolution](https://www.mass.gov/alternative-dispute-resolution) options may be available. 
   
@@ -351,7 +352,7 @@ fields:
   - "We will work together to come to agreement": parties_will_negotiate
     datatype: yesnoradio
 under: |  
-  You may prepare an agreement later in the interview if the parties are willing to work together to come to agreement. 
+  If both parties are willing to work together, this interview can help you create a separation agreement, upload one you already have, or continue with a plan to file it later.
 ---
 depends on: 
   - separation_agreement_reached
@@ -365,7 +366,7 @@ question: |
 subquestion: |
   You will need to file a {separation agreement}. 
   
-  Your Separation agreement tells the court how you will handle all issues related to your divorce.
+  Your separation agreement tells the court how you will handle all issues related to your divorce.
 
   Both parties must sign the agreement in the presence of a {notary}, who will mark the document to validate your signatures. 
  
@@ -375,15 +376,17 @@ fields:
   - "We have already prepared a detailed written separation agreement that fully captures our agreement on all relevant issues": separation_agreement_documented
     datatype: yesnoradio
 under: |
-      If you do not already have a complete written separation agreement you will be able to create one using this tool.
+  Whether or not you already have a written agreement, you will choose next whether to create one now, upload an existing one, or file one with the court later.
 ---
 id: Separation agreement format
 question: |
   Separation agreement format
 subquestion: |
-  Anyone filing a joint petition for divorce must file a separation agreement within 90 days of initial filing. 
+  Anyone filing a joint petition for divorce must file a separation agreement within 90 days of initial filing.
   
-  The separation agreement must be {notarized} and should completely address all major issues such as property division, child custody, and child support. 
+  You can create a separation agreement in this interview, upload a complete agreement you already have, or file your agreement with the court registry later.
+
+  The separation agreement must be {notarized} before you file it with the court and should completely address all major issues such as property division, child custody, and child support.
   
   You are highly encouraged to submit a complete, notarized agreement with initial filing. 
 fields: 
@@ -391,16 +394,14 @@ fields:
     input type: radio
     choices: 
       - "Create a separation agreement using this interview tool": interview
-        show if: not separation_agreement_documented
       - "Upload my complete, notarized separation agreement on the next screen": upload
-        show if: separation_agreement_documented
       - "File my complete, notarized separation agreement with the court registry later" : wait
-      #- "Use online dispute resolution app": Link action
-      # possible to hide options depending on separation_agreement_documented? (hide intervew and upload accordingly)
 ---
 id: Upload agreement
 question: |
   Upload separation agreement
+subquestion: |
+  Upload a complete, notarized separation agreement that both parties have signed.
 fields:
   - "Upload agreement": separation_agreement_upload
     datatype: file

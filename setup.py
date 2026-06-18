@@ -54,6 +54,8 @@ setup(name='docassemble.MATC1ADivorceJointPetition',
       url='https://docassemble.org',
       packages=find_namespace_packages(),
       install_requires=[
+          'docassemble.ALAffidavitOfIndigency',
+          'docassemble.MATCChildCareOrCustodyDisclosureAffidavit',
           'docassemble.MATCFinancialStatement',
           'docassemble.MATCSeparationAgreement',
       ],

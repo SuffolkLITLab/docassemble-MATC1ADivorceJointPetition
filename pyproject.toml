@@ -13,6 +13,8 @@ authors = [
     { name = "KP Hunsinger", email = "litlab@suffolk.edu" },
 ]
 dependencies = [
+    "docassemble.ALAffidavitOfIndigency",
+    "docassemble.MATCChildCareOrCustodyDisclosureAffidavit",
     "docassemble.MATCFinancialStatement",
     "docassemble.MATCSeparationAgreement",
 ]
