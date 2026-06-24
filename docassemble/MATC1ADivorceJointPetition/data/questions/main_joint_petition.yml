@@ -198,6 +198,12 @@ objects:
   - al_user_bundle: ALDocumentBundle.using(elements=[divorcejointpetition_Post_interview_instructions, divorcejointpetition_attachment, affidavit_attachment, affidavitofindigency_attachment, child_care_or_custody_disclosure_affidavit_next_steps, affidavit_of_care_or_custody_attachment, users[0].financial_statement_short_attachment, users[0].financial_statement_long_attachment, users[0].financial_statement_schedule_a_attachment, users[0].financial_statement_schedule_b_attachment, users[1].financial_statement_short_attachment, users[1].financial_statement_long_attachment, users[1].financial_statement_schedule_a_attachment, users[1].financial_statement_schedule_b_attachment, a_divorce_agreement_Post_interview_instructions, a_divorce_agreement_attachment], filename="joint_petition_divorce_packet", title="All forms to download for your records", enabled=True)
   - al_court_bundle: ALDocumentBundle.using(elements=[divorcejointpetition_attachment, affidavit_attachment, affidavitofindigency_attachment, affidavit_of_care_or_custody_attachment, users[0].financial_statement_short_attachment, users[0].financial_statement_long_attachment, users[0].financial_statement_schedule_a_attachment, users[0].financial_statement_schedule_b_attachment, users[1].financial_statement_short_attachment, users[1].financial_statement_long_attachment, users[1].financial_statement_schedule_a_attachment, users[1].financial_statement_schedule_b_attachment, a_divorce_agreement_attachment], filename="joint_petition_divorce_packet", title="All forms to deliver to court", enabled=True)
 ---
+event: al_user_bundle.save_downloads
+code: |
+  al_user_bundle._downloadable_files = action_argument("download_response")
+  divorcejointpetition_downloads_ready = True
+  background_response()
+---
 code: |
   enable_al_nav_sections = True
 ---
@@ -348,5 +354,11 @@ code: |
   users2_signature
   users2_petition_signature
   users1_petition_signature
+
+  if not defined("divorcejointpetition_downloads_ready"):
+    if al_user_bundle.generate_downloads_with_docx_task.ready():
+      divorcejointpetition_downloads_ready = True
+    else:
+      al_download_waiting_screen
 
   divorcejointpetition_download

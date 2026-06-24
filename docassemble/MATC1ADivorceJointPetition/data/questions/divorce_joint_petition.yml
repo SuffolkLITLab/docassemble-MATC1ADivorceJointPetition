@@ -715,20 +715,15 @@ fields:
 ---
 ####### Question Editing Line ######
 ---
-id: preview divorce joint petition
+id: review before signing divorce joint petition
 question: |
-  Preview your form before you sign it
+  Review your answers before you sign
 subquestion: |
-  Here is a preview of the form you will sign on the next page.   
-  
-  ${ al_court_bundle.as_pdf(key='preview') }
-
-  Click the image to open it in a new tab. Click the "Edit answers" button
-  to edit your answers.
+  Click the "Edit answers" button to fix any mistakes before you sign.
 
   ${ action_button_html(url_action('review_divorcejointpetition'), label='Edit answers', color='info') }
   
-  Remember to come back to this window to continue and sign your form.
+  When your answers are correct, continue to sign your forms.
 continue button field: divorcejointpetition_preview_question    
 ---
 code: |
@@ -943,12 +938,9 @@ question: |
 subquestion: |
   Thank you ${users}. Your form is ready to download and deliver.
   
-  View, download and send your form below. Click the "Edit answers" button to fix any mistakes.
-
-  ${ action_button_html(url_action('review_divorcejointpetition'), label='Edit answers', color='info') }
+  View, download and send your form below.
   
-  
-  ${ al_user_bundle.download_list_html() }
+  ${ al_user_bundle.download_list_html(use_previously_cached_files=True, include_full_pdf=True) }
   
 
   ${ al_user_bundle.send_button_html(show_editable_checkbox=False) }
