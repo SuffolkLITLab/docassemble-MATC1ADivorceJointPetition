@@ -86,6 +86,10 @@ metadata:
   update_notes: |
     Divorce Joint Petition v2.0 - Joint petition (initial filings) interview file for spring 2026 handoff
 ---
+template: interview_short_title
+content: |
+  File a Joint Petition for Divorce (1A) in Massachusetts    
+---
 sections:
   - packet_options: Forms to include
   - divorce_eligibility: Eligibility
