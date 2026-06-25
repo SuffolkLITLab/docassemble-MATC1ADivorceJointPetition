@@ -1,0 +1,676 @@
+---
+include:
+  - docassemble.AssemblyLine:assembly_line.yml
+  - docassemble.ALMassachusetts:al_massachusetts.yml
+  - docassemble.MassAccess:massaccess.yml
+---
+metadata:
+  title: >-
+    Temporary orders packet
+  short title: >-
+    Temporary orders
+  description: |-
+    This interview helps prepare a Massachusetts Probate and Family Court
+    motion for temporary orders, supporting affidavit, and proposed order.
+  can_I_use_this_form: |
+    You can use this interview if you have a Massachusetts Probate and Family
+    Court case and need the judge to make temporary orders while the case is
+    pending.
+  before_you_start: |
+    Before you start, gather your docket number, the name of the court division,
+    contact information for both parties, and the facts that explain why the
+    temporary orders are needed now.
+  when_you_are_finished: |
+    Review the motion, affidavit, and proposed order. File them with the court
+    and serve the other party unless the court tells you otherwise.
+  efiling_enabled: False
+  integrated_efiling: False
+  integrated_email_filing: False
+  requires_notarization: False
+  maturity: draft
+  estimated_completion_minutes: 25
+  estimated_completion_delta: 10
+  LIST_topics:
+    - "FA-00-00-00-00"
+  tags:
+    - "FA-00-00-00-00"
+  authors:
+    - Suffolk LIT Lab
+  original_form:
+    - https://www.mass.gov/info-details/probate-and-family-court-motion-cjd-400
+    - https://www.mass.gov/how-to/get-an-immediate-child-custody-or-parenting-time-order
+  help_page_url: >-
+    https://www.mass.gov/how-to/get-an-immediate-child-custody-or-parenting-time-order
+  help_page_title: >-
+    Get an immediate child custody or parenting time order - Mass.gov
+  allowed_courts:
+    - "Probate and Family Court"
+  typical_role: "plaintiff"
+  jurisdiction: "NAM-US-US+MA"
+  review_date: 2026-06-23
+  form_titles:
+    - Motion for Temporary Orders
+    - Affidavit in Support of Motion for Temporary Orders
+    - Proposed Order
+  form_numbers:
+    - CJ-D 400
+---
+code: |
+  AL_DEFAULT_COUNTRY = "US"
+---
+code: |
+  AL_DEFAULT_STATE = "MA"
+---
+code: |
+  github_repo_name = "docassemble-MATC1ADivorceJointPetition"
+---
+objects:
+  - users: ALPeopleList.using(ask_number=False, target_number=2)
+  - trial_court: MACourt
+  - temporary_orders_filer_address: ALAddress
+---
+sections:
+  - temporary_orders_intro_section: Start
+  - temporary_orders_case_section: Case information
+  - temporary_orders_request_section: Requested orders
+  - temporary_orders_facts_section: Supporting facts
+  - temporary_orders_service_section: Service
+  - temporary_orders_review_section: Review and download
+---
+mandatory: True
+code: |
+  al_intro_screen
+  temporary_orders_intro
+  temporary_orders_packet_order
+  temporary_orders_preview_question
+  temporary_orders_moving_party_signature
+  temporary_orders_download
+---
+id: temporary orders packet order
+sets: temporary_orders_packet_order
+code: |
+  allowed_courts = ["Probate and Family Court"]
+  user_role = "plaintiff"
+  user_ask_role = "plaintiff"
+
+  nav.set_section("temporary_orders_case_section")
+  trial_court.division
+  docket_number
+  users[0].name.first
+  users[1].name.first
+  users[0].address.address
+  users[1].address.address
+  users[0].phone_number
+  users[0].case_role
+  users[1].case_role
+  temporary_orders_moving_party_choice
+  temporary_orders_filer_address.address
+  temporary_orders_filer_address.city
+  temporary_orders_filer_address.state
+  temporary_orders_filer_address.zip
+  temporary_orders_filer_phone
+
+  nav.set_section("temporary_orders_request_section")
+  temporary_orders_request_categories
+  temporary_orders_requested_relief
+  temporary_orders_is_emergency
+  if temporary_orders_is_emergency:
+    temporary_orders_emergency_reason
+
+  nav.set_section("temporary_orders_facts_section")
+  temporary_orders_affidavit_facts
+  temporary_orders_proposed_order_mode
+  if temporary_orders_proposed_order_mode == "edit":
+    temporary_orders_proposed_order_text
+  temporary_orders_signature_date
+
+  nav.set_section("temporary_orders_service_section")
+  if temporary_orders_needs_service:
+    temporary_orders_service_method
+    if temporary_orders_service_method == "mail":
+      temporary_orders_service_mail_date
+    elif temporary_orders_service_method == "hand":
+      temporary_orders_service_hand_date
+      temporary_orders_service_hand_time
+  else:
+    temporary_orders_joint_service_notice
+
+  nav.set_section("temporary_orders_review_section")
+  temporary_orders_packet_order = True
+---
+id: temporary orders intro
+continue button field: temporary_orders_intro
+question: |
+  Temporary orders packet
+subquestion: |
+  This interview prepares three documents that work together:
+
+  1. A **Motion for Temporary Orders** asking the judge for temporary relief.
+  2. A **supporting affidavit** explaining the facts and timing.
+  3. A **proposed order** with the exact order you want the judge to sign.
+
+  Temporary orders are for issues that need a court decision before the final
+  divorce judgment or final hearing.
+---
+id: docket number
+question: |
+  What is the docket number?
+subquestion: |
+  If the court has not assigned a docket number yet, you can leave this blank
+  and write it in later.
+fields:
+  - Docket number: docket_number
+    required: False
+    maxlength: 75
+---
+id: temporary orders court division
+sets:
+  trial_court.division
+question: |
+  Which Probate and Family Court division is handling this case?
+fields:
+  - Court division: trial_court.division
+    input type: combobox
+    choices:
+      - Barnstable
+      - Berkshire
+      - Bristol
+      - Dukes
+      - Essex
+      - Franklin
+      - Hampden
+      - Hampshire
+      - Middlesex
+      - Nantucket
+      - Norfolk
+      - Plymouth
+      - Suffolk
+      - Worcester
+---
+id: temporary orders party b name
+sets:
+  users[1].name.first
+question: |
+  Spouse name
+subquestion: |
+  Who is the other party in this case?
+fields:
+  - First name: users[1].name.first
+  - Middle name: users[1].name.middle
+    required: False
+  - Last name: users[1].name.last
+  - Suffix: users[1].name.suffix
+    code: |
+      name_suffix()
+    required: False
+---
+id: temporary orders party a phone number
+sets:
+  users[0].phone_number
+question: |
+  What is ${ users[0] }'s phone number?
+fields:
+  - Phone number: users[0].phone_number
+    datatype: tel
+---
+id: temporary orders caption roles
+question: |
+  How should the case caption list the parties?
+subquestion: |
+  Use the roles shown on the court papers for this case.
+fields:
+  - "${ users[0] } is the": users[0].case_role
+    input type: radio
+    choices:
+      - Plaintiff: plaintiff
+      - Petitioner: petitioner
+      - Defendant: defendant
+      - Respondent: respondent
+  - "${ users[1] } is the": users[1].case_role
+    input type: radio
+    choices:
+      - Plaintiff: plaintiff
+      - Petitioner: petitioner
+      - Defendant: defendant
+      - Respondent: respondent
+---
+id: temporary orders moving party
+question: |
+  Who is asking for temporary orders?
+fields:
+  - Who is asking?: temporary_orders_moving_party_choice
+    input type: radio
+    choices:
+      - ${ users[0] }: user0
+      - ${ users[1] }: user1
+      - Both parties together: both
+---
+id: temporary orders moving party contact
+question: |
+  Contact information for the moving party
+subquestion: |
+  The motion form needs contact information for the person filing the motion.
+fields:
+  - Mailing address: temporary_orders_filer_address.address
+    address autocomplete: True
+    default: ${ temporary_orders_default_filer_address.address }
+  - Unit: temporary_orders_filer_address.unit
+    required: False
+    default: ${ temporary_orders_default_filer_address.unit }
+  - City: temporary_orders_filer_address.city
+    default: ${ temporary_orders_default_filer_address.city }
+  - State: temporary_orders_filer_address.state
+    code: |
+      states_list()
+    default: ${ temporary_orders_default_filer_address.state }
+  - Zip: temporary_orders_filer_address.zip
+    default: ${ temporary_orders_default_filer_address.zip }
+  - Phone number: temporary_orders_filer_phone
+    datatype: tel
+    default: ${ temporary_orders_default_filer_phone }
+---
+id: temporary orders request categories
+question: |
+  What temporary orders do you need?
+subquestion: |
+  Choose every issue the proposed order should cover.
+fields:
+  - Temporary orders requested: temporary_orders_request_categories
+    datatype: checkboxes
+    choices:
+      - Parenting schedule: parenting_schedule
+      - Legal custody or decision making: legal_custody
+      - Physical custody or where children live: physical_custody
+      - Child support: child_support
+      - Health insurance or medical expenses: health_insurance
+      - Use of the home or personal property: home_or_property
+      - Spousal support or household expenses: spousal_support
+      - Restraining conduct between the parties: conduct
+      - Other temporary order: other
+    minlength: 1
+---
+id: temporary orders requested relief
+question: |
+  Tell the court exactly what temporary orders you want
+subquestion: |
+  Write the requested orders in plain language. Include dates, times, exchange
+  locations, payment amounts, or deadlines when they matter.
+fields:
+  - Requested temporary orders: temporary_orders_requested_relief
+    input type: area
+    rows: 10
+    maxlength: 2500
+---
+id: temporary orders emergency
+question: |
+  Is this request urgent?
+subquestion: |
+  If there is an immediate risk or deadline, explain it in the motion and
+  affidavit so the court can decide how quickly to schedule the request.
+fields:
+  - Is this urgent?: temporary_orders_is_emergency
+    datatype: yesnoradio
+  - What makes this urgent?: temporary_orders_emergency_reason
+    input type: area
+    rows: 4
+    maxlength: 900
+    show if: temporary_orders_is_emergency
+---
+id: temporary orders affidavit facts
+question: |
+  Supporting facts
+subquestion: |
+  The affidavit should explain what happened, when it happened, and why the
+  temporary orders are needed now. Use short numbered facts when possible.
+fields:
+  - Facts supporting this request: temporary_orders_affidavit_facts
+    input type: area
+    rows: 14
+    maxlength: 5000
+help:
+  label: |
+    What should I include?
+  content: |
+    Include the most important facts, dates, current arrangements, safety issues,
+    child care details, payment history, or other facts that help the judge
+    understand why the temporary order is needed before final judgment.
+---
+id: proposed order mode
+question: |
+  Proposed order
+subquestion: |
+  The proposed order should be written as directions for the judge to sign.
+  You can start from the requested orders you already wrote, or edit the text now.
+fields:
+  - Proposed order starting point: temporary_orders_proposed_order_mode
+    input type: radio
+    choices:
+      - Use my requested orders as the proposed order: use_request
+      - Let me edit the proposed order text: edit
+  - Proposed order text: temporary_orders_proposed_order_text
+    input type: area
+    rows: 10
+    maxlength: 3000
+    default: ${ temporary_orders_generated_proposed_order_text }
+    show if:
+      variable: temporary_orders_proposed_order_mode
+      is: edit
+---
+id: temporary orders signature date
+question: |
+  Signature date
+fields:
+  - Date: temporary_orders_signature_date
+    datatype: date
+    default: ${ today() }
+---
+id: temporary orders service
+question: |
+  How will the other party get a copy?
+subquestion: |
+  The CJD 400 motion includes a certificate of service. Fill this out only when
+  one party is serving the other party.
+fields:
+  - Service method: temporary_orders_service_method
+    input type: radio
+    choices:
+      - Mail: mail
+      - Hand delivery: hand
+      - I do not know yet: later
+---
+id: temporary orders service mail date
+question: |
+  When will you mail the packet?
+fields:
+  - Mailing date: temporary_orders_service_mail_date
+    datatype: date
+    default: ${ today() }
+---
+id: temporary orders service hand delivery
+question: |
+  When will you hand-deliver the packet?
+fields:
+  - Hand-delivery date: temporary_orders_service_hand_date
+    datatype: date
+    default: ${ today() }
+  - Hand-delivery time: temporary_orders_service_hand_time
+    datatype: time
+---
+continue button field: temporary_orders_joint_service_notice
+question: |
+  Service
+subquestion: |
+  You said both parties are asking for the temporary orders together, so this
+  interview will leave the certificate of service blank.
+---
+code: |
+  temporary_orders_moving_party_index = 0 if temporary_orders_moving_party_choice != "user1" else 1
+---
+code: |
+  if temporary_orders_moving_party_choice == "both":
+    temporary_orders_moving_party_name = users[0].name_full() + " and " + users[1].name_full()
+  else:
+    temporary_orders_moving_party_name = users[temporary_orders_moving_party_index].name_full()
+---
+code: |
+  temporary_orders_default_filer_address = users[temporary_orders_moving_party_index].address
+---
+code: |
+  temporary_orders_default_filer_phone = users[temporary_orders_moving_party_index].phone_number
+---
+code: |
+  temporary_orders_needs_service = temporary_orders_moving_party_choice != "both"
+---
+code: |
+  if users[0].case_role in ["plaintiff", "petitioner"]:
+    temporary_orders_caption_plaintiff_petitioner_name = users[0].name_full()
+    temporary_orders_caption_defendant_respondent_name = users[1].name_full()
+  else:
+    temporary_orders_caption_plaintiff_petitioner_name = users[1].name_full()
+    temporary_orders_caption_defendant_respondent_name = users[0].name_full()
+---
+code: |
+  temporary_orders_moving_party_role = users[temporary_orders_moving_party_index].case_role
+---
+code: |
+  temporary_orders_motion_title = "Temporary Orders"
+---
+code: |
+  temporary_orders_generated_proposed_order_text = temporary_orders_requested_relief
+---
+code: |
+  temporary_orders_final_proposed_order_text = temporary_orders_proposed_order_text if temporary_orders_proposed_order_mode == "edit" else temporary_orders_generated_proposed_order_text
+---
+code: |
+  temporary_orders_motion_request_text = temporary_orders_requested_relief
+  if temporary_orders_is_emergency:
+    temporary_orders_motion_request_text += "\n\nEmergency basis: " + temporary_orders_emergency_reason
+---
+code: |
+  temporary_orders_service_recipient_index = 1 if temporary_orders_moving_party_index == 0 else 0
+---
+code: |
+  temporary_orders_service_recipient_name = users[temporary_orders_service_recipient_index].name_full()
+---
+code: |
+  temporary_orders_service_recipient_address = users[temporary_orders_service_recipient_index].address
+---
+code: |
+  temporary_orders_user_is_petitioner = temporary_orders_moving_party_role == "petitioner"
+  temporary_orders_user_is_defendant = temporary_orders_moving_party_role == "defendant"
+  temporary_orders_user_is_plaintiff = temporary_orders_moving_party_role == "plaintiff"
+  temporary_orders_user_is_respondent = temporary_orders_moving_party_role == "respondent"
+---
+code: |
+  temporary_orders_service_by_mail = temporary_orders_needs_service and temporary_orders_service_method == "mail"
+  temporary_orders_service_by_hand = temporary_orders_needs_service and temporary_orders_service_method == "hand"
+---
+code: |
+  if temporary_orders_service_by_hand:
+    temporary_orders_service_hand_time_display = temporary_orders_service_hand_time.strftime("%H:%M %p")
+  else:
+    temporary_orders_service_hand_time_display = ""
+---
+id: preview temporary orders packet
+continue button field: temporary_orders_preview_question
+question: |
+  Review the packet
+subquestion: |
+  Open each document and review it before you sign.
+
+  ${ temporary_orders_motion_attachment.as_pdf(key='preview') }
+
+  ${ temporary_orders_affidavit_attachment.as_pdf(key='preview') }
+
+  ${ temporary_orders_proposed_order_attachment.as_pdf(key='preview') }
+
+progress: 90
+---
+id: temporary orders moving party signature
+sets:
+  temporary_orders_moving_party_signature
+question: |
+  Sign the packet
+fields:
+  - Signature: temporary_orders_moving_party_signature
+    datatype: signature
+---
+id: download temporary orders packet
+event: temporary_orders_download
+decoration: file-download
+question: |
+  Download your temporary orders packet
+subquestion: |
+  Your temporary orders packet is ready.
+
+  ${ action_button_html(url_action('temporary_orders_review_answers'), label='Edit answers', color='info') }
+
+  ${ temporary_orders_user_bundle.download_list_html() }
+
+  ${ temporary_orders_user_bundle.send_button_html(show_editable_checkbox=False) }
+progress: 100
+---
+event: temporary_orders_review_answers
+question: |
+  Review answers
+subquestion: |
+  ${ temporary_orders_review_table }
+
+  ${ action_button_html(url_action('temporary_orders_download'), label='Back to download', color='primary') }
+---
+template: temporary_orders_review_table
+content: |
+  | Question | Answer |
+  | --- | --- |
+  | Court | ${ trial_court.division } |
+  | Docket number | ${ docket_number } |
+  | Caption plaintiff/petitioner | ${ temporary_orders_caption_plaintiff_petitioner_name } |
+  | Caption defendant/respondent | ${ temporary_orders_caption_defendant_respondent_name } |
+  | Moving party | ${ temporary_orders_moving_party_name } |
+  | Requested temporary orders | ${ temporary_orders_requested_relief } |
+  | Emergency | ${ "Yes" if temporary_orders_is_emergency else "No" } |
+  | Service | ${ temporary_orders_service_method if temporary_orders_needs_service else "Joint request - service certificate left blank" } |
+---
+objects:
+  - temporary_orders_motion_attachment: ALDocument.using(title="Motion for Temporary Orders", filename="temporary_orders_motion", enabled=True, has_addendum=True, default_overflow_message=AL_DEFAULT_OVERFLOW_MESSAGE)
+  - temporary_orders_affidavit_attachment: ALDocument.using(title="Supporting Affidavit", filename="temporary_orders_affidavit", enabled=True, has_addendum=False)
+  - temporary_orders_proposed_order_attachment: ALDocument.using(title="Proposed Order", filename="temporary_orders_proposed_order", enabled=True, has_addendum=False)
+---
+objects:
+  - temporary_orders_user_bundle: ALDocumentBundle.using(elements=[temporary_orders_motion_attachment, temporary_orders_affidavit_attachment, temporary_orders_proposed_order_attachment], filename="temporary_orders_packet", title="Temporary orders packet", enabled=True)
+  - temporary_orders_court_bundle: ALDocumentBundle.using(elements=[temporary_orders_motion_attachment, temporary_orders_affidavit_attachment, temporary_orders_proposed_order_attachment], filename="temporary_orders_packet_for_court", title="Temporary orders packet for court", enabled=True)
+---
+attachment:
+  name: Motion for Temporary Orders
+  filename: temporary_orders_motion
+  variable name: temporary_orders_motion_attachment[i]
+  skip undefined: True
+  pdf template file: temporary_orders_motion_cjd400.pdf
+  fields:
+    - "docket_number": ${ docket_number }
+    - "plaintiff": ${ temporary_orders_caption_plaintiff_petitioner_name }
+    - "defendant": ${ temporary_orders_caption_defendant_respondent_name }
+    - "user_name": ${ temporary_orders_moving_party_name }
+    - "signature_date__1": ${ temporary_orders_signature_date }
+    - "user_signature": ${ temporary_orders_moving_party_signature if i == "final" else "" }
+    - "user_name__2": ${ temporary_orders_moving_party_name }
+    - "user_address_street": ${ temporary_orders_filer_address.line_one() }
+    - "user_address_city": ${ temporary_orders_filer_address.city }
+    - "user_address_state": ${ temporary_orders_filer_address.state }
+    - "user_address_zip": ${ temporary_orders_filer_address.zip }
+    - "user_phone": ${ temporary_orders_filer_phone }
+    - "docket_number__2": ${ docket_number }
+    - "signature_date__2": ${ temporary_orders_signature_date }
+    - "other_party_name": ${ temporary_orders_service_recipient_name if temporary_orders_needs_service else "" }
+    - "other_party_address_street": ${ temporary_orders_service_recipient_address.line_one() if temporary_orders_needs_service else "" }
+    - "other_party_address_city": ${ temporary_orders_service_recipient_address.city if temporary_orders_needs_service else "" }
+    - "other_party_address_state": ${ temporary_orders_service_recipient_address.state if temporary_orders_needs_service else "" }
+    - "other_party_address_zip": ${ temporary_orders_service_recipient_address.zip if temporary_orders_needs_service else "" }
+    - "user_signature__2": ${ temporary_orders_moving_party_signature if i == "final" and temporary_orders_needs_service else "" }
+    - "court_division": ${ trial_court.division }
+    - "motion_name": ${ temporary_orders_motion_title }
+    - "user_is_petitioner": ${ temporary_orders_user_is_petitioner }
+    - "user_is_defendant": ${ temporary_orders_user_is_defendant }
+    - "user_is_plaintiff": ${ temporary_orders_user_is_plaintiff }
+    - "user_is_respondent": ${ temporary_orders_user_is_respondent }
+    - "user_request": ${ temporary_orders_motion_request_text }
+    - "hearing_city": ${ "" }
+    - "hearing_date_month_day_year": ${ "" }
+    - "hearing_time": ${ "" }
+    - "bbo_number": ${ "" }
+    - "court_division__2": ${ trial_court.division }
+    - "motion_name__2": ${ temporary_orders_motion_title }
+    - "service_by_hand_date": ${ temporary_orders_service_hand_date if temporary_orders_service_by_hand else "" }
+    - "service_by_hand_time": ${ temporary_orders_service_hand_time_display }
+    - "service_by_hand": ${ temporary_orders_service_by_hand }
+    - "service_by_mailing_date": ${ temporary_orders_service_mail_date if temporary_orders_service_by_mail else "" }
+    - "service_by_mailing": ${ temporary_orders_service_by_mail }
+    - "emergency": ${ "EMERGENCY" if temporary_orders_is_emergency else "" }
+---
+attachment:
+  name: Affidavit in Support of Motion for Temporary Orders
+  filename: temporary_orders_affidavit
+  variable name: temporary_orders_affidavit_attachment[i]
+  valid formats:
+    - pdf
+  content: |
+    # COMMONWEALTH OF MASSACHUSETTS
+
+    ## The Trial Court
+
+    ## Probate and Family Court Department
+
+    **${ trial_court.division } Division**
+
+    **Docket No.:** ${ docket_number }
+
+    **${ temporary_orders_caption_plaintiff_petitioner_name }**
+    Plaintiff/Petitioner
+
+    v.
+
+    **${ temporary_orders_caption_defendant_respondent_name }**
+    Defendant/Respondent
+
+    # Affidavit in Support of Motion for Temporary Orders
+
+    I, **${ temporary_orders_moving_party_name }**, state under the pains and
+    penalties of perjury that the following facts are true to the best of my
+    knowledge:
+
+    ${ temporary_orders_affidavit_facts }
+
+    % if temporary_orders_is_emergency:
+    **Urgency:** ${ temporary_orders_emergency_reason }
+    % endif
+
+    Signed on ${ temporary_orders_signature_date }.
+
+    ${ temporary_orders_moving_party_signature if i == "final" else "" }
+
+    **${ temporary_orders_moving_party_name }**
+---
+attachment:
+  name: Proposed Order
+  filename: temporary_orders_proposed_order
+  variable name: temporary_orders_proposed_order_attachment[i]
+  valid formats:
+    - pdf
+  content: |
+    # COMMONWEALTH OF MASSACHUSETTS
+
+    ## The Trial Court
+
+    ## Probate and Family Court Department
+
+    **${ trial_court.division } Division**
+
+    **Docket No.:** ${ docket_number }
+
+    **${ temporary_orders_caption_plaintiff_petitioner_name }**
+    Plaintiff/Petitioner
+
+    v.
+
+    **${ temporary_orders_caption_defendant_respondent_name }**
+    Defendant/Respondent
+
+    # Proposed Order on Motion for Temporary Orders
+
+    After review of the Motion for Temporary Orders and supporting affidavit,
+    it is ORDERED:
+
+    ${ temporary_orders_final_proposed_order_text }
+
+    Submitted by: **${ temporary_orders_moving_party_name }**
+
+    Date submitted: ${ temporary_orders_signature_date }
+
+    Date: ____________________
+
+    Justice of the Probate and Family Court: ______________________________
+---
+code: |
+  temporary_orders_motion_attachment.overflow_fields["user_request"].overflow_trigger = 900
+  temporary_orders_motion_attachment.overflow_fields["user_request"].label = "Requested temporary orders"
+  temporary_orders_motion_attachment.overflow_fields.gathered = True
