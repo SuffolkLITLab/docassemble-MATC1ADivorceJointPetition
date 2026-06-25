@@ -197,6 +197,10 @@ code: |
   a_divorce_agreement_Post_interview_instructions.enabled = include_separation_agreement
   a_divorce_agreement_attachment.enabled = include_separation_agreement
 ---
+objects:
+  - child_care_or_custody_disclosure_affidavit_next_steps: ALDocument.using(title="Care or custody affidavit instructions", filename="care_or_custody_affidavit_next_steps", has_addendum=False)
+  - affidavit_of_care_or_custody_attachment: ALDocument.using(title="Affidavit disclosing care or custody proceedings", filename="affidavit_disclosing_care_or_custody", has_addendum=False)
+---
 # Bundles group the ALDocuments into separate downloads, such as for court and for the user
 objects:
   - al_user_bundle: ALDocumentBundle.using(elements=[divorcejointpetition_Post_interview_instructions, divorcejointpetition_attachment, affidavit_attachment, affidavitofindigency_attachment, child_care_or_custody_disclosure_affidavit_next_steps, affidavit_of_care_or_custody_attachment, users[0].financial_statement_short_attachment, users[0].financial_statement_long_attachment, users[0].financial_statement_schedule_a_attachment, users[0].financial_statement_schedule_b_attachment, users[1].financial_statement_short_attachment, users[1].financial_statement_long_attachment, users[1].financial_statement_schedule_a_attachment, users[1].financial_statement_schedule_b_attachment, a_divorce_agreement_Post_interview_instructions, a_divorce_agreement_attachment], filename="joint_petition_divorce_packet", title="All forms to download for your records", enabled=True)
