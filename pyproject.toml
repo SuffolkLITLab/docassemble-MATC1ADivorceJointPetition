@@ -12,7 +12,12 @@ readme = "README.md"
 authors = [
     { name = "KP Hunsinger", email = "litlab@suffolk.edu" },
 ]
-dependencies = []
+dependencies = [
+    "docassemble.ALAffidavitOfIndigency",
+    "docassemble.MATCChildCareOrCustodyDisclosureAffidavit",
+    "docassemble.MATCFinancialStatement",
+    "docassemble.MATCSeparationAgreement",
+]
 license = "MIT"
 license-files = [
     "LICENSE",
