@@ -729,6 +729,23 @@ continue button field: divorcejointpetition_preview_question
 code: |
   signature_fields = ['users[0].signature', 'users[1].signature']
 ---
+code: |
+  def safe_attorney_bbo_number(index):
+    if not defined("attorneys.there_are_any") or not attorneys.there_are_any:
+      return ''
+    try:
+      return attorneys[index].bbo_number
+    except Exception:
+      return ''
+
+  def safe_attorney_name(index):
+    if not defined("attorneys.there_are_any") or not attorneys.there_are_any:
+      return ''
+    try:
+      return attorneys[index]
+    except Exception:
+      return ''
+---
 #code: |
 #  if users[0].has_attorney:
 #    users1_petition_signature = users[0].signature
@@ -748,13 +765,13 @@ signature: users[1].signature
 ---
 id: sign attorney A
 question: |
-  ${  attorneys[0]  }, sign below
-signature: users[0].signature
+  ${ safe_attorney_name(0) }, sign below
+signature: attorneys[0].signature
 ---
 id: sign attorney B
 question: |
-  ${  attorneys[1]  }, sign below
-signature: users[1].signature
+  ${ safe_attorney_name(1) }, sign below
+signature: attorneys[1].signature
 ---
 code: |
   users.there_is_another = False
@@ -900,14 +917,6 @@ review:
     button: |
       **users1_petition_signature**:
       ${ users1_petition_signature }
-  - Edit: attorneys1_bbo_number
-    button: |
-      **Attorney 1 BBO number**:
-      ${ attorneys1_bbo_number }
-  - Edit: attorneys2_bbo_number
-    button: |
-      **Attorney 2 BBO number**:
-      ${ attorneys2_bbo_number }
 ---
 id: edit users
 continue button field: users.revisit
@@ -1020,8 +1029,8 @@ attachment:
       - "users2_petition_signer_address_zip": ${ users[1].address.zip }
       - "users1_petition_signer_phone_number": ${ users[0].phone_number }
       - "users2_petition_signer_phone_number": ${ users[1].phone_number }
-      - "attorneys1_bbo_number": ${ attorneys[0].bbo_number }
-      - "attorneys2_bbo_number": ${ attorneys[1].bbo_number }
+      - "attorneys1_bbo_number": ${ safe_attorney_bbo_number(0) }
+      - "attorneys2_bbo_number": ${ safe_attorney_bbo_number(1) }
 ---
 attachment:
   name: affidavit
