@@ -950,7 +950,7 @@ progress: 100
 # ALDocument objects specify the metadata for each template
 objects:
   - divorcejointpetition_Post_interview_instructions: ALDocument.using(title="Instructions", filename="divorcejointpetition_next_steps.docx", has_addendum=False)
-  - divorcejointpetition_attachment: ALDocument.using(title="Joint1ADivorce", filename="divorcejointpetition", has_addendum=True, default_overflow_message=AL_DEFAULT_OVERFLOW_MESSAGE)
+  - divorcejointpetition_attachment: ALDocument.using(title="Joint1ADivorce", filename="divorcejointpetition", has_addendum=False)
   - affidavit_attachment: ALDocument.using(title="Affidavit", filename="affidavit", has_addendum=False, )
 ---
 # Each attachment defines a key in an ALDocument. We use `i` as the placeholder here so the same template is 
