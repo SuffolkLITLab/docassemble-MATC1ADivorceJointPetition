@@ -277,6 +277,10 @@ code: |
 
   interview_order_divorcejointpetition
 
+  nav.set_section("court_requests")
+  trial_court
+  set_trial_court_division
+
   include_care_or_custody_affidavit = children_of_marriage
   if include_care_or_custody_affidavit:
     set_care_or_custody_affidavit_defaults
@@ -292,6 +296,7 @@ code: |
 
   if include_financial_statement:
     nav.set_section("financial_statement")
+    financial_statement_court_division = trial_court.division
     interview_order_financial_statement
 
   if include_separation_agreement:
@@ -304,6 +309,11 @@ code: |
     ask_affidavit_questions
 
   joint_petition_interview_order = True
+---
+code: |
+  court_name = str(trial_court)
+  trial_court.division = court_name.replace(" Probate and Family Court - North", "").replace(" Probate and Family Court - South", "").replace(" Probate and Family Court", "")
+  set_trial_court_division = True
 ---
 code: |
   other_parties.there_are_any = False
@@ -358,10 +368,6 @@ code: |
   )
   divorcejointpetition_preview_question
   basic_questions_signature_flow
-  users1_signature
-  users2_signature
-  users2_petition_signature
-  users1_petition_signature
 
   if not defined("divorcejointpetition_downloads_ready"):
     if al_user_bundle.generate_downloads_with_docx_task.ready():
