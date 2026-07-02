@@ -1,7 +1,7 @@
 ---
 include:
   - docassemble.MATCFinancialStatement:financial_statement.yml
-  - docassemble.MATCSeparationAgreement:a_divorce_agreement.yml
+  - docassemble.MATCSeparationAgreement:separation_agreement.yml
   - docassemble.MATCChildCareOrCustodyDisclosureAffidavit:affidavit_disclosing_care_or_custody.yml
   - divorce_joint_petition.yml
 ---
