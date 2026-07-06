@@ -6,13 +6,14 @@ This interview is the home base from which to initiate a 1A divorce.
 
 
 Interview generates:
-- Joint petition (CJ-D 101A) 
-- Record of absolute divorce (R408) and
-- Affidavit of irretrievable breakdown
+
+  - Joint petition (CJ-D 101A) 
+  - Record of absolute divorce (R408) and
+  - Affidavit of irretrievable breakdown
   
 Or
 
-- Motion to convert from 1B to 1A
+  - Motion to convert from 1B to 1A
 
 Interviews needed if children:
 - Child care or custody disclosure (w/supplement for 5-9 children)
