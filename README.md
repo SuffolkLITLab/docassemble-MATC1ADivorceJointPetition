@@ -1,7 +1,7 @@
 This interview is the home base from which to initiate a 1A divorce. 
 
 [Data mapping dictionary updated 6/10/26](https://github.com/user-attachments/files/28799430/17_1A_Divorce_Field_Map_Team_Handoff_2026-06-09.xlsx)
-and [updated information about spouse attributes](https://github.com/SuffolkLITLab/docassemble-MATC1ADivorceJointPetition/wiki/Data-Dictionary-%E2%80%90-Spouses)
+and [updated 7/7/26 information about spouse attributes](https://github.com/SuffolkLITLab/docassemble-MATC1ADivorceJointPetition/wiki/Data-Dictionary-%E2%80%90-Spouses)
 
 [Project Overview](https://github.com/user-attachments/files/28799522/Divorce1AProjectOverview.docx)
 
