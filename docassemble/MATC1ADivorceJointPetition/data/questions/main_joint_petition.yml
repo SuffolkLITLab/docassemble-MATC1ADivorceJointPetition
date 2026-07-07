@@ -121,6 +121,7 @@ sections:
   - child_info: Agreement child information
   - child_custody: Agreement custody
   - parenting_time: Agreement parenting time
+  - child_support: Agreement child support
   - adult_health_insurance: Agreement health insurance
   - child_health_insurance: Agreement children's health insurance
   - education: Agreement education costs
@@ -247,6 +248,7 @@ data:
   - child_info: Agreement child information
   - child_custody: Agreement custody
   - parenting_time: Agreement parenting time
+  - child_support: Agreement child support
   - adult_health_insurance: Agreement health insurance
   - child_health_insurance: Agreement children's health insurance
   - education: Agreement education costs

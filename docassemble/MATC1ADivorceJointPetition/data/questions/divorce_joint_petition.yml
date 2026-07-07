@@ -746,16 +746,6 @@ question: |
   ${  users[1]  }, sign below
 signature: users[1].signature
 ---
-id: sign attorney A
-question: |
-  ${  attorneys[0]  }, sign below
-signature: users[0].signature
----
-id: sign attorney B
-question: |
-  ${  attorneys[1]  }, sign below
-signature: users[1].signature
----
 code: |
   users.there_is_another = False
 ---
