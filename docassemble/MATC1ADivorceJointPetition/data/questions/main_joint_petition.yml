@@ -91,52 +91,57 @@ content: |
   File a Joint Petition for Divorce (1A) in Massachusetts    
 ---
 sections:
-  - packet_options: Forms to include
+  - packet_options: Start / forms to include
   - divorce_eligibility: Eligibility
-  - separation_agreement: Separation agreement
-  - relationship_background: Relationship background
-  - court_requests: Divorce action details 
-  - party_information: Party information
-  - children_information: Children
-  - care_or_custody_affidavit_children: Care or custody affidavit children
-  - care_or_custody_affidavit_cases: Care or custody affidavit cases
-  - care_or_custody_affidavit_addresses: Care or custody affidavit addresses
-  - additional_circumstances_and_filings: Special circumstances and additional filings
-  - financial_statement: Financial statement
-  - fee_waiver: Fee waiver
-  - introduction: Financial statement introduction
-  - eligibility: Financial statement eligibility
-  - court_and_parties: Financial statement court and parties
-  - personal_information: Financial statement personal information
-  - cadence: Financial statement cadence
-  - income: Financial statement income
-  - deductions: Financial statement deductions
-  - expenses: Financial statement expenses
-  - assets: Financial statement assets
-  - liabilities: Financial statement liabilities
-  - review: Financial statement review
-  - download: Financial statement download
-  - parties: Agreement parties
-  - children_overview: Agreement children
-  - child_info: Agreement child information
-  - child_custody: Agreement custody
-  - parenting_time: Agreement parenting time
-  - child_support: Agreement child support
-  - adult_health_insurance: Agreement health insurance
-  - child_health_insurance: Agreement children's health insurance
-  - education: Agreement education costs
-  - taxes: Agreement taxes
-  - child_tax: Agreement child tax claim
-  - life_insurance: Agreement life insurance
-  - alimony: Agreement alimony
-  - real_estate: Agreement real estate
-  - personal_property: Agreement personal property
-  - debts: Agreement debts and liabilities
-  - retirement: Agreement retirement
-  - merger: Agreement merger / survival
-  - court_info: Agreement court and signatures
-  - review_a_divorce_agreement: Agreement review
-  - review_and_sign: Review and sign
+  - separation_agreement: Separation agreement plan
+  - one_a_parties_relationship_children: Parties, relationship, and children
+    subsections:
+      - relationship_background: Relationship background
+      - party_information: Party information
+      - children_information: Children
+      - care_or_custody_affidavit_children: Care or custody affidavit children
+      - care_or_custody_affidavit_cases: Care or custody affidavit cases
+      - care_or_custody_affidavit_addresses: Care or custody affidavit addresses
+  - court_requests: Court and filing details
+  - financial_statement: Financial information
+    subsections:
+      - introduction: Financial statement introduction
+      - eligibility: Financial statement eligibility
+      - court_and_parties: Financial statement court and parties
+      - personal_information: Financial statement personal information
+      - cadence: Financial statement cadence
+      - income: Financial statement income
+      - deductions: Financial statement deductions
+      - expenses: Financial statement expenses
+      - assets: Financial statement assets
+      - liabilities: Financial statement liabilities
+      - review: Financial statement review
+      - download: Financial statement download
+  - one_a_separation_agreement_terms: Separation agreement terms
+    subsections:
+      - parties: Agreement parties
+      - children_overview: Agreement children
+      - child_custody: Agreement custody
+      - parenting_time: Agreement parenting time
+      - child_support: Agreement child support
+      - adult_health_insurance: Agreement health insurance
+      - child_health_insurance: Agreement children's health insurance
+      - education: Agreement education costs
+      - taxes: Agreement taxes
+      - child_tax: Agreement child tax claim
+      - life_insurance: Agreement life insurance
+      - alimony: Agreement alimony
+      - real_estate: Agreement real estate
+      - personal_property: Agreement personal property
+      - debts: Agreement debts and liabilities
+      - retirement: Agreement retirement
+      - merger: Agreement merger / survival
+      - court_info: Agreement court and signatures
+      - review_a_divorce_agreement: Agreement review
+  - additional_circumstances_and_filings: Other filings
+    subsections:
+      - fee_waiver: Fee waiver
+  - review_and_sign: Review, sign, and download
 ---
 code: |
   github_repo_name =  'docassemble-MATC1ADivorceJointPetition'
@@ -218,52 +223,57 @@ code: |
 ---
 variable name: al_nav_sections
 data:
-  - packet_options: Forms to include
+  - packet_options: Start / forms to include
   - divorce_eligibility: Eligibility
-  - separation_agreement: Separation agreement
-  - relationship_background: Relationship background
-  - court_requests: Divorce action details
-  - party_information: Party information
-  - children_information: Children
-  - care_or_custody_affidavit_children: Care or custody affidavit children
-  - care_or_custody_affidavit_cases: Care or custody affidavit cases
-  - care_or_custody_affidavit_addresses: Care or custody affidavit addresses
-  - additional_circumstances_and_filings: Special circumstances and additional filings
-  - financial_statement: Financial statement
-  - fee_waiver: Fee waiver
-  - introduction: Financial statement introduction
-  - eligibility: Financial statement eligibility
-  - court_and_parties: Financial statement court and parties
-  - personal_information: Financial statement personal information
-  - cadence: Financial statement cadence
-  - income: Financial statement income
-  - deductions: Financial statement deductions
-  - expenses: Financial statement expenses
-  - assets: Financial statement assets
-  - liabilities: Financial statement liabilities
-  - review: Financial statement review
-  - download: Financial statement download
-  - parties: Agreement parties
-  - children_overview: Agreement children
-  - child_info: Agreement child information
-  - child_custody: Agreement custody
-  - parenting_time: Agreement parenting time
-  - child_support: Agreement child support
-  - adult_health_insurance: Agreement health insurance
-  - child_health_insurance: Agreement children's health insurance
-  - education: Agreement education costs
-  - taxes: Agreement taxes
-  - child_tax: Agreement child tax claim
-  - life_insurance: Agreement life insurance
-  - alimony: Agreement alimony
-  - real_estate: Agreement real estate
-  - personal_property: Agreement personal property
-  - debts: Agreement debts and liabilities
-  - retirement: Agreement retirement
-  - merger: Agreement merger / survival
-  - court_info: Agreement court and signatures
-  - review_a_divorce_agreement: Agreement review
-  - review_and_sign: Review and sign
+  - separation_agreement: Separation agreement plan
+  - one_a_parties_relationship_children: Parties, relationship, and children
+    subsections:
+      - relationship_background: Relationship background
+      - party_information: Party information
+      - children_information: Children
+      - care_or_custody_affidavit_children: Care or custody affidavit children
+      - care_or_custody_affidavit_cases: Care or custody affidavit cases
+      - care_or_custody_affidavit_addresses: Care or custody affidavit addresses
+  - court_requests: Court and filing details
+  - financial_statement: Financial information
+    subsections:
+      - introduction: Financial statement introduction
+      - eligibility: Financial statement eligibility
+      - court_and_parties: Financial statement court and parties
+      - personal_information: Financial statement personal information
+      - cadence: Financial statement cadence
+      - income: Financial statement income
+      - deductions: Financial statement deductions
+      - expenses: Financial statement expenses
+      - assets: Financial statement assets
+      - liabilities: Financial statement liabilities
+      - review: Financial statement review
+      - download: Financial statement download
+  - one_a_separation_agreement_terms: Separation agreement terms
+    subsections:
+      - parties: Agreement parties
+      - children_overview: Agreement children
+      - child_custody: Agreement custody
+      - parenting_time: Agreement parenting time
+      - child_support: Agreement child support
+      - adult_health_insurance: Agreement health insurance
+      - child_health_insurance: Agreement children's health insurance
+      - education: Agreement education costs
+      - taxes: Agreement taxes
+      - child_tax: Agreement child tax claim
+      - life_insurance: Agreement life insurance
+      - alimony: Agreement alimony
+      - real_estate: Agreement real estate
+      - personal_property: Agreement personal property
+      - debts: Agreement debts and liabilities
+      - retirement: Agreement retirement
+      - merger: Agreement merger / survival
+      - court_info: Agreement court and signatures
+      - review_a_divorce_agreement: Agreement review
+  - additional_circumstances_and_filings: Other filings
+    subsections:
+      - fee_waiver: Fee waiver
+  - review_and_sign: Review, sign, and download
 ---
 id: choose forms to include
 question: |
@@ -359,6 +369,7 @@ code: |
   al_intro_screen
   divorcejointpetition_intro
   joint_petition_interview_order
+  nav.set_section("review_and_sign")
   signature_date
   # Store anonymous data for analytics / statistics
   store_variables_snapshot(
