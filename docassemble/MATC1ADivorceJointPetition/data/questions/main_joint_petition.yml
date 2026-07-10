@@ -3,6 +3,8 @@ include:
   - docassemble.MATCFinancialStatement:financial_statement.yml
   - docassemble.MATCSeparationAgreement:separation_agreement.yml
   - docassemble.MATCChildCareOrCustodyDisclosureAffidavit:affidavit_disclosing_care_or_custody.yml
+  - docassemble.MATCCSGWorksheet:child_support_guidelines_worksheet_core.yml
+  - docassemble.matcfindingsanddeterminations:cjd_305_findings_determinations_core.yml
   - divorce_joint_petition.yml
 ---
 metadata:
@@ -91,52 +93,72 @@ content: |
   File a Joint Petition for Divorce (1A) in Massachusetts    
 ---
 sections:
-  - packet_options: Forms to include
+  - packet_options: Start / forms to include
   - divorce_eligibility: Eligibility
-  - separation_agreement: Separation agreement
-  - relationship_background: Relationship background
-  - court_requests: Divorce action details 
-  - party_information: Party information
-  - children_information: Children
-  - care_or_custody_affidavit_children: Care or custody affidavit children
-  - care_or_custody_affidavit_cases: Care or custody affidavit cases
-  - care_or_custody_affidavit_addresses: Care or custody affidavit addresses
-  - additional_circumstances_and_filings: Special circumstances and additional filings
-  - financial_statement: Financial statement
-  - fee_waiver: Fee waiver
-  - introduction: Financial statement introduction
-  - eligibility: Financial statement eligibility
-  - court_and_parties: Financial statement court and parties
-  - personal_information: Financial statement personal information
-  - cadence: Financial statement cadence
-  - income: Financial statement income
-  - deductions: Financial statement deductions
-  - expenses: Financial statement expenses
-  - assets: Financial statement assets
-  - liabilities: Financial statement liabilities
-  - review: Financial statement review
-  - download: Financial statement download
-  - parties: Agreement parties
-  - children_overview: Agreement children
-  - child_info: Agreement child information
-  - child_custody: Agreement custody
-  - parenting_time: Agreement parenting time
-  - child_support: Agreement child support
-  - adult_health_insurance: Agreement health insurance
-  - child_health_insurance: Agreement children's health insurance
-  - education: Agreement education costs
-  - taxes: Agreement taxes
-  - child_tax: Agreement child tax claim
-  - life_insurance: Agreement life insurance
-  - alimony: Agreement alimony
-  - real_estate: Agreement real estate
-  - personal_property: Agreement personal property
-  - debts: Agreement debts and liabilities
-  - retirement: Agreement retirement
-  - merger: Agreement merger / survival
-  - court_info: Agreement court and signatures
-  - review_a_divorce_agreement: Agreement review
-  - review_and_sign: Review and sign
+  - separation_agreement: Separation agreement plan
+  - one_a_parties_relationship_children: Parties, relationship, and children
+    subsections:
+      - relationship_background: Relationship background
+      - party_information: Party information
+      - children_information: Children
+      - care_or_custody_affidavit_children: Care or custody affidavit children
+      - care_or_custody_affidavit_cases: Care or custody affidavit cases
+      - care_or_custody_affidavit_addresses: Care or custody affidavit addresses
+  - child_support_guidelines: Child support worksheet
+    subsections:
+      - csg_intro: Worksheet introduction
+      - csg_parties: Worksheet parents and children
+      - csg_income: Worksheet income and deductions
+      - csg_childcare: Worksheet child care costs
+      - csg_review: Worksheet result
+  - court_requests: Court and filing details
+  - financial_statement: Financial information
+    subsections:
+      - introduction: Financial statement introduction
+      - eligibility: Financial statement eligibility
+      - court_and_parties: Financial statement court and parties
+      - personal_information: Financial statement personal information
+      - cadence: Financial statement cadence
+      - income: Financial statement income
+      - deductions: Financial statement deductions
+      - expenses: Financial statement expenses
+      - assets: Financial statement assets
+      - liabilities: Financial statement liabilities
+      - review: Financial statement review
+      - download: Financial statement download
+  - one_a_separation_agreement_terms: Separation agreement terms
+    subsections:
+      - parties: Agreement parties
+      - children_overview: Agreement children
+      - child_custody: Agreement custody
+      - parenting_time: Agreement parenting time
+      - child_support: Agreement child support
+      - adult_health_insurance: Agreement health insurance
+      - child_health_insurance: Agreement children's health insurance
+      - education: Agreement education costs
+      - taxes: Agreement taxes
+      - child_tax: Agreement child tax claim
+      - life_insurance: Agreement life insurance
+      - alimony: Agreement alimony
+      - real_estate: Agreement real estate
+      - personal_property: Agreement personal property
+      - debts: Agreement debts and liabilities
+      - retirement: Agreement retirement
+      - merger: Agreement merger / survival
+      - court_info: Agreement court and signatures
+      - review_a_divorce_agreement: Agreement review
+  - child_support_findings: Child support findings
+    subsections:
+      - fnd_intro: Findings introduction
+      - fnd_income_findings: Findings income
+      - fnd_coverage: Findings coverage and education
+      - fnd_deviation: Findings deviation
+      - fnd_closing: Findings review
+      - fnd_review_cjd_305: Findings answer review
+  - additional_circumstances_and_filings: Other filings
+    subsections:
+      - fee_waiver: Fee waiver
+  - review_and_sign: Review, sign, and download
 ---
 code: |
   github_repo_name =  'docassemble-MATC1ADivorceJointPetition'
@@ -167,9 +189,23 @@ code: |
     defined("include_care_or_custody_affidavit")
     and include_care_or_custody_affidavit
   )
+---
+code: |
   affidavit_of_care_or_custody_attachment.enabled = (
     defined("include_care_or_custody_affidavit")
     and include_care_or_custody_affidavit
+  )
+---
+code: |
+  ma_child_support_guidelines_worksheet_attachment.enabled = (
+    defined("include_child_support_guidelines_worksheet")
+    and include_child_support_guidelines_worksheet
+  )
+---
+code: |
+  cjd_305_attachment.enabled = (
+    defined("include_findings_and_determinations")
+    and include_findings_and_determinations
   )
 ---
 code: |
@@ -178,16 +214,22 @@ code: |
     and showifdef(users[i].attr_name("making_statement_for"))
     and showifdef(users[i].attr_name("financial_form_type")) == "short"
   )
+---
+code: |
   users[i].financial_statement_long_attachment.enabled = (
     include_financial_statement
     and showifdef(users[i].attr_name("making_statement_for"))
     and showifdef(users[i].attr_name("financial_form_type")) == "long"
   )
+---
+code: |
   users[i].financial_statement_schedule_a_attachment.enabled = (
     include_financial_statement
     and showifdef(users[i].attr_name("making_statement_for"))
     and showifdef(users[i].attr_name("has_self_employment_income"))
   )
+---
+code: |
   users[i].financial_statement_schedule_b_attachment.enabled = (
     include_financial_statement
     and showifdef(users[i].attr_name("making_statement_for"))
@@ -196,6 +238,8 @@ code: |
 ---
 code: |
   a_divorce_agreement_Post_interview_instructions.enabled = include_separation_agreement
+---
+code: |
   a_divorce_agreement_attachment.enabled = include_separation_agreement
 ---
 objects:
@@ -204,8 +248,8 @@ objects:
 ---
 # Bundles group the ALDocuments into separate downloads, such as for court and for the user
 objects:
-  - al_user_bundle: ALDocumentBundle.using(elements=[divorcejointpetition_Post_interview_instructions, divorcejointpetition_attachment, affidavit_attachment, affidavitofindigency_attachment, child_care_or_custody_disclosure_affidavit_next_steps, affidavit_of_care_or_custody_attachment, users[0].financial_statement_short_attachment, users[0].financial_statement_long_attachment, users[0].financial_statement_schedule_a_attachment, users[0].financial_statement_schedule_b_attachment, users[1].financial_statement_short_attachment, users[1].financial_statement_long_attachment, users[1].financial_statement_schedule_a_attachment, users[1].financial_statement_schedule_b_attachment, a_divorce_agreement_Post_interview_instructions, a_divorce_agreement_attachment], filename="joint_petition_divorce_packet", title="All forms to download for your records", enabled=True)
-  - al_court_bundle: ALDocumentBundle.using(elements=[divorcejointpetition_attachment, affidavit_attachment, affidavitofindigency_attachment, affidavit_of_care_or_custody_attachment, users[0].financial_statement_short_attachment, users[0].financial_statement_long_attachment, users[0].financial_statement_schedule_a_attachment, users[0].financial_statement_schedule_b_attachment, users[1].financial_statement_short_attachment, users[1].financial_statement_long_attachment, users[1].financial_statement_schedule_a_attachment, users[1].financial_statement_schedule_b_attachment, a_divorce_agreement_attachment], filename="joint_petition_divorce_packet", title="All forms to deliver to court", enabled=True)
+  - al_user_bundle: ALDocumentBundle.using(elements=[divorcejointpetition_Post_interview_instructions, divorcejointpetition_attachment, affidavit_attachment, affidavitofindigency_attachment, child_care_or_custody_disclosure_affidavit_next_steps, affidavit_of_care_or_custody_attachment, ma_child_support_guidelines_worksheet_attachment, cjd_305_attachment, users[0].financial_statement_short_attachment, users[0].financial_statement_long_attachment, users[0].financial_statement_schedule_a_attachment, users[0].financial_statement_schedule_b_attachment, users[1].financial_statement_short_attachment, users[1].financial_statement_long_attachment, users[1].financial_statement_schedule_a_attachment, users[1].financial_statement_schedule_b_attachment, a_divorce_agreement_Post_interview_instructions, a_divorce_agreement_attachment], filename="joint_petition_divorce_packet", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[divorcejointpetition_attachment, affidavit_attachment, affidavitofindigency_attachment, affidavit_of_care_or_custody_attachment, ma_child_support_guidelines_worksheet_attachment, cjd_305_attachment, users[0].financial_statement_short_attachment, users[0].financial_statement_long_attachment, users[0].financial_statement_schedule_a_attachment, users[0].financial_statement_schedule_b_attachment, users[1].financial_statement_short_attachment, users[1].financial_statement_long_attachment, users[1].financial_statement_schedule_a_attachment, users[1].financial_statement_schedule_b_attachment, a_divorce_agreement_attachment], filename="joint_petition_divorce_packet", title="All forms to deliver to court", enabled=True)
 ---
 event: al_user_bundle.save_downloads
 code: |
@@ -218,52 +262,72 @@ code: |
 ---
 variable name: al_nav_sections
 data:
-  - packet_options: Forms to include
+  - packet_options: Start / forms to include
   - divorce_eligibility: Eligibility
-  - separation_agreement: Separation agreement
-  - relationship_background: Relationship background
-  - court_requests: Divorce action details
-  - party_information: Party information
-  - children_information: Children
-  - care_or_custody_affidavit_children: Care or custody affidavit children
-  - care_or_custody_affidavit_cases: Care or custody affidavit cases
-  - care_or_custody_affidavit_addresses: Care or custody affidavit addresses
-  - additional_circumstances_and_filings: Special circumstances and additional filings
-  - financial_statement: Financial statement
-  - fee_waiver: Fee waiver
-  - introduction: Financial statement introduction
-  - eligibility: Financial statement eligibility
-  - court_and_parties: Financial statement court and parties
-  - personal_information: Financial statement personal information
-  - cadence: Financial statement cadence
-  - income: Financial statement income
-  - deductions: Financial statement deductions
-  - expenses: Financial statement expenses
-  - assets: Financial statement assets
-  - liabilities: Financial statement liabilities
-  - review: Financial statement review
-  - download: Financial statement download
-  - parties: Agreement parties
-  - children_overview: Agreement children
-  - child_info: Agreement child information
-  - child_custody: Agreement custody
-  - parenting_time: Agreement parenting time
-  - child_support: Agreement child support
-  - adult_health_insurance: Agreement health insurance
-  - child_health_insurance: Agreement children's health insurance
-  - education: Agreement education costs
-  - taxes: Agreement taxes
-  - child_tax: Agreement child tax claim
-  - life_insurance: Agreement life insurance
-  - alimony: Agreement alimony
-  - real_estate: Agreement real estate
-  - personal_property: Agreement personal property
-  - debts: Agreement debts and liabilities
-  - retirement: Agreement retirement
-  - merger: Agreement merger / survival
-  - court_info: Agreement court and signatures
-  - review_a_divorce_agreement: Agreement review
-  - review_and_sign: Review and sign
+  - separation_agreement: Separation agreement plan
+  - one_a_parties_relationship_children: Parties, relationship, and children
+    subsections:
+      - relationship_background: Relationship background
+      - party_information: Party information
+      - children_information: Children
+      - care_or_custody_affidavit_children: Care or custody affidavit children
+      - care_or_custody_affidavit_cases: Care or custody affidavit cases
+      - care_or_custody_affidavit_addresses: Care or custody affidavit addresses
+  - child_support_guidelines: Child support worksheet
+    subsections:
+      - csg_intro: Worksheet introduction
+      - csg_parties: Worksheet parents and children
+      - csg_income: Worksheet income and deductions
+      - csg_childcare: Worksheet child care costs
+      - csg_review: Worksheet result
+  - court_requests: Court and filing details
+  - financial_statement: Financial information
+    subsections:
+      - introduction: Financial statement introduction
+      - eligibility: Financial statement eligibility
+      - court_and_parties: Financial statement court and parties
+      - personal_information: Financial statement personal information
+      - cadence: Financial statement cadence
+      - income: Financial statement income
+      - deductions: Financial statement deductions
+      - expenses: Financial statement expenses
+      - assets: Financial statement assets
+      - liabilities: Financial statement liabilities
+      - review: Financial statement review
+      - download: Financial statement download
+  - one_a_separation_agreement_terms: Separation agreement terms
+    subsections:
+      - parties: Agreement parties
+      - children_overview: Agreement children
+      - child_custody: Agreement custody
+      - parenting_time: Agreement parenting time
+      - child_support: Agreement child support
+      - adult_health_insurance: Agreement health insurance
+      - child_health_insurance: Agreement children's health insurance
+      - education: Agreement education costs
+      - taxes: Agreement taxes
+      - child_tax: Agreement child tax claim
+      - life_insurance: Agreement life insurance
+      - alimony: Agreement alimony
+      - real_estate: Agreement real estate
+      - personal_property: Agreement personal property
+      - debts: Agreement debts and liabilities
+      - retirement: Agreement retirement
+      - merger: Agreement merger / survival
+      - court_info: Agreement court and signatures
+      - review_a_divorce_agreement: Agreement review
+  - child_support_findings: Child support findings
+    subsections:
+      - fnd_intro: Findings introduction
+      - fnd_income_findings: Findings income
+      - fnd_coverage: Findings coverage and education
+      - fnd_deviation: Findings deviation
+      - fnd_closing: Findings review
+      - fnd_review_cjd_305: Findings answer review
+  - additional_circumstances_and_filings: Other filings
+    subsections:
+      - fee_waiver: Fee waiver
+  - review_and_sign: Review, sign, and download
 ---
 id: choose forms to include
 question: |
@@ -294,6 +358,16 @@ code: |
     interview_order_affidavit_disclosing_care_or_custody_addresses
     trigger_aff_care_or_custody_computed_variables
 
+  include_child_support_guidelines_worksheet = children_of_marriage
+  include_findings_and_determinations = children_of_marriage
+  if include_child_support_guidelines_worksheet:
+    set_child_support_guidelines_defaults
+    nav.set_section("child_support_guidelines")
+    ma_child_support_guidelines_worksheet_intro
+    interview_order_ma_child_support_guidelines_worksheet
+    set_child_support_defaults_from_guidelines
+    child_support_guidelines_result_reviewed
+
   include_separation_agreement = separation_agreement_format == "interview"
 
   if include_financial_statement:
@@ -303,6 +377,12 @@ code: |
 
   if include_separation_agreement:
     interview_order_a_divorce_agreement
+
+  if include_findings_and_determinations:
+    set_findings_and_determinations_defaults
+    nav.set_section("child_support_findings")
+    cjd_305_intro
+    interview_order_cjd_305
 
   nav.set_section("fee_waiver")
   set_indigency_defaults
@@ -316,6 +396,42 @@ code: |
   court_name = str(trial_court)
   trial_court.division = court_name.replace(" Probate and Family Court - North", "").replace(" Probate and Family Court - South", "").replace(" Probate and Family Court", "")
   set_trial_court_division = True
+---
+code: |
+  case_name = "In re " + str(users)
+  docket_number = ""
+  signature_date = today()
+  preparer_name = users[0].name.full()
+  set_child_support_guidelines_defaults = True
+---
+code: |
+  child_support_guideline_amount = payor_final_support_obligation_amount
+  guidelines_support_amount = payor_final_support_obligation_amount
+  guidelines_frequency = "Weekly"
+  child_support_frequency = "Weekly"
+  payor_name = payor.name.full()
+  recipient_name = recipient.name.full()
+  child_support_payer = payor.name.full()
+  child_support_recipient = recipient.name.full()
+  set_child_support_defaults_from_guidelines = True
+---
+id: child support worksheet result
+continue button field: child_support_guidelines_result_reviewed
+section: csg_review
+question: |
+  Child support worksheet result
+subquestion: |
+  The worksheet calculates a weekly child support amount of **${ currency(payor_final_support_obligation_amount) }**.
+
+  Payor: ${ payor.name.full() }
+
+  Recipient: ${ recipient.name.full() }
+
+  The separation agreement and findings form will use this as the starting amount.
+---
+code: |
+  trial_court_division = trial_court.division
+  set_findings_and_determinations_defaults = True
 ---
 code: |
   other_parties.there_are_any = False
@@ -359,6 +475,7 @@ code: |
   al_intro_screen
   divorcejointpetition_intro
   joint_petition_interview_order
+  nav.set_section("review_and_sign")
   signature_date
   # Store anonymous data for analytics / statistics
   store_variables_snapshot(
