@@ -1,5 +1,6 @@
 ---
 include:
+  - docassemble.MATCMotionToAmend:motion_to_amend.yml
   - docassemble.MATCFinancialStatement:financial_statement.yml
   - docassemble.MATCSeparationAgreement:separation_agreement.yml
   - docassemble.MATCChildCareOrCustodyDisclosureAffidavit:affidavit_disclosing_care_or_custody.yml
@@ -93,6 +94,7 @@ content: |
   File a Joint Petition for Divorce (1A) in Massachusetts    
 ---
 sections:
+  - convert_1b_to_1a: Existing case
   - packet_options: Start / forms to include
   - divorce_eligibility: Eligibility
   - separation_agreement: Separation agreement plan
@@ -164,13 +166,28 @@ code: |
   github_repo_name =  'docassemble-MATC1ADivorceJointPetition'
 ---
 code: |
-  al_form_type = "starts_case" 
+  al_form_type = "starts_case"
 ---
 code: |
   users[0].party_label = "Party A"
   users[1].party_label = "Party B"
   users[0].separation_agreement_role = "party_a"
   users[1].separation_agreement_role = "party_b"
+---
+id: existing 1B action screener
+question: |
+  Do you already have a divorce case filed?
+subquestion: |
+  If you or your spouse already filed a **1B divorce complaint** with the
+  court, and you both now agree to convert it to a joint no-fault 1A
+  divorce, we can help you prepare the motion to do that first.
+section: convert_1b_to_1a
+fields:
+  - "Do you already have a divorce (1B) action filed with the court?": has_existing_1b_action
+    datatype: yesnoradio
+---
+code: |
+  motion_to_amend_attachment.enabled = defined("has_existing_1b_action") and has_existing_1b_action
 ---
 code: |
   divorcejointpetition_Post_interview_instructions.enabled = True
@@ -248,8 +265,8 @@ objects:
 ---
 # Bundles group the ALDocuments into separate downloads, such as for court and for the user
 objects:
-  - al_user_bundle: ALDocumentBundle.using(elements=[divorcejointpetition_Post_interview_instructions, divorcejointpetition_attachment, affidavit_attachment, affidavitofindigency_attachment, child_care_or_custody_disclosure_affidavit_next_steps, affidavit_of_care_or_custody_attachment, ma_child_support_guidelines_worksheet_attachment, cjd_305_attachment, users[0].financial_statement_short_attachment, users[0].financial_statement_long_attachment, users[0].financial_statement_schedule_a_attachment, users[0].financial_statement_schedule_b_attachment, users[1].financial_statement_short_attachment, users[1].financial_statement_long_attachment, users[1].financial_statement_schedule_a_attachment, users[1].financial_statement_schedule_b_attachment, a_divorce_agreement_Post_interview_instructions, a_divorce_agreement_attachment], filename="joint_petition_divorce_packet", title="All forms to download for your records", enabled=True)
-  - al_court_bundle: ALDocumentBundle.using(elements=[divorcejointpetition_attachment, affidavit_attachment, affidavitofindigency_attachment, affidavit_of_care_or_custody_attachment, ma_child_support_guidelines_worksheet_attachment, cjd_305_attachment, users[0].financial_statement_short_attachment, users[0].financial_statement_long_attachment, users[0].financial_statement_schedule_a_attachment, users[0].financial_statement_schedule_b_attachment, users[1].financial_statement_short_attachment, users[1].financial_statement_long_attachment, users[1].financial_statement_schedule_a_attachment, users[1].financial_statement_schedule_b_attachment, a_divorce_agreement_attachment], filename="joint_petition_divorce_packet", title="All forms to deliver to court", enabled=True)
+  - al_user_bundle: ALDocumentBundle.using(elements=[motion_to_amend_attachment, divorcejointpetition_Post_interview_instructions, divorcejointpetition_attachment, affidavit_attachment, affidavitofindigency_attachment, child_care_or_custody_disclosure_affidavit_next_steps, affidavit_of_care_or_custody_attachment, ma_child_support_guidelines_worksheet_attachment, cjd_305_attachment, users[0].financial_statement_short_attachment, users[0].financial_statement_long_attachment, users[0].financial_statement_schedule_a_attachment, users[0].financial_statement_schedule_b_attachment, users[1].financial_statement_short_attachment, users[1].financial_statement_long_attachment, users[1].financial_statement_schedule_a_attachment, users[1].financial_statement_schedule_b_attachment, a_divorce_agreement_Post_interview_instructions, a_divorce_agreement_attachment], filename="joint_petition_divorce_packet", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[motion_to_amend_attachment, divorcejointpetition_attachment, affidavit_attachment, affidavitofindigency_attachment, affidavit_of_care_or_custody_attachment, ma_child_support_guidelines_worksheet_attachment, cjd_305_attachment, users[0].financial_statement_short_attachment, users[0].financial_statement_long_attachment, users[0].financial_statement_schedule_a_attachment, users[0].financial_statement_schedule_b_attachment, users[1].financial_statement_short_attachment, users[1].financial_statement_long_attachment, users[1].financial_statement_schedule_a_attachment, users[1].financial_statement_schedule_b_attachment, a_divorce_agreement_attachment], filename="joint_petition_divorce_packet", title="All forms to deliver to court", enabled=True)
 ---
 event: al_user_bundle.save_downloads
 code: |
@@ -262,6 +279,7 @@ code: |
 ---
 variable name: al_nav_sections
 data:
+  - convert_1b_to_1a: Existing case
   - packet_options: Start / forms to include
   - divorce_eligibility: Eligibility
   - separation_agreement: Separation agreement plan
@@ -338,6 +356,13 @@ fields:
 ---
 id: joint petition interview order
 code: |
+  nav.set_section("convert_1b_to_1a")
+  has_existing_1b_action
+  if has_existing_1b_action:
+    interview_order_motion_to_amend
+    previous_action = True
+    previous_action_detail = f"1B Divorce Complaint, Docket No. {docket_number}, filed {action_commenced_date.format()}"
+
   nav.set_section("packet_options")
   include_financial_statement
 
