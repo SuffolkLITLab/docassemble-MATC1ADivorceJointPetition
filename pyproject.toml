@@ -13,10 +13,8 @@ authors = [
     { name = "KP Hunsinger", email = "litlab@suffolk.edu" },
 ]
 dependencies = [
-    "docassemble.ALAffidavitOfIndigency",
-    "docassemble.MATCChildCareOrCustodyDisclosureAffidavit",
-    "docassemble.MATCFinancialStatement",
-    "docassemble.MATCSeparationAgreement",
+    "docassemble.ALAffidavitOfIndigency>=2.2.0",
+    "docassemble.MATCSeparationAgreement @ git+https://github.com/SuffolkLITLab/docassemble-MATCSeparationAgreement.git@main",
 ]
 license = "MIT"
 license-files = [
