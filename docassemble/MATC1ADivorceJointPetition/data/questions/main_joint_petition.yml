@@ -360,8 +360,6 @@ code: |
   has_existing_1b_action
   if has_existing_1b_action:
     interview_order_motion_to_amend
-    previous_action = True
-    previous_action_detail = f"1B Divorce Complaint, Docket No. {docket_number}, filed {action_commenced_date.format()}"
 
   nav.set_section("packet_options")
   include_financial_statement
@@ -481,6 +479,7 @@ code: |
   users[0].mobile_number = users[0].phone_number
   set_indigency_defaults = True
 ---
+id: getting help with court fees
 question: |
   Getting help with court fees
 subquestion: |

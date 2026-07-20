@@ -74,9 +74,13 @@ code: |
   marriage_date
   set_marriage_location
   
-  previous_action
-  if previous_action == True:
-    previous_action_detail
+  if defined("has_existing_1b_action") and has_existing_1b_action:
+    previous_action = True
+    previous_action_detail = f"1B Divorce Complaint, Docket No. {docket_number}, filed {action_commenced_date.format()}"
+  else:
+    previous_action
+    if previous_action == True:
+      previous_action_detail
 
   live_together
   marital_home.zip

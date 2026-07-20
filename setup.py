@@ -53,7 +53,7 @@ setup(name='docassemble.MATC1ADivorceJointPetition',
       license='MIT',
       url='https://docassemble.org',
       packages=find_namespace_packages(),
-      install_requires=['docassemble.ALAffidavitOfIndigency>=2.2.0', 'docassemble.MATCSeparationAgreement @ git+https://github.com/SuffolkLITLab/docassemble-MATCSeparationAgreement.git@main'],
+      install_requires=['docassemble.ALAffidavitOfIndigency>=2.3.0', 'docassemble.MATCSeparationAgreement @ git+https://github.com/SuffolkLITLab/docassemble-MATCSeparationAgreement.git@main'],
       zip_safe=False,
       package_data=find_package_data(where='docassemble/MATC1ADivorceJointPetition/', package='docassemble.MATC1ADivorceJointPetition'),
      )

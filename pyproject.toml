@@ -13,7 +13,7 @@ authors = [
     { name = "KP Hunsinger", email = "litlab@suffolk.edu" },
 ]
 dependencies = [
-    "docassemble.ALAffidavitOfIndigency>=2.2.0",
+    "docassemble.ALAffidavitOfIndigency>=2.3.0",
     "docassemble.MATCSeparationAgreement @ git+https://github.com/SuffolkLITLab/docassemble-MATCSeparationAgreement.git@main",
 ]
 license = "MIT"
