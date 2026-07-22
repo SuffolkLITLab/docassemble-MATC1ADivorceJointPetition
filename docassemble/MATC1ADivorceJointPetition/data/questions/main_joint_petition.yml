@@ -366,6 +366,8 @@ code: |
   include_financial_statement_spouse_1 = financial_statement_scope in ("both", "spouse_1_only")
   include_financial_statement_spouse_2 = financial_statement_scope in ("both", "spouse_2_only")
   include_financial_statement = financial_statement_scope != "neither"
+  users[0].making_statement_for = include_financial_statement_spouse_1
+  users[1].making_statement_for = include_financial_statement_spouse_2
 
 ---
 template: financial_statement_decision_help
