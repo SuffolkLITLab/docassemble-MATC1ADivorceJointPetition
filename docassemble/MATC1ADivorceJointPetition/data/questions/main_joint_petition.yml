@@ -357,8 +357,8 @@ fields:
     datatype: radio
     choices:
       - Both spouses: both
-      - Only {{  users[0]  }}: spouse_1_only
-      - Only {{  users[1]  }}: spouse_2_only
+      - "Only ${ users[0] }": spouse_1_only
+      - "Only ${ users[1] }": spouse_2_only
       - Neither spouse right now: neither
 
 ---
