@@ -88,9 +88,11 @@ code: |
 
   nav.set_section("party_information")
 
-  users[0].address.address
+  if ask_party_a_address:
+    users[0].address.address
   users[0].phone_number
-  users[1].address.address
+  if ask_party_b_address:
+    users[1].address.address
   users[1].phone_number
 
   users.gather()
@@ -424,6 +426,8 @@ fields:
   - "Country of marriage": marriage_location_country
     show if: international_marriage
     required: False
+  - "When did you last live together?": last_living_together_date
+    datatype: date
   - "When did the marriage breakdown occur?": marriage_breakdown_date
     datatype: date
   - "Briefly explain what caused the marriage breakdown": marriage_breakdown_justification
@@ -490,8 +494,8 @@ fields:
     datatype: radio
     choices:
       - "We both do": "both"
-      - "${  users[0]  } does": 0
-      - "${  users[1]  } does": 1
+      - "${  users[0]  } does": "party_a"
+      - "${  users[1]  } does": "party_b"
       - "Neither of us does": "neither"
 ---
 code: |
@@ -500,11 +504,11 @@ code: |
     users[1].address = marital_home
     ask_party_a_address = False
     ask_party_b_address = False
-  elif who_lives_at_marital_home == 0:
+  elif who_lives_at_marital_home == "party_a":
     users[0].address = marital_home
     ask_party_a_address = False
     ask_party_b_address = True
-  elif who_lives_at_marital_home == 1:
+  elif who_lives_at_marital_home == "party_b":
     users[1].address = marital_home
     ask_party_a_address = True
     ask_party_b_address = False
