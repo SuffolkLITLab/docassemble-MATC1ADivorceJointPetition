@@ -73,7 +73,7 @@ code: |
   nav.set_section("relationship_background")
   marriage_date
   set_marriage_location
-  
+
   if defined("has_existing_1b_action") and has_existing_1b_action:
     previous_action = True
     previous_action_detail = f"1B Divorce Complaint, Docket No. {docket_number}, filed {action_commenced_date.format()}"
@@ -82,15 +82,17 @@ code: |
     if previous_action == True:
       previous_action_detail
 
-  live_together
   marital_home.zip
+  who_lives_at_marital_home
   copy_marital_address_fields
-  
-  nav.set_section("party_information") 
-  
-  users[0].address.address
-  users[1].address.address
+
+  nav.set_section("party_information")
+
+  if ask_party_a_address:
+    users[0].address.address
   users[0].phone_number
+  if ask_party_b_address:
+    users[1].address.address
   users[1].phone_number
 
   users.gather()
@@ -181,21 +183,21 @@ fields:
   - code: |
       users[1].name_fields()  
 ---
-id: Party A Phone number 
-sets:  
+id: Party A Phone number
+sets:
   users[0].phone_number
 question: |
-  What is ${  users[0]  }'s phone number?'
-fields: 
+  What is ${  users[0]  }'s phone number?
+fields:
   - "${ users[0]  } phone number": users[0].phone_number
     datatype: tel
 ---
-id: Party B Phone number 
-sets:  
+id: Party B Phone number
+sets:
   users[1].phone_number
 question: |
-  What is ${  users[1]  }'s phone number?'
-fields: 
+  What is ${  users[1]  }'s phone number?
+fields:
   - "${ users[1]  } phone number": users[1].phone_number
     datatype: tel
 ---
@@ -482,79 +484,60 @@ fields:
     maxlength: 252
     required: False 
 ---
-id: Living arrangements
-question: |
-  Living arrangements
-fields: 
-  - "Do ${  users[0]  } and ${  users[1]  } currently live together?": live_together
-    datatype: radio
-    choices: 
-      - We live together: True
-      - We live in separate households: False
-  - "When did ${  users[0].familiar()  } and ${  users[1].familiar()  } last live together?": last_living_together_date
-    datatype: date
-    show if:
-      variable: live_together
-      is: False
-  - "Does either ${  users[0]  } or ${  users[1]  } live in the {marital home}?": marital_home_occupied
-    datatype: yesnoradio
-    show if:
-      variable: live_together
-      is: False
-  - "Who lives in the marital home?": marital_home_occupant
-    datatype: radio
-    show if:
-      variable: marital_home_occupied
-      is: True
-    choices: 
-      - "${  users[0]  }": 0
-      - "${  users[1]  }": 1
----
 id: marital home address
 sets:
   - marital_home.address
   - marital_home.zip
 question: |
   Marital home address
-fields: 
+subquestion: |
+  What is the address where you last lived together? This is your marital home — the address listed on the court petition.
+fields:
   - code: |
       marital_home.address_fields(show_county=True)
 ---
-#if live together copy marital home address to users address fields
+id: who lives at marital home
+sets:
+  - who_lives_at_marital_home
+question: |
+  Do either of you still live at this address?
+fields:
+  - "": who_lives_at_marital_home
+    datatype: radio
+    choices:
+      - "We both do": "both"
+      - "${  users[0]  } does": "party_a"
+      - "${  users[1]  } does": "party_b"
+      - "Neither of us does": "neither"
+---
 code: |
-  if live_together: 
-    users[0].address.address = users[1].address.address = marital_home.address
-    users[0].address.unit = users[1].address.unit = marital_home.unit
-    users[0].address.city = users[1].address.city = marital_home.city
-    users[0].address.state = users[1].address.state = marital_home.state
-    users[0].address.zip = users[1].address.zip = marital_home.zip
-    users[0].address.county = users[1].address.county = marital_home.county
+  if who_lives_at_marital_home == "both":
+    users[0].address = marital_home
+    users[1].address = marital_home
+    ask_party_a_address = False
+    ask_party_b_address = False
+  elif who_lives_at_marital_home == "party_a":
+    users[0].address = marital_home
+    ask_party_a_address = False
+    ask_party_b_address = True
+  elif who_lives_at_marital_home == "party_b":
+    users[1].address = marital_home
+    ask_party_a_address = True
+    ask_party_b_address = False
   else:
-    if marital_home_occupied:
-      if marital_home_occupant == 0:
-        users[0].address.address = marital_home.address
-        users[0].address.unit = marital_home.unit
-        users[0].address.city = marital_home.city
-        users[0].address.state = marital_home.state
-        users[0].address.zip = marital_home.zip
-        users[0].address.county = marital_home.county
-      elif marital_home_occupant == 1:
-        users[1].address.address = marital_home.address
-        users[1].address.unit = marital_home.unit
-        users[1].address.city = marital_home.city
-        users[1].address.state = marital_home.state
-        users[1].address.zip = marital_home.zip
-        users[1].address.county = marital_home.county
+    ask_party_a_address = True
+    ask_party_b_address = True
   copy_marital_address_fields = True
 ---
 id: Party A home address
 sets:
   - users[0].address.address
   - users[0].address.zip
+if: ask_party_a_address
 question: |
   Address: ${ users[0] }
 subquestion: |
-  What is ${ users[0].familiar() }'s address?
+  What is ${ users[0].familiar() }'s current address?
 fields:
   - code: |
       users[0].address_fields(show_county=True)
@@ -563,10 +546,11 @@ id: Party B home address
 sets:
   - users[1].address.address
   - users[1].address.zip
+if: ask_party_b_address
 question: |
   Address: ${ users[1] }
 subquestion: |
-  What is ${ users[1].familiar() }'s address?
+  What is ${ users[1].familiar() }'s current address?
 fields:
   - code: |
       users[1].address_fields(show_county=True)
