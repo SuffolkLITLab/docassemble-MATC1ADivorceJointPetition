@@ -194,7 +194,7 @@ code: |
   divorcejointpetition_Post_interview_instructions.enabled = True
 ---
 code: |
-  jointmotiontofilemarriagecertificatelate_attachment = True
+  jointmotiontofilemarriagecertificatelate_attachment.enabled = needs_late_marriage_certificate_motion
 ---
 code: |
   divorcejointpetition_attachment.enabled = True
@@ -368,12 +368,15 @@ code: |
   nav.set_section("packet_options")
   include_financial_statement
 
-  interview_order_jointmotiontofilemarriagecertificatelate
   interview_order_divorcejointpetition
 
   nav.set_section("court_requests")
   trial_court
   set_trial_court_division
+
+  needs_late_marriage_certificate_motion = not bool(marriage_certificate_upload)
+  if needs_late_marriage_certificate_motion:
+    interview_order_jointmotiontofilemarriagecertificatelate
 
   include_care_or_custody_affidavit = children_of_marriage
   if include_care_or_custody_affidavit:

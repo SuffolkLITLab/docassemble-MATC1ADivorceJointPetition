@@ -10,23 +10,20 @@ comment: |
   Controls order and branching logic for questions specific to this form
 id: interview_order_jointmotiontofilemarriagecertificatelate
 code: |
-  users.gather()
-  set_parts(subtitle=str(users))
-  marriage_city
-  has_certified_marriage_certificate
-  if has_certified_marriage_certificate:
-    uploaded_marriage_certificate
-    marriage_proof_delay_reason = ""
-    marriage_proof_delay_action_plan = ""
-  else:
-    marriage_proof_delay_reason
+  # The parent packet has already collected the parties and marriage details.
+  marriage_city = marriage_location_city
+  marriage_state = marriage_location_state
+  marriage_country = marriage_location_country
+  marriage_proof_delay_reason
+  marriage_proof_delay_action_plan
   users[0].phone_number
   trial_court.division
   users[1].phone_number
   users[0].address.address
   signature_date
   users[1].address.address
-  docket_number
+  if not defined("docket_number"):
+    docket_number = ""
   interview_order_jointmotiontofilemarriagecertificatelate = True
 ---
 id: Joint_motion_to_file_marriage_certificate_late
