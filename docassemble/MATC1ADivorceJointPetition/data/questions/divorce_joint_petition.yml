@@ -88,11 +88,9 @@ code: |
 
   nav.set_section("party_information")
 
-  if ask_party_a_address:
-    users[0].address.address
+  users[0].address.address
   users[0].phone_number
-  if ask_party_b_address:
-    users[1].address.address
+  users[1].address.address
   users[1].phone_number
 
   users.gather()
@@ -370,38 +368,24 @@ id: Separation agreement status
 question: |
   Separation agreement
 subquestion: |
-  You will need to file a {separation agreement}. 
-  
-  Your separation agreement tells the court how you will handle all issues related to your divorce.
-
-  Both parties must sign the agreement in the presence of a {notary}, who will mark the document to validate your signatures. 
- 
-  A complete, {notarized} separation agreement is strongly encouraged at the time of filing.
-  
-fields: 
-  - "We have already prepared a detailed written separation agreement that fully captures our agreement on all relevant issues": separation_agreement_documented
+  Your separation agreement tells the court how you will handle property, custody, and support. It must be {notarized} within 90 days of filing and should be filed with your initial petition.
+fields:
+  - "Have you already prepared a separation agreement?": separation_agreement_documented
     datatype: yesnoradio
-under: |
-  Whether or not you already have a written agreement, you will choose next whether to create one now, upload an existing one, or file one with the court later.
----
-id: Separation agreement format
-question: |
-  Separation agreement format
-subquestion: |
-  Anyone filing a joint petition for divorce must file a separation agreement within 90 days of initial filing.
-  
-  You can create a separation agreement in this interview, upload a complete agreement you already have, or file your agreement with the court registry later.
-
-  The separation agreement must be {notarized} before you file it with the court and should completely address all major issues such as property division, child custody, and child support.
-  
-  You are highly encouraged to submit a complete, notarized agreement with initial filing. 
-fields: 
-  - "How would you like to file your separation agreement?": separation_agreement_format
+  - "How would you like to proceed?": separation_agreement_format
     input type: radio
-    choices: 
-      - "Create a separation agreement using this interview tool": interview
-      - "Upload my complete, notarized separation agreement on the next screen": upload
-      - "File my complete, notarized separation agreement with the court registry later" : wait
+    show if: separation_agreement_documented
+    choices:
+      - "Upload my complete, notarized agreement now": upload
+      - "File it with the court registry later": wait
+  - "How would you like to proceed?": separation_agreement_format
+    input type: radio
+    show if:
+      variable: separation_agreement_documented
+      is: False
+    choices:
+      - "Create one using this interview tool": interview
+      - "File something with the court registry later": wait
 ---
 id: Upload agreement
 question: |
@@ -506,8 +490,8 @@ fields:
     datatype: radio
     choices:
       - "We both do": "both"
-      - "${  users[0]  } does": "party_a"
-      - "${  users[1]  } does": "party_b"
+      - "${  users[0]  } does": 0
+      - "${  users[1]  } does": 1
       - "Neither of us does": "neither"
 ---
 code: |
@@ -516,11 +500,11 @@ code: |
     users[1].address = marital_home
     ask_party_a_address = False
     ask_party_b_address = False
-  elif who_lives_at_marital_home == "party_a":
+  elif who_lives_at_marital_home == 0:
     users[0].address = marital_home
     ask_party_a_address = False
     ask_party_b_address = True
-  elif who_lives_at_marital_home == "party_b":
+  elif who_lives_at_marital_home == 1:
     users[1].address = marital_home
     ask_party_a_address = True
     ask_party_b_address = False
