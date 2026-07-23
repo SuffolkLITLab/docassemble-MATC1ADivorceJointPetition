@@ -1,0 +1,337 @@
+---
+# Included interview logic for the umbrella joint-petition flow.
+# The umbrella main file must define the bundles that include
+# jointmotiontofilemarriagecertificatelate_attachment and set the court/role globals.
+objects:
+  - attorneys: ALPeopleList.using(there_are_any=True)
+  - users: ALPeopleList.using(ask_number=False, target_number=2)
+---
+comment: |
+  Controls order and branching logic for questions specific to this form
+id: interview_order_jointmotiontofilemarriagecertificatelate
+code: |
+  # The parent packet has already collected the parties and marriage details.
+  marriage_city = marriage_location_city
+  marriage_state = marriage_location_state
+  marriage_country = marriage_location_country
+  marriage_proof_delay_reason
+  marriage_proof_delay_action_plan
+  users[0].phone_number
+  trial_court.division
+  users[1].phone_number
+  users[0].address.address
+  signature_date
+  users[1].address.address
+  if not defined("docket_number"):
+    docket_number = ""
+  interview_order_jointmotiontofilemarriagecertificatelate = True
+---
+id: Joint_motion_to_file_marriage_certificate_late
+continue button field: jointmotiontofilemarriagecertificatelate_intro
+question: |
+  Joint motion to file marriage certificate late
+subquestion: |
+  This interview will help you file a joint motion to file marriage certificate late if not submitting with petition.
+  
+  Before you get started, please gather:
+  
+  1. Marriage information (Date, location)
+  2. Information about how to obtain a certified copy of your marriage certificate and/or translation. 
+   
+  
+  When you are finished, you will need to:
+  
+  1. File this motion with your joint petition. 
+  2. Obtain a certified copy of your marriage certificate and/or translation and file with the court as soon as possible.
+
+  If you are a couple filing a joint petition for divorce you can use this interview to file a joint motion to file marriage certificate late if not submitting certified copy of marriage certificate with petition.
+
+  Most people take about 10 minutes to complete this interview.
+---
+sets: 
+  - users[i].name.first
+  - users[i].name.last
+  - users[i].name.middle
+  - users[i].name.suffix  
+id: Petitioner name fields
+question: |
+  % if i == 0:
+  Petitioner A
+  % elif i == 1:
+  Petitioner B
+  % else:
+  Petitioner Name
+  % endif
+subquestion: |
+  % if i == 1:
+  Who is ${ users[0] }'s spouse?
+  % else:
+  What is your name?
+  % endif
+fields:
+  - code: |
+      users[i].name_fields()
+---
+id: users_limit
+depends on:
+  - users
+code: |
+  users.there_is_another = (len(users) < 2)
+---
+id: Marriage Details
+question: |
+  Marriage Details
+subquestion: |
+  When and where did ${ users[0] } and ${ users[1] } get married?
+fields:
+  - "Date of marriage ceremony": marriage_date
+    datatype: date
+  - "City where marriage took place": marriage_city
+  - "Marriage occurred outside the United States?": international_marriage
+    datatype: yesnoradio
+  - "State where marriage took place": marriage_state
+    required: False
+    show if:
+      variable: international_marriage
+      is: False
+  - "Country where marriage took place": marriage_country
+    required: False
+    show if:
+      variable: international_marriage
+      is: True
+---
+id: Certified marriage certificate
+question: |
+  Certified marriage certificate
+fields:
+  - "Do you already have a certified copy of your marriage certificate?": has_certified_marriage_certificate
+    datatype: yesnoradio
+  - "Upload your certified marriage certificate (optional)": uploaded_marriage_certificate
+    datatype: file
+    required: False
+    show if:
+      variable: has_certified_marriage_certificate
+      is: True
+---
+id: Reason for Delay
+question: |
+  Reason for Delay
+subquestion: |
+  Tell the court why you do not have your certified marriage certificate yet and what you are doing to get it.
+
+  You can copy and paste one of these examples, then edit it to match your situation:
+
+  ${ collapse_template(order_certified_copy_example) }
+  ${ collapse_template(translation_example) }
+  ${ collapse_template(urgent_filing_example) }
+fields:
+  - "Reason for marriage certificate delay": marriage_proof_delay_reason
+    input type: area
+  - "Plan to obtain and submit certified copy of marriage certificate": marriage_proof_delay_action_plan
+    input type: area
+---
+template: order_certified_copy_example
+subject: |
+  Example: We need to order a certified copy
+content: |
+  We were married in [City, State/Country], and we do not have a certified copy of our marriage certificate yet.
+  We requested a certified copy from [agency/city/town/state/country] on [date].
+  We are waiting for processing and delivery.
+
+  We will file the certified copy with the court as soon as we receive it.
+---
+template: translation_example
+subject: |
+  Example: We need a certified translation
+content: |
+  Our marriage certificate is not in English.
+  We are obtaining a certified English translation from [translator/service].
+  We expect to receive the certified translation by [date].
+
+  We will file both the marriage certificate and certified translation with the court as soon as they are ready.
+---
+template: urgent_filing_example
+subject: |
+  Example: We need to file now while waiting for documents
+content: |
+  We are filing our joint petition now because we need to move our case forward as soon as possible.
+  We do not yet have the certified marriage certificate because [brief reason, such as waiting for mail or processing].
+  We are actively working to get the required documents.
+
+  We will file the certified marriage certificate (and certified translation, if needed) promptly after receiving them.
+---
+id: preview jointmotiontofilemarriagecertificatelate
+question: |
+  Preview your form before you sign it
+subquestion: |
+  Here is a preview of the form you will sign on the next page.   
+  
+  ${ al_court_bundle.as_pdf(key='preview') }
+
+  Click the image to open it in a new tab. Click the "Edit answers" button
+  to edit your answers.
+
+  ${ action_button_html(url_action('review_jointmotiontofilemarriagecertificatelate'), label='Edit answers', color='info') }
+  
+  Please come back to this window to finish and sign your form.
+continue button field: jointmotiontofilemarriagecertificatelate_preview_question    
+---
+code: |
+  signature_fields = ['users[0].signature', 'users[1].signature']
+---
+code: |
+  # This is a placeholder for the addresses that will be searched
+  # for matching address to court. Edit if court venue is based on 
+  # a different address than the user's
+  [user.address.address for user in users.complete_elements()]
+  addresses_to_search = [user.address for user in users.complete_elements()]
+
+---
+id: jointmotiontofilemarriagecertificatelate review screen
+event: review_jointmotiontofilemarriagecertificatelate
+question: |
+  Review your answers
+review:
+  - Edit: users.revisit
+    button: |
+      **Users**
+
+      % for item in users:
+        * ${ item }
+      % endfor
+  - Edit: marriage_state
+    button: |
+      **State where marriage took place**:
+      ${ marriage_state }
+  - Edit: marriage_proof_delay_action_plan
+    button: |
+      **Plan to fix marriage proof delay**:
+      ${ marriage_proof_delay_action_plan }
+  - Edit: trial_court
+    button: |
+      **Trial court**
+  
+      % if defined("trial_court.division"):
+      * division: ${ trial_court.division }
+      % endif
+  - Edit: marriage_city
+    button: |
+      **City where marriage took place**:
+      ${ marriage_city }
+  - Edit: marriage_date
+    button: |
+      **Date of marriage ceremony**:
+      ${ marriage_date }
+  - Edit: marriage_country
+    button: |
+      **Country where marriage took place**:
+      ${ marriage_country }
+  - Edit: signature_date
+    button: |
+      **Date of Signature**:
+      ${ signature_date }
+  - Edit: i
+    button: |
+      **I**:
+      ${ i }
+  - Edit: attorneys.revisit
+    button: |
+      **Attorneys**
+
+      % for item in attorneys:
+        * ${ item }
+      % endfor
+  - Edit: marriage_proof_delay_reason
+    button: |
+      **Reason for marriage proof delay**:
+      ${ marriage_proof_delay_reason }
+  - Edit: docket_number
+    button: |
+      **Docket number**:
+      ${ docket_number }
+  - Edit: international_marriage
+    button: |
+      **Marriage was outside of United States**:
+      ${ word(yesno(international_marriage)) }
+---
+id: edit users
+continue button field: users.revisit
+question: |
+  Edit users
+subquestion: |
+  ${ users.table }
+
+  ${ users.add_action() }
+---
+table: users.table
+rows: users
+columns:
+  - Phone number: |
+      row_item.phone_number if defined("row_item.phone_number") else ""
+  - Signature: |
+      row_item.signature if defined("row_item.signature") else ""
+  - Address: |
+      row_item.address.block() if defined("row_item.address.address") else ""
+  - Name: |
+      row_item.name_full() if defined("row_item.name.first") else ""
+edit:
+  - phone_number
+  - signature
+  - address.address
+  - name.first
+confirm: True
+
+---
+id: edit attorneys
+continue button field: attorneys.revisit
+question: |
+  Edit attorneys
+subquestion: |
+  ${ attorneys.table }
+
+  ${ attorneys.add_action() }
+---
+table: attorneys.table
+rows: attorneys
+columns:
+  - Bbo number: |
+      row_item.bbo_number if defined("row_item.bbo_number") else ""
+edit:
+  - bbo_number
+confirm: True
+
+---
+id: download jointmotiontofilemarriagecertificatelate
+event: jointmotiontofilemarriagecertificatelate_download
+question: |
+  All done
+subquestion: |
+  Thank you ${users}. Your form is ready. Please download it and deliver it.
+  
+  View, download and send your form below. Click the "Edit answers" button to fix any mistakes.
+
+  ${ action_button_html(url_action('review_jointmotiontofilemarriagecertificatelate'), label='Edit answers', color='info') }
+  
+  
+  ${ al_user_bundle.download_list_html() }
+  
+
+  ${ al_user_bundle.send_button_html(show_editable_checkbox=True) }
+
+progress: 100
+---
+# ALDocument objects specify the metadata for each template
+objects:
+  - jointmotiontofilemarriagecertificatelate_attachment: ALDocument.using(title="Joint motion to file marriage certificate late", filename="jointmotiontofilemarriagecertificatelate", has_addendum=False, )
+---
+# Each attachment defines a key in an ALDocument. We use `i` as the placeholder here so the same template is 
+# used for "preview" and "final" keys, and logic in the template checks the value of 
+# `i` to show or hide the user's signature
+---
+attachment:
+  name: jointmotiontofilemarriagecertificatelate
+  filename: jointmotiontofilemarriagecertificatelate
+  variable name: jointmotiontofilemarriagecertificatelate_attachment[i]
+  skip undefined: True
+  docx template file: jointmotiontofilemarriagecertificatelate.docx
+  tagged pdf: True
