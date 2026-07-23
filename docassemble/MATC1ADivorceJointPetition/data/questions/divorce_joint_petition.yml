@@ -945,6 +945,7 @@ progress: 100
 objects:
   - divorcejointpetition_Post_interview_instructions: ALDocument.using(title="Instructions", filename="divorcejointpetition_next_steps.docx", has_addendum=False)
   - divorcejointpetition_attachment: ALDocument.using(title="Joint1ADivorce", filename="divorcejointpetition", has_addendum=False)
+  - r408_attachment: ALDocument.using(title="Report of Absolute Divorce or Annulment (R-408)", filename="r408", has_addendum=False)
   - affidavit_attachment: ALDocument.using(title="Affidavit", filename="affidavit", has_addendum=False, )
 ---
 # Each attachment defines a key in an ALDocument. We use `i` as the placeholder here so the same template is 
@@ -1016,6 +1017,70 @@ attachment:
       - "users2_petition_signer_phone_number": ${ users[1].phone_number }
       - "attorneys1_bbo_number": ${ attorneys[0].bbo_number }
       - "attorneys2_bbo_number": ${ attorneys[1].bbo_number }
+---
+attachment:
+  name: r408
+  filename: r408
+  variable name: r408_attachment[i]
+  skip undefined: True
+  pdf template file: r408.pdf
+  fields:
+      - "trial_court_division": ${ trial_court.address.county }
+      - "docket_number": ${ docket_number }
+      - "judgment_type_divorce": ${ True }
+      - "judgment_type_annulment": ${ False }
+      - "marriage_date": ${ marriage_date.format() }
+      - "marriage_location": ${ marriage_location }
+      - "judgment_date": ${ "" }
+      - "divorce_absolute_date": ${ "" }
+      - "divorce_grounds": ${ "Irretrievable breakdown" }
+      - "submitting_official_fullname": ${ "" }
+      - "users1_role_plaintiff": ${ True }
+      - "users1_role_defendant": ${ False }
+      - "users1_name_first": ${ users[0].name.first }
+      - "users1_name_middle": ${ showifdef(users[0].attr_name("name.middle")) }
+      - "users1_name_last": ${ users[0].name.last }
+      - "users1_name_last_upon_divorce": ${ users[0].former_name_last if users[0].name_change and defined(users[0].attr_name("former_name_last")) else users[0].name.last }
+      - "users1_name_last_at_birth": ${ showifdef(users[0].attr_name("former_name_last")) }
+      - "users1_birthdate": ${ showifdef(users[0].attr_name("birthdate")) }
+      - "users1_gender_male": ${ False }
+      - "users1_gender_female": ${ False }
+      - "users1_ssn": ${ users[0].ssn }
+      - "users1_marriage_count": ${ "---" }
+      - "users1_custodial_children_count": ${ users1_number_of_custodial_children if defined("users1_number_of_custodial_children") else 0 }
+      - "users1_address_address": ${ users[0].address.address }
+      - "users1_address_city": ${ users[0].address.city }
+      - "users1_address_state": ${ users[0].address.state }
+      - "users1_address_zip": ${ users[0].address.zip }
+      - "users2_role_plaintiff": ${ True }
+      - "users2_role_defendant": ${ False }
+      - "users2_name_first": ${ users[1].name.first }
+      - "users2_name_middle": ${ showifdef(users[1].attr_name("name.middle")) }
+      - "users2_name_last": ${ users[1].name.last }
+      - "users2_name_last_upon_divorce": ${ users[1].former_name_last if users[1].name_change and defined(users[1].attr_name("former_name_last")) else users[1].name.last }
+      - "users2_name_last_at_birth": ${ showifdef(users[1].attr_name("former_name_last")) }
+      - "users2_birthdate": ${ showifdef(users[1].attr_name("birthdate")) }
+      - "users2_gender_male": ${ False }
+      - "users2_gender_female": ${ False }
+      - "users2_ssn": ${ users[1].ssn }
+      - "users2_marriage_count": ${ "---" }
+      - "users2_custodial_children_count": ${ users2_number_of_custodial_children if defined("users2_number_of_custodial_children") else 0 }
+      - "users2_address_address": ${ users[1].address.address }
+      - "users2_address_city": ${ users[1].address.city }
+      - "users2_address_state": ${ users[1].address.state }
+      - "users2_address_zip": ${ users[1].address.zip }
+      - "children_count": ${ len(children) if defined("children_of_marriage") and children_of_marriage else 0 }
+      - "children1_name_full": ${ children[0].name_full() if len(children) > 0 else "" }
+      - "children2_name_full": ${ children[1].name_full() if len(children) > 1 else "" }
+      - "children3_name_full": ${ children[2].name_full() if len(children) > 2 else "" }
+      - "children4_name_full": ${ children[3].name_full() if len(children) > 3 else "" }
+      - "children5_name_full": ${ children[4].name_full() if len(children) > 4 else "" }
+      - "children1_birthdate": ${ children[0].birthdate.format() if len(children) > 0 and defined(children[0].attr_name("birthdate")) else "" }
+      - "children2_birthdate": ${ children[1].birthdate.format() if len(children) > 1 and defined(children[1].attr_name("birthdate")) else "" }
+      - "children3_birthdate": ${ children[2].birthdate.format() if len(children) > 2 and defined(children[2].attr_name("birthdate")) else "" }
+      - "children4_birthdate": ${ children[3].birthdate.format() if len(children) > 3 and defined(children[3].attr_name("birthdate")) else "" }
+      - "children5_birthdate": ${ children[4].birthdate.format() if len(children) > 4 and defined(children[4].attr_name("birthdate")) else "" }
+      - "r408_overflow": ${ "\n".join([f"{child.name_full()}, {child.birthdate.format() if defined(child.attr_name('birthdate')) else ''}" for child in children.complete_elements()[5:]]) if len(children.complete_elements()) > 5 else "" }
 ---
 attachment:
   name: affidavit
