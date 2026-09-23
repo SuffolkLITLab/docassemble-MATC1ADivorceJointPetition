@@ -89,10 +89,13 @@ subquestion: |
   We only need any R408 details that were not already collected.
 validation code: |
   import re
+  # These fields use "show if", so they render under anonymous names and an
+  # error aimed at field="users1_ssn_last_four" is silently dropped. Raise it
+  # without a field so it appears at the top of the screen.
   if defined("users1_ssn_last_four") and (not re.fullmatch(r"\d{4}", str(users1_ssn_last_four))):
-    validation_error("Enter exactly 4 digits.", field="users1_ssn_last_four")
+    validation_error(f"Enter exactly 4 digits for the last 4 of {users[0]}'s Social Security Number.")
   if defined("users2_ssn_last_four") and (not re.fullmatch(r"\d{4}", str(users2_ssn_last_four))):
-    validation_error("Enter exactly 4 digits.", field="users2_ssn_last_four")
+    validation_error(f"Enter exactly 4 digits for the last 4 of {users[1]}'s Social Security Number.")
 fields:
   - "${ users[0] } sex": users1_gender
     datatype: radio
