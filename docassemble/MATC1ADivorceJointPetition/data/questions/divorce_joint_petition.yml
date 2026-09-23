@@ -158,7 +158,11 @@ terms:
   separation agreement: |
     A written document listing all things the parties agree on in their divorce, like child support, taxes, parenting time, and property division
   notary: |
-    A notary or notary is authorized by the Commonwealth of Massachusetts to witnes signatures, among other possible duties. 
+    A notary public is authorized by the Commonwealth of Massachusetts to witness signatures, among other duties.
+  legally married: |
+    Married under a marriage license, with the marriage recorded by a government, for example on a marriage certificate. If you are not sure whether your relationship counts as a legal marriage, talk with a lawyer before you continue.
+  certified copy: |
+    A copy of your marriage certificate from the city or town clerk, or the state registry, where your marriage was recorded. It has an official seal or stamp. A photocopy is not a certified copy.
   notarize: |
     The process where a notary public witnesses signatures and places a seal on document to ensure authenticity
   notarized: |
@@ -214,7 +218,7 @@ sets:
 question: |
   What is ${  users[0]  }'s phone number?
 fields:
-  - "${ users[0]  } phone number": users[0].phone_number
+  - Phone number: users[0].phone_number
     datatype: tel
 ---
 id: Party B Phone number
@@ -223,21 +227,23 @@ sets:
 question: |
   What is ${  users[1]  }'s phone number?
 fields:
-  - "${ users[1]  } phone number": users[1].phone_number
+  - Phone number: users[1].phone_number
     datatype: tel
 ---
 id: legal marriage
 question: |
   Confirm legal marriage
-fields: 
-  - "Are ${  users[0].name_full()  } and ${  users[1].name_full()  } legally married?" : legal_marriage
+subquestion: |
+  Are ${ users[0].name_full() } and ${ users[1].name_full() } {legally married}?
+fields:
+  - no label: legal_marriage
     datatype: yesnoradio
 ---
 id: upload marriage proof
 question: |
   Upload marriage certificate
 subquestion: |
-  Submitting a certified copy of your marriage certificate is strongly encouraged at the time of initial filing. Upload a copy here to include it with your filings. Keep any original copies as the court may ask for a physical certified copy. 
+  Filing a {certified copy} of your marriage certificate with your petition is strongly encouraged. Upload a copy here to include it with your filings. Keep your certified copy, because the court may ask for it.
   
 fields:
   - "Upload marriage certificate": marriage_certificate_upload
@@ -261,9 +267,11 @@ buttons:
 ---
 id: Confirm Massachusetts jurisdiction A
 question: |
-  Massachusetts jurisdiction confirmation
+  Massachusetts residency
+subquestion: |
+  Has ${ users[0] }, ${ users[1] }, or both lived in Massachusetts for the whole year right before you file?
 fields:
-  - "Have either or both ${ users[0] } and ${ users[1] } lived in Massachusetts for at least one year?": massachusetts_residency
+  - no label: massachusetts_residency
     datatype: yesnoradio
 ---
 id: Confirm Massachusetts jurisdiction B
@@ -343,7 +351,8 @@ subquestion: |
   You said you are not willing to work out an agreement together.
   % endif
 
-  To file a 1A divorce, all of these must be true. A 1A divorce is for couples who
+  To file a 1A divorce, you must both want the divorce, file together, and file a
+  notarized separation agreement. A 1A divorce is for couples who
   agree about ending the marriage, and who agree about how to handle money,
   property, and children.
 
@@ -468,6 +477,7 @@ fields:
 ---
 id: Cautionary message notarized separation agreement
 continue button field: cautionary_message_delay_agreement
+continue button label: I understand
 question: |
   Confirm information
 subquestion: |
@@ -626,7 +636,7 @@ sets:
 question: |
   Marital home address
 subquestion: |
-  What is the address where you last lived together? This is your marital home — the address listed on the court petition.
+  What is the address where you last lived together? This is your {marital home}.
 fields:
   - code: |
       marital_home.address_fields(show_county=True)
@@ -1426,9 +1436,9 @@ progress: 100
 ---
 # ALDocument objects specify the metadata for each template
 objects:
-  - divorcejointpetition_Post_interview_instructions: ALDocument.using(title="Instructions", filename="divorcejointpetition_next_steps.docx", has_addendum=False)
-  - divorcejointpetition_attachment: ALDocument.using(title="Joint1ADivorce", filename="divorcejointpetition", has_addendum=False)
-  - affidavit_attachment: ALDocument.using(title="Affidavit", filename="affidavit", has_addendum=False, )
+  - divorcejointpetition_Post_interview_instructions: ALDocument.using(title="Next steps for your joint petition", filename="divorcejointpetition_next_steps.docx", has_addendum=False)
+  - divorcejointpetition_attachment: ALDocument.using(title="Joint Petition for Divorce (1A)", filename="divorcejointpetition", has_addendum=False)
+  - affidavit_attachment: ALDocument.using(title="Affidavit of Irretrievable Breakdown", filename="affidavit", has_addendum=False, )
 ---
 # Each attachment defines a key in an ALDocument. We use `i` as the placeholder here so the same template is 
 # used for "preview" and "final" keys, and logic in the template checks the value of 
