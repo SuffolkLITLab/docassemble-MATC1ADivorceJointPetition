@@ -805,8 +805,7 @@ id: Custodial children
 question: |
   Who the children live with
 subquestion: |
-  How many of your ${ children_of_marriage_number } {children of the marriage}
-  live with each of you?
+  How many of the {children of the marriage} live with each of you?
 fields:
   - "Living with ${ users[0] }": users1_number_of_custodial_children
     datatype: integer
