@@ -38,10 +38,12 @@ code: |
 ---
 code: |
   import re
-  if not defined("users1_ssn_last_four") and defined(users[0].attr_name("ssn")) and users[0].ssn:
-    users1_ssn_last_four = str(users[0].ssn)[-4:]
-  if not defined("users2_ssn_last_four") and defined(users[1].attr_name("ssn")) and users[1].ssn:
-    users2_ssn_last_four = str(users[1].ssn)[-4:]
+  # Copy the last 4 only when they are 4 digits. A copied value hides the R408
+  # field, so a bad copy would leave the user an error they cannot fix.
+  if not defined("users1_ssn_last_four") and defined(users[0].attr_name("ssn")) and re.fullmatch(r"\d{4}", str(users[0].ssn or "").strip()[-4:]):
+    users1_ssn_last_four = str(users[0].ssn).strip()[-4:]
+  if not defined("users2_ssn_last_four") and defined(users[1].attr_name("ssn")) and re.fullmatch(r"\d{4}", str(users[1].ssn or "").strip()[-4:]):
+    users2_ssn_last_four = str(users[1].ssn).strip()[-4:]
 
   need_r408_demographics = (
     not showifdef("users1_gender")
@@ -89,35 +91,45 @@ subquestion: |
   We only need any R408 details that were not already collected.
 validation code: |
   import re
+  # Raise the error without field= so it shows at the top of the screen. An
+  # error aimed at a field that is not on the screen is silently dropped.
   if defined("users1_ssn_last_four") and (not re.fullmatch(r"\d{4}", str(users1_ssn_last_four))):
-    validation_error("Enter exactly 4 digits.", field="users1_ssn_last_four")
+    validation_error(f"Enter exactly 4 digits for the last 4 of {users[0]}'s Social Security Number.")
   if defined("users2_ssn_last_four") and (not re.fullmatch(r"\d{4}", str(users2_ssn_last_four))):
-    validation_error("Enter exactly 4 digits.", field="users2_ssn_last_four")
+    validation_error(f"Enter exactly 4 digits for the last 4 of {users[1]}'s Social Security Number.")
 fields:
   - "${ users[0] } sex": users1_gender
     datatype: radio
     choices:
       - Male: male
       - Female: female
-    show if: not showifdef("users1_gender")
+    show if:
+      code: |
+        not showifdef("users1_gender")
   - "${ users[1] } sex": users2_gender
     datatype: radio
     choices:
       - Male: male
       - Female: female
-    show if: not showifdef("users2_gender")
+    show if:
+      code: |
+        not showifdef("users2_gender")
   - "${ users[0] } Social Security Number (last 4 digits)": users1_ssn_last_four
     input type: tel
     minlength: 4
     maxlength: 4
     hint: 4 digits
-    show if: not showifdef("users1_ssn_last_four")
+    show if:
+      code: |
+        not showifdef("users1_ssn_last_four")
   - "${ users[1] } Social Security Number (last 4 digits)": users2_ssn_last_four
     input type: tel
     minlength: 4
     maxlength: 4
     hint: 4 digits
-    show if: not showifdef("users2_ssn_last_four")
+    show if:
+      code: |
+        not showifdef("users2_ssn_last_four")
 ---
 id: r408 prior marriages and birth names
 if: need_r408_marriage_numbers
@@ -128,12 +140,24 @@ fields:
     datatype: integer
     min: 1
     default: 1
+    show if:
+      code: |
+        not defined("users1_marriage_number")
   - "Number of times ${ users[1] } has been married (including this marriage)": users2_marriage_number
     datatype: integer
     min: 1
     default: 1
+    show if:
+      code: |
+        not defined("users2_marriage_number")
   - "${ users[0] } surname at birth or adoption": users1_name_last_at_birth
+    show if:
+      code: |
+        not defined("users1_name_last_at_birth")
   - "${ users[1] } surname at birth or adoption": users2_name_last_at_birth
+    show if:
+      code: |
+        not defined("users2_name_last_at_birth")
 ---
 id: r408 additional children info
 if: need_r408_addendum
