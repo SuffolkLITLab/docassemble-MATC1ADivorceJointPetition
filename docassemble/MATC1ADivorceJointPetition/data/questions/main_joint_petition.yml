@@ -166,6 +166,26 @@ sections:
 code: |
   github_repo_name =  'docassemble-MATC1ADivorceJointPetition'
 ---
+comment: |
+  The financial statement asks how many children live with each spouse, counting
+  children from any relationship. Start from the children of the marriage who
+  live with that spouse, which the R408 section asks first, and let the spouse
+  change the number or add other children on that screen.
+code: |
+  if defined(users[i].attr_name("has_children")):
+    # Already answered on the financial statement; keep the answer.
+    users[i].children_count_prefilled = False
+  else:
+    if not children_of_marriage:
+      children_from_marriage_living_with_user = 0
+    elif i == 0:
+      children_from_marriage_living_with_user = users1_number_of_custodial_children
+    else:
+      children_from_marriage_living_with_user = users2_number_of_custodial_children
+    users[i].children_living_with_user_count = children_from_marriage_living_with_user
+    users[i].has_children = bool(children_of_marriage or children_from_marriage_living_with_user)
+    users[i].children_count_prefilled = True
+---
 code: |
   al_form_type = "starts_case"
 ---

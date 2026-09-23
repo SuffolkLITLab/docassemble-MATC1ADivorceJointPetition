@@ -792,9 +792,10 @@ id: Children of the Marriage
 question: |
   Children of the Marriage
 subquestion: |
-  Were any children born or adopted during the marriage between ${  users[0]  } and ${  users[1]  }?
+  Were any children born to or adopted by ${ users[0] } and ${ users[1] } during
+  the marriage? These are your {children of the marriage}.
 fields:
-  - "Are there any {children of the marriage}?": children_of_marriage
+  - no label: children_of_marriage
     datatype: yesnoradio
   - "How many children came from the marriage between ${ users[0].familiar() } and ${ users[1].familiar() }?": children_of_marriage_number
     datatype: integer
@@ -802,14 +803,19 @@ fields:
 ---
 id: Custodial children
 question: |
-  Custodial Children
+  Who the children live with
+subquestion: |
+  How many of your ${ children_of_marriage_number } {children of the marriage}
+  live with each of you?
 fields:
-  - "${ users[0] } number of custodial children": users1_number_of_custodial_children
+  - "Living with ${ users[0] }": users1_number_of_custodial_children
     datatype: integer
+    min: 0
     default: ${ children_of_marriage_number }
-  - "${ users[1] } number of custodial children": users2_number_of_custodial_children
+  - "Living with ${ users[1] }": users2_number_of_custodial_children
     datatype: integer
-    default: ${ children_of_marriage_number }
+    min: 0
+    default: 0
 ---
 id: Children details
 question: |
