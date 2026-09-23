@@ -62,10 +62,13 @@ jobs:
           # The certified runtime: exact image and external packages.
           - runtime: pinned
             image: jhpyle/docassemble@sha256:c0b0a707a6cd2149d5777ee83af1ea1de544210e597371eac93e67a1503c395c
+            checkout_flags: ""
           # apps-dev parity: the Docassemble version students use. Only the
           # image is pinned; deploys there install external packages from main.
           - runtime: apps-dev
             image: jhpyle/docassemble@sha256:ac9cadf5159913281e34469e2e4c46fa14eabcf559a3a410b74fc2fbda74ad8b
+            # A deploy to apps-dev installs each interview package from main.
+            checkout_flags: --track-main
     env:
       DA_IMAGE: ${{ matrix.image }}
     steps:
@@ -85,12 +88,21 @@ jobs:
         run: |
           python docassemble-MATC1ADivorceJointPetition/tests/certification/checkout_packages.py \
             --workspace "$GITHUB_WORKSPACE" \
-            --skip docassemble.MATC1ADivorceJointPetition
+            --skip docassemble.MATC1ADivorceJointPetition ${{ matrix.checkout_flags }}
 
       - uses: actions/download-artifact@v4
         with:
           name: combined-static-catalog
           path: docassemble-MATC1ADivorceJointPetition/tests/certification/artifacts
+
+      - name: Rebuild the static catalog for this checkout
+        # The apps-dev runtime checks out the interview packages at main, so
+        # the audit must compare against a catalog of the same sources.
+        working-directory: docassemble-MATC1ADivorceJointPetition
+        run: |
+          python -m pip install pyyaml
+          python tests/certification/build_catalog.py --workspace "$GITHUB_WORKSPACE" \
+            --output tests/certification/artifacts/static_catalog.json
 
       - name: Start disposable Docassemble server
         timeout-minutes: 15
