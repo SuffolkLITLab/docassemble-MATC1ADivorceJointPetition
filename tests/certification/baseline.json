@@ -116,5 +116,12 @@
     "docassemble.MassAccess": "0.4.3",
     "docassemble.ALAffidavitOfIndigency": "2.3.0",
     "docassemble.GithubFeedbackForm": "0.5.6"
+  },
+  "parity_runtimes": {
+    "apps-dev": {
+      "image": "jhpyle/docassemble@sha256:ac9cadf5159913281e34469e2e4c46fa14eabcf559a3a410b74fc2fbda74ad8b",
+      "docassemble": "1.9.8",
+      "reason": "apps-dev.suffolklitlab.org runs Docassemble 1.9.8; some bugs only appear there"
+    }
   }
 }

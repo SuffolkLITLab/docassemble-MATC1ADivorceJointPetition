@@ -36,6 +36,28 @@ class RuntimeManifestTests(unittest.TestCase):
         self.assertIn("runtime image mismatch", errors[0])
         self.assertIn("package mismatch", errors[1])
 
+    def test_parity_runtime_checks_only_its_image(self):
+        baseline = dict(
+            BASELINE,
+            parity_runtimes={"apps-dev": {"image": "example/image@sha256:parity"}},
+        )
+        self.assertEqual(
+            verify(
+                baseline,
+                ["example/image@sha256:parity"],
+                "docassemble.Example==9.9.9\n",
+                runtime="apps-dev",
+            ),
+            [],
+        )
+        errors = verify(baseline, ["example/image@sha256:other"], "", runtime="apps-dev")
+        self.assertEqual(len(errors), 1)
+        self.assertIn("runtime image mismatch", errors[0])
+
+    def test_unknown_parity_runtime_fails(self):
+        errors = verify(BASELINE, ["example/image@sha256:abc"], "", runtime="missing")
+        self.assertEqual(errors, ["unknown runtime: missing"])
+
 
 if __name__ == "__main__":
     unittest.main()
