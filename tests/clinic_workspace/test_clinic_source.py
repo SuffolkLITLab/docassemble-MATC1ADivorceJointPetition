@@ -256,7 +256,14 @@ class ClinicSourceContractTests(unittest.TestCase):
         ).read_text()
         question = r408_source.split("id: r408 prior marriages and birth names", 1)[1]
         question = question.split("---", 1)[0]
-        self.assertNotIn("show if:", question)
+        # A plain-string show if names a field on the same screen; these name
+        # none, so the browser would hide the fields forever. Server-side
+        # conditions must use the code form.
+        fields = yaml.safe_load("id: r408 prior marriages and birth names" + question)["fields"]
+        for field in fields:
+            if "show if" in field:
+                self.assertIsInstance(field["show if"], dict)
+                self.assertIn("code", field["show if"])
 
     def test_multistep_workspace_actions_use_the_durable_pending_controller(self) -> None:
         self.assertIn(
