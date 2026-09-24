@@ -51,6 +51,7 @@ default_variables:
   financial_statement_scope: neither
   legal_marriage: true
   marriage_certificate_plan: later
+  spouses_present: both
   marriage_certificate_upload: ''
   massachusetts_residency: true
   divorce_type_affirmations:
@@ -669,6 +670,51 @@ modeled_paths:
     expected_terminal_ids:
       - taxes no agreement exit
     terminal_assertions: false
+
+  - name: only spouse 1 present
+    family: presence
+    overrides:
+      spouses_present: spouse_1
+      financial_statement_scope: spouse_1_only
+      users[0].gross_annual_income: 74999
+      users[0].has_self_employment_income: false
+      users[0].has_rental_income: false
+      users[0].income_list.selected_types:
+        wages: true
+      users[0].expense_list.selected_types:
+        rent: true
+      # Facts only the absent spouse may know, left unknown
+      users2_gender: unknown
+      users2_ssn_last_four: ''
+      users2_name_last_at_birth: ''
+    required_screen_ids:
+      - who is here today
+      - sign party A
+      - still needed from absent spouse
+    forbidden_screen_ids:
+      - sign party B
+
+  - name: only spouse 2 present
+    family: presence
+    overrides:
+      spouses_present: spouse_2
+      financial_statement_scope: spouse_2_only
+      users[1].gross_annual_income: 74999
+      users[1].has_self_employment_income: false
+      users[1].has_rental_income: false
+      users[1].income_list.selected_types:
+        wages: true
+      users[1].expense_list.selected_types:
+        rent: true
+      users1_gender: unknown
+      users1_ssn_last_four: ''
+      users1_name_last_at_birth: ''
+    required_screen_ids:
+      - who is here today
+      - sign party B
+      - still needed from absent spouse
+    forbidden_screen_ids:
+      - sign party A
 
 cardinality_classes:
   users: [2]

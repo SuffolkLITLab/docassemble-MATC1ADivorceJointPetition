@@ -89,33 +89,39 @@ question: |
   Details for the R408 report
 subquestion: |
   We only need any R408 details that were not already collected.
+  % if showifdef("absent_spouse_index") is not None:
+
+  Leave blank anything you don't know about ${ users[absent_spouse_index] }.
+  We will list what is still needed before you finish.
+  % endif
 validation code: |
   import re
   # Raise the error without field= so it shows at the top of the screen. An
   # error aimed at a field that is not on the screen is silently dropped.
-  if defined("users1_ssn_last_four") and (not re.fullmatch(r"\d{4}", str(users1_ssn_last_four))):
+  if defined("users1_ssn_last_four") and users1_ssn_last_four and (not re.fullmatch(r"\d{4}", str(users1_ssn_last_four))):
     validation_error(f"Enter exactly 4 digits for the last 4 of {users[0]}'s Social Security Number.")
-  if defined("users2_ssn_last_four") and (not re.fullmatch(r"\d{4}", str(users2_ssn_last_four))):
+  if defined("users2_ssn_last_four") and users2_ssn_last_four and (not re.fullmatch(r"\d{4}", str(users2_ssn_last_four))):
     validation_error(f"Enter exactly 4 digits for the last 4 of {users[1]}'s Social Security Number.")
 fields:
   - "${ users[0] } sex": users1_gender
     datatype: radio
-    choices:
-      - Male: male
-      - Female: female
+    code: |
+      [{"male": "Male"}, {"female": "Female"}] + ([{"unknown": "I don't know"}] if showifdef("absent_spouse_index") == 0 else [])
+    required: showifdef("absent_spouse_index") != 0
     show if:
       code: |
         not showifdef("users1_gender")
   - "${ users[1] } sex": users2_gender
     datatype: radio
-    choices:
-      - Male: male
-      - Female: female
+    code: |
+      [{"male": "Male"}, {"female": "Female"}] + ([{"unknown": "I don't know"}] if showifdef("absent_spouse_index") == 1 else [])
+    required: showifdef("absent_spouse_index") != 1
     show if:
       code: |
         not showifdef("users2_gender")
   - "${ users[0] } Social Security Number (last 4 digits)": users1_ssn_last_four
     input type: tel
+    required: showifdef("absent_spouse_index") != 0
     minlength: 4
     maxlength: 4
     hint: 4 digits
@@ -124,6 +130,7 @@ fields:
         not showifdef("users1_ssn_last_four")
   - "${ users[1] } Social Security Number (last 4 digits)": users2_ssn_last_four
     input type: tel
+    required: showifdef("absent_spouse_index") != 1
     minlength: 4
     maxlength: 4
     hint: 4 digits
@@ -138,6 +145,7 @@ question: |
 fields:
   - "Number of times ${ users[0] } has been married (including this marriage)": users1_marriage_number
     datatype: integer
+    required: showifdef("absent_spouse_index") != 0
     min: 1
     default: 1
     show if:
@@ -145,16 +153,19 @@ fields:
         not defined("users1_marriage_number")
   - "Number of times ${ users[1] } has been married (including this marriage)": users2_marriage_number
     datatype: integer
+    required: showifdef("absent_spouse_index") != 1
     min: 1
     default: 1
     show if:
       code: |
         not defined("users2_marriage_number")
   - "${ users[0] } surname at birth or adoption": users1_name_last_at_birth
+    required: showifdef("absent_spouse_index") != 0
     show if:
       code: |
         not defined("users1_name_last_at_birth")
   - "${ users[1] } surname at birth or adoption": users2_name_last_at_birth
+    required: showifdef("absent_spouse_index") != 1
     show if:
       code: |
         not defined("users2_name_last_at_birth")
@@ -221,13 +232,13 @@ attachment:
     - "users1_name_last": ${ users[0].name.last }
     - "users1_is_defendant": ${ users1_is_defendant }
     - "users1_name_last_after_divorce": ${ users1_name_last_after_divorce }
-    - "users1_name_last_at_birth": ${ users1_name_last_at_birth }
-    - "users1_birthdate": ${ users[0].birthdate.format() }
+    - "users1_name_last_at_birth": ${ users1_name_last_at_birth or "" }
+    - "users1_birthdate": ${ users[0].birthdate.format() if users[0].birthdate else "" }
     - "users1_gender_male": ${ users1_gender_male }
     - "users1_gender_female": ${ users1_gender_female }
-    - "users1_marriage_number": ${ users1_marriage_number }
+    - "users1_marriage_number": ${ users1_marriage_number or "" }
     - "users1_number_of_custodial_children": ${ users1_number_of_custodial_children }
-    - "users1_ssn_last_four": ${ users1_ssn_last_four }
+    - "users1_ssn_last_four": ${ users1_ssn_last_four or "" }
     - "users1_address_address": ${ users[0].address.address }
     - "users1_address_city": ${ users[0].address.city }
     - "users1_address_state": ${ users[0].address.state }
@@ -238,13 +249,13 @@ attachment:
     - "users2_name_last": ${ users[1].name.last }
     - "users2_is_defendant": ${ users2_is_defendant }
     - "users2_name_last_after_divorce": ${ users2_name_last_after_divorce }
-    - "users2_name_last_at_birth": ${ users2_name_last_at_birth }
-    - "users2_birthdate": ${ users[1].birthdate.format() }
+    - "users2_name_last_at_birth": ${ users2_name_last_at_birth or "" }
+    - "users2_birthdate": ${ users[1].birthdate.format() if users[1].birthdate else "" }
     - "users2_gender_male": ${ users2_gender_male }
     - "users2_gender_female": ${ users2_gender_female }
-    - "users2_ssn": ${ users2_ssn_last_four }
+    - "users2_ssn": ${ users2_ssn_last_four or "" }
     - "users2_number_of_custodial_children": ${ users2_number_of_custodial_children }
-    - "users2_marriage_number": ${ users2_marriage_number }
+    - "users2_marriage_number": ${ users2_marriage_number or "" }
     - "users2_address_address": ${ users[1].address.address }
     - "users2_address_city": ${ users[1].address.city }
     - "users2_address_zip": ${ users[1].address.zip }

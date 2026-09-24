@@ -226,6 +226,7 @@ question: |
 fields:
   - Phone number: users[0].phone_number
     datatype: tel
+    required: showifdef("absent_spouse_index") != 0
 ---
 id: Party B Phone number
 sets:
@@ -235,6 +236,7 @@ question: |
 fields:
   - Phone number: users[1].phone_number
     datatype: tel
+    required: showifdef("absent_spouse_index") != 1
 ---
 id: legal marriage
 question: |

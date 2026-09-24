@@ -166,6 +166,62 @@ sections:
 code: |
   github_repo_name =  'docassemble-MATC1ADivorceJointPetition'
 ---
+id: who is here today
+question: |
+  Who is here today?
+subquestion: |
+  If one spouse is not here, you can still prepare the documents. That spouse
+  signs the printed documents later, and you can leave blank anything only they
+  know. We will list what is still needed before you finish.
+fields:
+  - no label: spouses_present
+    datatype: radio
+    choices:
+      - Both of us: both
+      - "Only ${ users[0] }": spouse_1
+      - "Only ${ users[1] }": spouse_2
+---
+code: |
+  absent_spouse_index = {"both": None, "spouse_1": 1, "spouse_2": 0}[spouses_present]
+---
+comment: |
+  Facts about the absent spouse that were left blank. The documents print them
+  blank; this list tells the spouses what to complete before filing.
+code: |
+  still_needed_spouse = users[absent_spouse_index]
+  still_needed_prefix = f"users{absent_spouse_index + 1}"
+  still_needed_items = [f"{still_needed_spouse}'s signature on each document"]
+  if not showifdef(still_needed_spouse.attr_name("birthdate")):
+    still_needed_items.append(f"{still_needed_spouse}'s date of birth")
+  if not showifdef(still_needed_spouse.attr_name("phone_number")):
+    still_needed_items.append(f"{still_needed_spouse}'s phone number")
+  if showifdef("include_r408"):
+    if showifdef(still_needed_prefix + "_gender") not in ("male", "female"):
+      still_needed_items.append(f"{still_needed_spouse}'s sex (R408 report)")
+    if not showifdef(still_needed_prefix + "_ssn_last_four"):
+      still_needed_items.append(f"The last 4 digits of {still_needed_spouse}'s Social Security number (R408 report)")
+    if not showifdef(still_needed_prefix + "_marriage_number"):
+      still_needed_items.append(f"How many times {still_needed_spouse} has been married (R408 report)")
+    if not showifdef(still_needed_prefix + "_name_last_at_birth"):
+      still_needed_items.append(f"{still_needed_spouse}'s surname at birth or adoption (R408 report)")
+  if showifdef("include_financial_statement_spouse_" + str(absent_spouse_index + 1)) is False:
+    still_needed_items.append(f"{still_needed_spouse}'s financial statement")
+---
+id: still needed from absent spouse
+continue button field: still_needed_from_absent_spouse_reviewed
+question: |
+  Still needed from ${ users[absent_spouse_index] }
+subquestion: |
+  Your documents are ready to sign. Before you file them,
+  ${ users[absent_spouse_index] } needs to:
+
+  % for item in still_needed_items:
+  * ${ item }
+  % endfor
+
+  The documents leave these blank. ${ users[absent_spouse_index] } can fill them
+  in and sign the printed copies.
+---
 comment: |
   The financial statement asks how many children live with each spouse, counting
   children from any relationship. Start from the children of the marriage who
@@ -481,6 +537,7 @@ subquestion: |
 fields:
   - Whose financial statement do you want to prepare now?: financial_statement_scope
     datatype: radio
+    default: ${ "both" if spouses_present == "both" else spouses_present + "_only" }
     choices:
       - Both spouses: both
       - "Only ${ users[0] }": spouse_1_only
@@ -517,6 +574,10 @@ code: |
     combined_interview_order_motion_to_amend
 
   nav.set_section("packet_options")
+  spouses_present
+  if absent_spouse_index is not None:
+    # Lets the financial statement's date of birth be left blank for them.
+    users[absent_spouse_index].personal_details_optional = True
   include_financial_statement
 
   interview_order_divorcejointpetition
@@ -820,6 +881,12 @@ code: |
       'attorneys[0].signature' if users[0].has_attorney else 'users[0].signature',
       'attorneys[1].signature' if users[1].has_attorney else 'users[1].signature',
   ]
+  if absent_spouse_index is not None:
+    still_needed_from_absent_spouse_reviewed
+    if not users[absent_spouse_index].has_attorney:
+      # The absent spouse signs the printed documents later; leave the line blank.
+      signature_fields.remove(f"users[{absent_spouse_index}].signature")
+      users[absent_spouse_index].signature = ""
   basic_questions_signature_flow
 
   combined_document_titles_set
