@@ -10,10 +10,11 @@ comment: |
   Controls order and branching logic for questions specific to this form
 id: interview_order_jointmotiontofilemarriagecertificatelate
 code: |
-  # The parent packet has already collected the parties and marriage details.
-  marriage_city = marriage_location_city
-  marriage_state = marriage_location_state
-  marriage_country = marriage_location_country
+  # The parent packet has already collected the parties and marriage details
+  # on id: Relationship background; the code blocks below copy them.
+  marriage_city
+  marriage_state
+  marriage_country
   marriage_proof_delay_reason
   marriage_proof_delay_action_plan
   users[0].phone_number
@@ -78,27 +79,23 @@ depends on:
 code: |
   users.there_is_another = (len(users) < 2)
 ---
-id: Marriage Details
-question: |
-  Marriage Details
-subquestion: |
-  When and where did ${ users[0] } and ${ users[1] } get married?
-fields:
-  - "Date of marriage ceremony": marriage_date
-    datatype: date
-  - "City where marriage took place": marriage_city
-  - "Marriage occurred outside the United States?": international_marriage
-    datatype: yesnoradio
-  - "State where marriage took place": marriage_state
-    required: False
-    show if:
-      variable: international_marriage
-      is: False
-  - "Country where marriage took place": marriage_country
-    required: False
-    show if:
-      variable: international_marriage
-      is: True
+comment: |
+  The motion's marriage place comes from id: Relationship background. These
+  recompute if the location is edited on a review screen.
+depends on:
+  - marriage_location_city
+code: |
+  marriage_city = marriage_location_city
+---
+depends on:
+  - marriage_location_state
+code: |
+  marriage_state = marriage_location_state
+---
+depends on:
+  - marriage_location_country
+code: |
+  marriage_country = country_name(marriage_location_country) if marriage_location_country else ""
 ---
 id: Certified marriage certificate
 question: |
@@ -199,7 +196,7 @@ review:
       % for item in users:
         * ${ item }
       % endfor
-  - Edit: marriage_state
+  - Edit: marriage_location_state
     button: |
       **State where marriage took place**:
       ${ marriage_state }
@@ -214,7 +211,7 @@ review:
       % if defined("trial_court.division"):
       * division: ${ trial_court.division }
       % endif
-  - Edit: marriage_city
+  - Edit: marriage_location_city
     button: |
       **City where marriage took place**:
       ${ marriage_city }
@@ -222,7 +219,7 @@ review:
     button: |
       **Date of marriage ceremony**:
       ${ marriage_date }
-  - Edit: marriage_country
+  - Edit: marriage_location_country
     button: |
       **Country where marriage took place**:
       ${ marriage_country }

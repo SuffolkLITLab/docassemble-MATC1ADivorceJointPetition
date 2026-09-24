@@ -86,11 +86,13 @@ code: |
   nav.set_section("relationship_background")
   marriage_date
   set_marriage_location
+  # Only one of state and country is asked, but the late marriage certificate
+  # motion reads both. Define the other here so that motion does not send us
+  # back to this screen forever.
   if not international_marriage:
-    # The country is only asked for marriages outside the United States, but
-    # the late marriage certificate motion reads it either way. Define it here
-    # so that motion does not send us back to this screen forever.
     marriage_location_country = ""
+  else:
+    marriage_location_state = ""
 
   if defined("has_existing_1b_action") and has_existing_1b_action:
     previous_action = True
@@ -574,15 +576,22 @@ subquestion: |
 fields:
   - "When were you married?": marriage_date
     datatype: date
-  - "Did you get married in the United States of America?": international_marriage
+  - "Did you get married in the United States?": international_marriage
     datatype: noyesradio
-  - "Location of marriage: City": marriage_location_city
+  - "City or town where you got married": marriage_location_city
     maxlength: 54
-  - "Location of marriage: State": marriage_location_state
-    required: False
-  - "Country of marriage": marriage_location_country
-    show if: international_marriage
-    required: False
+  - "State": marriage_location_state
+    code: |
+      states_list()
+    show if:
+      variable: international_marriage
+      is: False
+  - "Country": marriage_location_country
+    code: |
+      countries_list()
+    show if:
+      variable: international_marriage
+      is: True
   - "When did you last live together?": last_living_together_date
     datatype: date
   - "When did the marriage breakdown occur?": marriage_breakdown_date
@@ -597,9 +606,9 @@ fields:
 ---
 code: |
   if international_marriage:
-    marriage_location = f"{ marriage_location_city } { marriage_location_state } { marriage_location_country }"
+    marriage_location = ", ".join(part for part in [marriage_location_city, country_name(marriage_location_country)] if part)
   else:
-    marriage_location = f"{ marriage_location_city } { marriage_location_state }"
+    marriage_location = ", ".join(part for part in [marriage_location_city, marriage_location_state] if part)
   set_marriage_location = True
 ---
 id: Previous actions
@@ -1348,15 +1357,15 @@ review:
     button: |
       **Date of marriage**:
       ${ marriage_date }
-  - Edit: marriage_city
+  - Edit: marriage_location_city
     button: |
       **City where marriage took place**:
       ${ marriage_city }
-  - Edit: marriage_state
+  - Edit: marriage_location_state
     button: |
       **State where marriage took place**:
       ${ marriage_state }
-  - Edit: marriage_country
+  - Edit: marriage_location_country
     button: |
       **Country where marriage took place**:
       ${ marriage_country }
