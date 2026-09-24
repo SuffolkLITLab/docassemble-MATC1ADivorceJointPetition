@@ -16,6 +16,16 @@ class RuntimeManifestTests(unittest.TestCase):
             freeze_digest("ALPHA==1\nzulu==2\n"),
         )
 
+    def test_freeze_digest_ignores_local_interview_packages(self):
+        # CI installs the docassemble.MATC* packages from uploaded zips whose
+        # hashes change on every run; their commits are pinned by checkout.
+        base = "alpha==1\n"
+        with_local = base + (
+            "docassemble.MATCFinancialStatement @ file:///x/file.zip#sha256=aaa\n"
+            "docassemble.matcfindingsanddeterminations @ file:///y/file.zip#sha256=bbb\n"
+        )
+        self.assertEqual(freeze_digest(base), freeze_digest(with_local))
+
     def test_exact_manifest_passes(self):
         self.assertEqual(
             verify(

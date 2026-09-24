@@ -7,7 +7,7 @@
   },
   "runtime": {
     "image": "jhpyle/docassemble@sha256:c0b0a707a6cd2149d5777ee83af1ea1de544210e597371eac93e67a1503c395c",
-    "pip_freeze_sha256": "605e18ca766d99b354e6612fe555f973b699e843c2f7ec76dc0998b64ecfbf2e"
+    "pip_freeze_sha256": "64bbb3b63c6df20db3112e9f907341850ec06346dd7cad5a66fe012984bf2912"
   },
   "candidate_overlays": [
     {
