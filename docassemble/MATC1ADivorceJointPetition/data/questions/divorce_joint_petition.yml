@@ -38,8 +38,12 @@ code: |
   if legal_marriage == False: 
     cautionary_message_divorce
   
-  marriage_certificate_upload
-  
+  marriage_certificate_plan
+  if marriage_certificate_plan == "upload":
+    marriage_certificate_upload
+  else:
+    marriage_certificate_upload = None
+
   massachusetts_residency
   if massachusetts_residency == False:
     couple_ever_lived_in_massachusetts
@@ -248,9 +252,19 @@ subquestion: |
   Filing a {certified copy} of your marriage certificate with your petition is strongly encouraged. Upload a copy here to include it with your filings. Keep your certified copy, because the court may ask for it.
   
 fields:
+  - "How do you want to file your marriage certificate?": marriage_certificate_plan
+    input type: radio
+    choices:
+      - "File it with the court later": later
+      - "Upload a copy now": upload
+    help: |
+      If you file it later, this interview also prepares a motion asking the
+      court for more time to file it.
   - "Upload marriage certificate": marriage_certificate_upload
     datatype: file
-    required: False
+    show if:
+      variable: marriage_certificate_plan
+      is: upload
 under: |
   This document will likely need to be filed before the court can give you a hearing date or hear your case.
 ---
@@ -375,23 +389,23 @@ under: |
   [**Which type of divorce should I file?**](https://www.mass.gov/decision-tree/which-type-of-divorce-should-i-file)
 ---
 id: Agreement on major issues
-question: | 
-  Agreement on major issues
+question: |
+  Do you agree on the major issues?
 subquestion: |
-  You will need to explain to the court how you will handle any issues related to your divorce. 
-  These issues may include:
-  
-  
+  In a 1A divorce, you tell the court how you will handle the issues in your
+  divorce, such as:
+
   * Child support
   * Parenting time
   * Child custody
   * Alimony
   * Dividing shared property (marital assets)
-  * Health insurance 
-  
-  **Do ${  users[0].name_full()  } and ${  users[1].name_full()  } agree on how to resolve all major issues, such as property division, child custody, and child support?**
-fields: 
-  - "We agree on the major issues": separation_agreement_reached
+  * Health insurance
+
+  Do ${ users[0].name_full() } and ${ users[1].name_full() } agree on how to
+  handle all of them? You do not need to have written anything down yet.
+fields:
+  - no label: separation_agreement_reached
     datatype: yesnoradio
 ---
 id: Willing to negotiate agreement
@@ -435,7 +449,7 @@ subquestion: |
   Because your child support guidelines worksheet is not done yet, this tool cannot create a separation agreement for you. The agreement must state a child support guideline amount, and that amount comes from the worksheet.
   % endif
 fields:
-  - "Have you already prepared a separation agreement?": separation_agreement_documented
+  - "Have you already written your agreement down in a separation agreement?": separation_agreement_documented
     datatype: yesnoradio
   - "How would you like to proceed?": separation_agreement_format
     input type: radio
@@ -1409,10 +1423,14 @@ review:
     button: |
       **Uploaded separation agreement**:
       ${ separation_agreement_upload.filename if defined("separation_agreement_upload.filename") else "Uploaded" }
-  - Edit: marriage_certificate_upload
+  - Edit: marriage_certificate_plan
     button: |
       **Certified marriage certificate**:
+      % if marriage_certificate_plan == "upload":
       ${ marriage_certificate_upload.filename if defined("marriage_certificate_upload.filename") else "Uploaded" }
+      % else:
+      Filing it later
+      % endif
 ---
 id: edit users
 continue button field: users.revisit
