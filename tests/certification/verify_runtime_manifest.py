@@ -30,7 +30,27 @@ def freeze_digest(text: str) -> str:
     return hashlib.sha256(normalized.encode()).hexdigest()
 
 
-def verify(baseline: dict, image_digests: list[str], freeze_text: str) -> list[str]:
+def verify(
+    baseline: dict,
+    image_digests: list[str],
+    freeze_text: str,
+    runtime: str = "pinned",
+) -> list[str]:
+    """Check a runtime against the baseline.
+
+    "pinned" is the certified runtime: exact image, external package versions
+    and pip freeze. A parity runtime (baseline["parity_runtimes"]) mirrors a
+    shared server, such as apps-dev, whose deploys install external packages
+    from their main branches, so only its image is checked.
+    """
+    if runtime != "pinned":
+        parity = baseline.get("parity_runtimes", {}).get(runtime)
+        if parity is None:
+            return [f"unknown runtime: {runtime}"]
+        if parity["image"] not in image_digests:
+            return [f"runtime image mismatch: expected {parity['image']}, got {image_digests}"]
+        return []
+
     errors = []
     expected_image = baseline["runtime"]["image"]
     if expected_image not in image_digests:
@@ -58,12 +78,14 @@ def main() -> int:
     parser.add_argument("--baseline", type=Path, default=HERE / "baseline.json")
     parser.add_argument("--image", type=Path, required=True)
     parser.add_argument("--pip-freeze", type=Path, required=True)
+    parser.add_argument("--runtime", default="pinned")
     args = parser.parse_args()
 
     errors = verify(
         json.loads(args.baseline.read_text()),
         json.loads(args.image.read_text()),
         args.pip_freeze.read_text(),
+        runtime=args.runtime,
     )
     if errors:
         print("\n".join(errors))
