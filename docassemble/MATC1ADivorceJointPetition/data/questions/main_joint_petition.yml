@@ -166,6 +166,26 @@ sections:
 code: |
   github_repo_name =  'docassemble-MATC1ADivorceJointPetition'
 ---
+comment: |
+  The financial statement asks how many children live with each spouse, counting
+  children from any relationship. Start from the children of the marriage who
+  live with that spouse, which the R408 section asks first, and let the spouse
+  change the number or add other children on that screen.
+code: |
+  if defined(users[i].attr_name("has_children")):
+    # Already answered on the financial statement; keep the answer.
+    users[i].children_count_prefilled = False
+  else:
+    if not children_of_marriage:
+      children_from_marriage_living_with_user = 0
+    elif i == 0:
+      children_from_marriage_living_with_user = users1_number_of_custodial_children
+    else:
+      children_from_marriage_living_with_user = users2_number_of_custodial_children
+    users[i].children_living_with_user_count = children_from_marriage_living_with_user
+    users[i].has_children = bool(children_of_marriage or children_from_marriage_living_with_user)
+    users[i].children_count_prefilled = True
+---
 code: |
   al_form_type = "starts_case"
 ---
@@ -174,6 +194,34 @@ code: |
   users[1].party_label = "Party B"
   users[0].separation_agreement_role = "party_a"
   users[1].separation_agreement_role = "party_b"
+---
+comment: |
+  The combined flow already knows whose financial statements to prepare
+  (financial_statement_scope), so the standalone financial statement's "What is
+  your role in this case?" question has nothing to decide here. Answer it, and
+  keep the Party A / Party B labels above instead of the standalone
+  "Petitioner" / "Defendant" labels, which don't fit a joint petition.
+code: |
+  financial_statement_person_role = "party_a"
+---
+code: |
+  set_financial_statement_party_labels = True
+---
+comment: |
+  Several documents share a title in the combined packet: each spouse's
+  financial statement forms, and more than one "Instructions" file. Name them
+  so the download list tells them apart.
+code: |
+  for titled_user in users:
+    for titled_document, base_title in (
+        (titled_user.financial_statement_short_attachment, "Financial Statement (Short Form)"),
+        (titled_user.financial_statement_long_attachment, "Financial Statement (Long Form)"),
+        (titled_user.financial_statement_schedule_a_attachment, "Schedule A - Self-Employment Income"),
+        (titled_user.financial_statement_schedule_b_attachment, "Schedule B - Rental Income"),
+    ):
+      titled_document.title = f"{base_title}: {titled_user}"
+  a_divorce_agreement_Post_interview_instructions.title = "Next steps for your separation agreement"
+  combined_document_titles_set = True
 ---
 # Standalone child interviews initialize some documents with enabled=True,
 # which AssemblyLine preserves as always_enabled. The combined parent owns its
@@ -774,6 +822,7 @@ code: |
   ]
   basic_questions_signature_flow
 
+  combined_document_titles_set
   combined_bundle_final_packet_normalized
   combined_bundle_enabled_document_names
   if not defined("divorcejointpetition_downloads_ready"):
