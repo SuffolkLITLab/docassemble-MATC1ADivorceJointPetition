@@ -172,14 +172,19 @@ fields:
 ---
 id: interview order r408
 code: |
-  users[0].birthdate
-  users[1].birthdate
+  # Ask who the children live with before the birthdates: the birthdate screen
+  # is the financial statement's personal-information screen, which pre-fills
+  # each spouse's children from these counts in the combined interview.
   if children_of_marriage:
     users1_number_of_custodial_children
     users2_number_of_custodial_children
   else:
     users1_number_of_custodial_children = 0
     users2_number_of_custodial_children = 0
+  users[0].children_count_prefilled
+  users[1].children_count_prefilled
+  users[0].birthdate
+  users[1].birthdate
   if need_r408_demographics:
     users1_gender
     users2_gender
