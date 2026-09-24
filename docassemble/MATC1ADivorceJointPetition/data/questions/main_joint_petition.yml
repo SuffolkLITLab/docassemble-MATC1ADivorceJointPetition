@@ -537,7 +537,7 @@ subquestion: |
 fields:
   - Whose financial statement do you want to prepare now?: financial_statement_scope
     datatype: radio
-    default: ${ {"both": "both", "spouse_1": "spouse_1_only", "spouse_2": "spouse_2_only"}[spouses_present] }
+    default: ${ "both" if spouses_present == "both" else spouses_present + "_only" }
     choices:
       - Both spouses: both
       - "Only ${ users[0] }": spouse_1_only
