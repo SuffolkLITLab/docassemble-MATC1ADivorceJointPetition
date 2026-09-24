@@ -651,6 +651,10 @@ modeled_paths:
       health_insurance_custom_terms_adult: false
     required_screen_ids:
       - health insurance no agreement exit
+    # A 1A divorce needs agreement on every issue, so this path ends here.
+    expected_terminal_ids:
+      - health insurance no agreement exit
+    terminal_assertions: false
 
   - name: agreement tax impasse
     family: agreement
@@ -661,6 +665,10 @@ modeled_paths:
       taxes_file_separately: false
     required_screen_ids:
       - taxes no agreement exit
+    # A 1A divorce needs agreement on every issue, so this path ends here.
+    expected_terminal_ids:
+      - taxes no agreement exit
+    terminal_assertions: false
 
 cardinality_classes:
   users: [2]
