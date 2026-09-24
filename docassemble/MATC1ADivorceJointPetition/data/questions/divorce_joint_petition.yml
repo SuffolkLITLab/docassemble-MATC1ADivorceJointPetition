@@ -1111,8 +1111,10 @@ comment: |
 code: |
   if len(venue_courts) == 1:
     trial_court = venue_courts[0]
-  else:
+  elif len(venue_courts):
     trial_court = selected_trial_court
+  else:
+    trial_court = fallback_trial_court
 ---
 id: choose probate and family court
 section: court_requests
@@ -1135,7 +1137,9 @@ fields:
     show if:
       code: |
         len(venue_courts)
-  - no label: selected_trial_court
+  # A separate variable: when both fields set selected_trial_court, the hidden
+  # one can overwrite the chosen court with None on some servers.
+  - no label: fallback_trial_court
     datatype: object
     object labeler: court_short_label
     choices: all_courts.filter_courts(allowed_courts)
