@@ -50,6 +50,7 @@ default_variables:
   has_existing_1b_action: false
   financial_statement_scope: neither
   legal_marriage: true
+  marriage_certificate_plan: later
   marriage_certificate_upload: ''
   massachusetts_residency: true
   divorce_type_affirmations:
@@ -526,6 +527,7 @@ modeled_paths:
   - name: uploaded marriage certificate
     family: documents
     overrides:
+      marriage_certificate_plan: upload
       marriage_certificate_upload:
         $file: docassemble/MATC1ADivorceJointPetition/data/templates/r408.pdf
 
@@ -649,6 +651,10 @@ modeled_paths:
       health_insurance_custom_terms_adult: false
     required_screen_ids:
       - health insurance no agreement exit
+    # A 1A divorce needs agreement on every issue, so this path ends here.
+    expected_terminal_ids:
+      - health insurance no agreement exit
+    terminal_assertions: false
 
   - name: agreement tax impasse
     family: agreement
@@ -659,6 +665,10 @@ modeled_paths:
       taxes_file_separately: false
     required_screen_ids:
       - taxes no agreement exit
+    # A 1A divorce needs agreement on every issue, so this path ends here.
+    expected_terminal_ids:
+      - taxes no agreement exit
+    terminal_assertions: false
 
 cardinality_classes:
   users: [2]

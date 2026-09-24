@@ -926,7 +926,15 @@ def run_scenario(client: Client, scenario: dict[str, Any], limits: Limits) -> di
                 time.sleep(2)
                 continue
             download_wait_started = None
-            if is_terminal(question):
+            # A modeled path can end on purpose at an explanatory stop that
+            # still has buttons (for example an Exit button), which the API
+            # reports as an ordinary question. Declared stops end the path
+            # instead of being answered.
+            declared_stop = (
+                not scenario.get("terminal_assertions", True)
+                and qid in set(scenario.get("expected_terminal_ids", []))
+            )
+            if is_terminal(question) or declared_stop:
                 result["terminal_id"] = qid
                 expected_terminal_ids = set(scenario.get("expected_terminal_ids", []))
                 missing_required_screens = sorted(

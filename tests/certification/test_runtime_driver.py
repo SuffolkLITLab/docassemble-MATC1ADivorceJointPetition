@@ -302,6 +302,33 @@ class RuntimeDriverTests(unittest.TestCase):
         self.assertEqual(result["terminal_id"], "taxes no agreement exit")
         self.assertNotIn("terminal_evidence", result)
 
+    def test_declared_early_terminal_with_exit_button_ends_the_path(self):
+        # The separation agreement's no-agreement screens offer an Exit
+        # button, so the API reports them as multiple_choice. A user cannot
+        # continue past them; the driver must not answer its way through.
+        stop = {
+            "id": "taxes no agreement exit",
+            "questionType": "multiple_choice",
+            "fields": [],
+            "event_list": ["taxes_no_agreement_exit"],
+        }
+        beyond = {
+            "id": "download divorce joint petition",
+            "questionType": "event",
+            "fields": [],
+        }
+        scenario = {
+            **SCENARIO,
+            "expected_terminal_ids": ["taxes no agreement exit"],
+            "terminal_assertions": False,
+        }
+
+        client = FakeClient([stop, beyond])
+        result = run_scenario(client, scenario, limits())
+
+        self.assertEqual(result["status"], "pass")
+        self.assertEqual(result["terminal_id"], "taxes no agreement exit")
+
     def test_route_screen_expectations_reject_wrong_signer(self):
         wrong_signer = {
             "id": "sign party A",

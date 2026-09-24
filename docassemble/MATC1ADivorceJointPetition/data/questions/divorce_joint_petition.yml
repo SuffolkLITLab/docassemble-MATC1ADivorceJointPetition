@@ -38,8 +38,12 @@ code: |
   if legal_marriage == False: 
     cautionary_message_divorce
   
-  marriage_certificate_upload
-  
+  marriage_certificate_plan
+  if marriage_certificate_plan == "upload":
+    marriage_certificate_upload
+  else:
+    marriage_certificate_upload = None
+
   massachusetts_residency
   if massachusetts_residency == False:
     couple_ever_lived_in_massachusetts
@@ -86,11 +90,13 @@ code: |
   nav.set_section("relationship_background")
   marriage_date
   set_marriage_location
+  # Only one of state and country is asked, but the late marriage certificate
+  # motion reads both. Define the other here so that motion does not send us
+  # back to this screen forever.
   if not international_marriage:
-    # The country is only asked for marriages outside the United States, but
-    # the late marriage certificate motion reads it either way. Define it here
-    # so that motion does not send us back to this screen forever.
     marriage_location_country = ""
+  else:
+    marriage_location_state = ""
 
   if defined("has_existing_1b_action") and has_existing_1b_action:
     previous_action = True
@@ -158,7 +164,11 @@ terms:
   separation agreement: |
     A written document listing all things the parties agree on in their divorce, like child support, taxes, parenting time, and property division
   notary: |
-    A notary or notary is authorized by the Commonwealth of Massachusetts to witnes signatures, among other possible duties. 
+    A notary public is authorized by the Commonwealth of Massachusetts to witness signatures, among other duties.
+  legally married: |
+    Married under a marriage license, with the marriage recorded by a government, for example on a marriage certificate. If you are not sure whether your relationship counts as a legal marriage, talk with a lawyer before you continue.
+  certified copy: |
+    A copy of your marriage certificate from the city or town clerk, or the state registry, where your marriage was recorded. It has an official seal or stamp. A photocopy is not a certified copy.
   notarize: |
     The process where a notary public witnesses signatures and places a seal on document to ensure authenticity
   notarized: |
@@ -214,7 +224,7 @@ sets:
 question: |
   What is ${  users[0]  }'s phone number?
 fields:
-  - "${ users[0]  } phone number": users[0].phone_number
+  - Phone number: users[0].phone_number
     datatype: tel
 ---
 id: Party B Phone number
@@ -223,26 +233,38 @@ sets:
 question: |
   What is ${  users[1]  }'s phone number?
 fields:
-  - "${ users[1]  } phone number": users[1].phone_number
+  - Phone number: users[1].phone_number
     datatype: tel
 ---
 id: legal marriage
 question: |
   Confirm legal marriage
-fields: 
-  - "Are ${  users[0].name_full()  } and ${  users[1].name_full()  } legally married?" : legal_marriage
+subquestion: |
+  Are ${ users[0].name_full() } and ${ users[1].name_full() } {legally married}?
+fields:
+  - no label: legal_marriage
     datatype: yesnoradio
 ---
 id: upload marriage proof
 question: |
   Upload marriage certificate
 subquestion: |
-  Submitting a certified copy of your marriage certificate is strongly encouraged at the time of initial filing. Upload a copy here to include it with your filings. Keep any original copies as the court may ask for a physical certified copy. 
+  Filing a {certified copy} of your marriage certificate with your petition is strongly encouraged. Upload a copy here to include it with your filings. Keep your certified copy, because the court may ask for it.
   
 fields:
+  - "How do you want to file your marriage certificate?": marriage_certificate_plan
+    input type: radio
+    choices:
+      - "File it with the court later": later
+      - "Upload a copy now": upload
+    help: |
+      If you file it later, this interview also prepares a motion asking the
+      court for more time to file it.
   - "Upload marriage certificate": marriage_certificate_upload
     datatype: file
-    required: False
+    show if:
+      variable: marriage_certificate_plan
+      is: upload
 under: |
   This document will likely need to be filed before the court can give you a hearing date or hear your case.
 ---
@@ -261,9 +283,11 @@ buttons:
 ---
 id: Confirm Massachusetts jurisdiction A
 question: |
-  Massachusetts jurisdiction confirmation
+  Massachusetts residency
+subquestion: |
+  Has ${ users[0] }, ${ users[1] }, or both lived in Massachusetts for the whole year right before you file?
 fields:
-  - "Have either or both ${ users[0] } and ${ users[1] } lived in Massachusetts for at least one year?": massachusetts_residency
+  - no label: massachusetts_residency
     datatype: yesnoradio
 ---
 id: Confirm Massachusetts jurisdiction B
@@ -343,7 +367,8 @@ subquestion: |
   You said you are not willing to work out an agreement together.
   % endif
 
-  To file a 1A divorce, all of these must be true. A 1A divorce is for couples who
+  To file a 1A divorce, you must both want the divorce, file together, and file a
+  notarized separation agreement. A 1A divorce is for couples who
   agree about ending the marriage, and who agree about how to handle money,
   property, and children.
 
@@ -364,23 +389,23 @@ under: |
   [**Which type of divorce should I file?**](https://www.mass.gov/decision-tree/which-type-of-divorce-should-i-file)
 ---
 id: Agreement on major issues
-question: | 
-  Agreement on major issues
+question: |
+  Do you agree on the major issues?
 subquestion: |
-  You will need to explain to the court how you will handle any issues related to your divorce. 
-  These issues may include:
-  
-  
+  In a 1A divorce, you tell the court how you will handle the issues in your
+  divorce, such as:
+
   * Child support
   * Parenting time
   * Child custody
   * Alimony
   * Dividing shared property (marital assets)
-  * Health insurance 
-  
-  **Do ${  users[0].name_full()  } and ${  users[1].name_full()  } agree on how to resolve all major issues, such as property division, child custody, and child support?**
-fields: 
-  - "We agree on the major issues": separation_agreement_reached
+  * Health insurance
+
+  Do ${ users[0].name_full() } and ${ users[1].name_full() } agree on how to
+  handle all of them? You do not need to have written anything down yet.
+fields:
+  - no label: separation_agreement_reached
     datatype: yesnoradio
 ---
 id: Willing to negotiate agreement
@@ -424,7 +449,7 @@ subquestion: |
   Because your child support guidelines worksheet is not done yet, this tool cannot create a separation agreement for you. The agreement must state a child support guideline amount, and that amount comes from the worksheet.
   % endif
 fields:
-  - "Have you already prepared a separation agreement?": separation_agreement_documented
+  - "Have you already written your agreement down in a separation agreement?": separation_agreement_documented
     datatype: yesnoradio
   - "How would you like to proceed?": separation_agreement_format
     input type: radio
@@ -468,6 +493,7 @@ fields:
 ---
 id: Cautionary message notarized separation agreement
 continue button field: cautionary_message_delay_agreement
+continue button label: I understand
 question: |
   Confirm information
 subquestion: |
@@ -564,15 +590,22 @@ subquestion: |
 fields:
   - "When were you married?": marriage_date
     datatype: date
-  - "Did you get married in the United States of America?": international_marriage
+  - "Did you get married in the United States?": international_marriage
     datatype: noyesradio
-  - "Location of marriage: City": marriage_location_city
+  - "City or town where you got married": marriage_location_city
     maxlength: 54
-  - "Location of marriage: State": marriage_location_state
-    required: False
-  - "Country of marriage": marriage_location_country
-    show if: international_marriage
-    required: False
+  - "State": marriage_location_state
+    code: |
+      states_list()
+    show if:
+      variable: international_marriage
+      is: False
+  - "Country": marriage_location_country
+    code: |
+      countries_list()
+    show if:
+      variable: international_marriage
+      is: True
   - "When did you last live together?": last_living_together_date
     datatype: date
   - "When did the marriage breakdown occur?": marriage_breakdown_date
@@ -587,9 +620,9 @@ fields:
 ---
 code: |
   if international_marriage:
-    marriage_location = f"{ marriage_location_city } { marriage_location_state } { marriage_location_country }"
+    marriage_location = ", ".join(part for part in [marriage_location_city, country_name(marriage_location_country)] if part)
   else:
-    marriage_location = f"{ marriage_location_city } { marriage_location_state }"
+    marriage_location = ", ".join(part for part in [marriage_location_city, marriage_location_state] if part)
   set_marriage_location = True
 ---
 id: Previous actions
@@ -626,7 +659,7 @@ sets:
 question: |
   Marital home address
 subquestion: |
-  What is the address where you last lived together? This is your marital home — the address listed on the court petition.
+  What is the address where you last lived together? This is your {marital home}.
 fields:
   - code: |
       marital_home.address_fields(show_county=True)
@@ -792,9 +825,10 @@ id: Children of the Marriage
 question: |
   Children of the Marriage
 subquestion: |
-  Were any children born or adopted during the marriage between ${  users[0]  } and ${  users[1]  }?
+  Were any children born to or adopted by ${ users[0] } and ${ users[1] } during
+  the marriage? These are your {children of the marriage}.
 fields:
-  - "Are there any {children of the marriage}?": children_of_marriage
+  - no label: children_of_marriage
     datatype: yesnoradio
   - "How many children came from the marriage between ${ users[0].familiar() } and ${ users[1].familiar() }?": children_of_marriage_number
     datatype: integer
@@ -802,14 +836,18 @@ fields:
 ---
 id: Custodial children
 question: |
-  Custodial Children
+  Who the children live with
+subquestion: |
+  How many of the {children of the marriage} live with each of you?
 fields:
-  - "${ users[0] } number of custodial children": users1_number_of_custodial_children
+  - "Living with ${ users[0] }": users1_number_of_custodial_children
     datatype: integer
+    min: 0
     default: ${ children_of_marriage_number }
-  - "${ users[1] } number of custodial children": users2_number_of_custodial_children
+  - "Living with ${ users[1] }": users2_number_of_custodial_children
     datatype: integer
-    default: ${ children_of_marriage_number }
+    min: 0
+    default: 0
 ---
 id: Children details
 question: |
@@ -1111,8 +1149,10 @@ comment: |
 code: |
   if len(venue_courts) == 1:
     trial_court = venue_courts[0]
-  else:
+  elif len(venue_courts):
     trial_court = selected_trial_court
+  else:
+    trial_court = fallback_trial_court
 ---
 id: choose probate and family court
 section: court_requests
@@ -1135,7 +1175,9 @@ fields:
     show if:
       code: |
         len(venue_courts)
-  - no label: selected_trial_court
+  # A separate variable: when both fields set selected_trial_court, the hidden
+  # one can overwrite the chosen court with None on some servers.
+  - no label: fallback_trial_court
     datatype: object
     object labeler: court_short_label
     choices: all_courts.filter_courts(allowed_courts)
@@ -1329,15 +1371,15 @@ review:
     button: |
       **Date of marriage**:
       ${ marriage_date }
-  - Edit: marriage_city
+  - Edit: marriage_location_city
     button: |
       **City where marriage took place**:
       ${ marriage_city }
-  - Edit: marriage_state
+  - Edit: marriage_location_state
     button: |
       **State where marriage took place**:
       ${ marriage_state }
-  - Edit: marriage_country
+  - Edit: marriage_location_country
     button: |
       **Country where marriage took place**:
       ${ marriage_country }
@@ -1381,10 +1423,14 @@ review:
     button: |
       **Uploaded separation agreement**:
       ${ separation_agreement_upload.filename if defined("separation_agreement_upload.filename") else "Uploaded" }
-  - Edit: marriage_certificate_upload
+  - Edit: marriage_certificate_plan
     button: |
       **Certified marriage certificate**:
+      % if marriage_certificate_plan == "upload":
       ${ marriage_certificate_upload.filename if defined("marriage_certificate_upload.filename") else "Uploaded" }
+      % else:
+      Filing it later
+      % endif
 ---
 id: edit users
 continue button field: users.revisit
@@ -1426,9 +1472,9 @@ progress: 100
 ---
 # ALDocument objects specify the metadata for each template
 objects:
-  - divorcejointpetition_Post_interview_instructions: ALDocument.using(title="Instructions", filename="divorcejointpetition_next_steps.docx", has_addendum=False)
-  - divorcejointpetition_attachment: ALDocument.using(title="Joint1ADivorce", filename="divorcejointpetition", has_addendum=False)
-  - affidavit_attachment: ALDocument.using(title="Affidavit", filename="affidavit", has_addendum=False, )
+  - divorcejointpetition_Post_interview_instructions: ALDocument.using(title="Next steps for your joint petition", filename="divorcejointpetition_next_steps.docx", has_addendum=False)
+  - divorcejointpetition_attachment: ALDocument.using(title="Joint Petition for Divorce (1A)", filename="divorcejointpetition", has_addendum=False)
+  - affidavit_attachment: ALDocument.using(title="Affidavit of Irretrievable Breakdown", filename="affidavit", has_addendum=False, )
 ---
 # Each attachment defines a key in an ALDocument. We use `i` as the placeholder here so the same template is 
 # used for "preview" and "final" keys, and logic in the template checks the value of 
