@@ -9,20 +9,7 @@
     "image": "jhpyle/docassemble@sha256:c0b0a707a6cd2149d5777ee83af1ea1de544210e597371eac93e67a1503c395c",
     "pip_freeze_sha256": "64bbb3b63c6df20db3112e9f907341850ec06346dd7cad5a66fe012984bf2912"
   },
-  "candidate_overlays": [
-    {
-      "repository": "SuffolkLITLab/docassemble-MATC1ADivorceJointPetition",
-      "pull_request": 159,
-      "sha": "5519eb22068534a82d93f49a2650617077618054",
-      "reason": "Known fix for the separation-agreement merge loop"
-    },
-    {
-      "repository": "SuffolkLITLab/docassemble-MATCChildCareOrCustodyDisclosureAffidavit",
-      "pull_request": 3,
-      "sha": "08f31c860457e41ea757d3b1f8469c74a7a53556",
-      "reason": "Fix API rendering of the multi-child custody checkbox question"
-    }
-  ],
+  "candidate_overlays": [],
   "coverage_scope": {
     "feature_packages": [
       "docassemble.MATC1ADivorceJointPetition",
@@ -56,17 +43,17 @@
     "docassemble.MATCFinancialStatement": {
       "repository": "SuffolkLITLab/docassemble-MATCFinancialStatement",
       "directory": "docassemble-MATCFinancialStatement",
-      "sha": "a1dbe3d228c7f36674217103abb082ae35610741"
+      "sha": "a181bcdb1c2cfda91f9d7ce95524277a0c402815"
     },
     "docassemble.MATCSeparationAgreement": {
       "repository": "SuffolkLITLab/docassemble-MATCSeparationAgreement",
       "directory": "docassemble-MATCSeparationAgreement",
-      "sha": "dce8a19a3249a7be750ddc326913bc2bb93c6dfe"
+      "sha": "d0f5bf521e3b53d1813145084f8c27730caf5149"
     },
     "docassemble.MATCChildCareOrCustodyDisclosureAffidavit": {
       "repository": "SuffolkLITLab/docassemble-MATCChildCareOrCustodyDisclosureAffidavit",
       "directory": "docassemble-MATCChildCareOrCustodyDisclosureAffidavit",
-      "sha": "08f31c860457e41ea757d3b1f8469c74a7a53556"
+      "sha": "26549dfa503b8d6120ad3df4d71fda933dcf5d23"
     },
     "docassemble.MATCCSGWorksheet": {
       "repository": "SuffolkLITLab/docassemble-MATCCSGWorksheet",
