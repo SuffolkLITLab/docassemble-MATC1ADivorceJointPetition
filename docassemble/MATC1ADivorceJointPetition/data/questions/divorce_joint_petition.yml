@@ -625,7 +625,11 @@ fields:
   - "Briefly explain what caused the marriage breakdown": marriage_breakdown_justification
     input type: area
     maxlength: 810
-    help: Keep your summary brief. You do not need to go into specific detail but make it clear to the court why you want a divorce.
+    help: |
+      The wording already filled in is the standard language for a 1A divorce.
+      In plain terms, it means the marriage no longer works and cannot be repaired.
+      You can keep it as it is, or add a sentence or two in your own words. You do
+      not need to give details or say who is at fault.
     default: |
       Irreconcilable differences have led to an irretrievable breakdown of the marriage.
 
