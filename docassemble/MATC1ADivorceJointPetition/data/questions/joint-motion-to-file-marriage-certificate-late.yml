@@ -114,48 +114,52 @@ id: Reason for Delay
 question: |
   Reason for Delay
 subquestion: |
-  Tell the court why you do not have your certified marriage certificate yet and what you are doing to get it.
+  Tell the court two things:
 
-  You can copy and paste one of these examples, then edit it to match your situation:
+  1. **The reason:** why you do not have a certified copy of your marriage certificate yet.
+  2. **The plan:** what you have done to get it, and when you expect to file it.
+
+  You can copy one of these examples, then edit it to match your situation:
 
   ${ collapse_template(order_certified_copy_example) }
   ${ collapse_template(translation_example) }
   ${ collapse_template(urgent_filing_example) }
+validation code: |
+  if len(marriage_proof_delay_action_plan.split()) < 8:
+    validation_error("Say what you have done to get the certified copy and when you expect to file it. For example: who you ordered it from, on what date, and when you expect it.", field="marriage_proof_delay_action_plan")
 fields:
   - "Reason for marriage certificate delay": marriage_proof_delay_reason
     input type: area
   - "Plan to obtain and submit certified copy of marriage certificate": marriage_proof_delay_action_plan
     input type: area
+    help: |
+      For example: "We ordered a certified copy from the Boston City Clerk on
+      [date]. We expect it within two weeks and will file it with the court
+      as soon as it arrives."
 ---
 template: order_certified_copy_example
 subject: |
   Example: We need to order a certified copy
 content: |
-  We were married in [City, State/Country], and we do not have a certified copy of our marriage certificate yet.
-  We requested a certified copy from [agency/city/town/state/country] on [date].
-  We are waiting for processing and delivery.
+  **Reason:** We were married in [city or town, state or country], and we do not have a certified copy of our marriage certificate yet.
 
-  We will file the certified copy with the court as soon as we receive it.
+  **Plan:** We requested a certified copy from the [city or town clerk, or state or country records office] on [date]. We expect to receive it by [date] and will file it with the court as soon as it arrives.
 ---
 template: translation_example
 subject: |
   Example: We need a certified translation
 content: |
-  Our marriage certificate is not in English.
-  We are obtaining a certified English translation from [translator/service].
-  We expect to receive the certified translation by [date].
+  **Reason:** Our marriage certificate is not in English, and the court needs a certified English translation.
 
-  We will file both the marriage certificate and certified translation with the court as soon as they are ready.
+  **Plan:** We asked [translator or service] for a certified translation on [date] and expect it by [date]. We will file the certificate and the translation together as soon as they are ready.
 ---
 template: urgent_filing_example
 subject: |
   Example: We need to file now while waiting for documents
 content: |
-  We are filing our joint petition now because we need to move our case forward as soon as possible.
-  We do not yet have the certified marriage certificate because [brief reason, such as waiting for mail or processing].
-  We are actively working to get the required documents.
+  **Reason:** We need to file our joint petition now so our case can move forward. Our certified marriage certificate has not arrived yet because [brief reason, such as it is still being processed or mailed].
 
-  We will file the certified marriage certificate (and certified translation, if needed) promptly after receiving them.
+  **Plan:** We requested the certified copy from [office] on [date]. We will file it (and a certified translation, if needed) as soon as we receive it.
 ---
 id: preview jointmotiontofilemarriagecertificatelate
 question: |

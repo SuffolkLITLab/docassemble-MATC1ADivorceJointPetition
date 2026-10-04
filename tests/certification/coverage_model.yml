@@ -47,6 +47,9 @@ dimensions:
   custody_case_participation: [no cases, know of, participated]
 
 default_variables:
+  # The late marriage certificate motion requires a real plan (8+ words).
+  marriage_proof_delay_reason: We have not received our certified marriage certificate yet.
+  marriage_proof_delay_action_plan: We requested a certified copy from the city clerk and will file it when it arrives.
   has_existing_1b_action: false
   financial_statement_scope: neither
   legal_marriage: true
