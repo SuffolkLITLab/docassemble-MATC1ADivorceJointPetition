@@ -183,6 +183,8 @@ terms:
    The last residential address shared by divorcing parties
   financial statement: |
     A form summarizing a party's estimated income and expenses, assets, liabilities, and health insurance, etc. 
+  joint petition: |
+    The court form you and your spouse file together to ask for a 1A divorce.
   divorce absolute: |
     The date a divorce becomes final
   both: |
@@ -333,9 +335,11 @@ id: Divorce type
 question: |
   Is a 1A divorce right for you?
 subquestion: |
-  A joint petition, or "1A," is a no-fault divorce that both spouses file
-  together. It asks you to file a notarized {separation agreement}, either when
+  A {joint petition}, or "1A," is a no-fault divorce that both spouses file
+  together. It asks you to file a {notarized} {separation agreement}, either when
   you file or within 90 days.
+
+  ${ collapse_template(what_is_a_separation_agreement) }
 
   **All three statements below must be true to file a 1A divorce.** Check each
   one that is true for ${ users[0].familiar() } and ${ users[1].familiar() }.
@@ -350,8 +354,22 @@ fields:
     none of the above: False
 under: |
   [**Which type of divorce should I file?**](https://www.mass.gov/decision-tree/which-type-of-divorce-should-i-file)
+  A short set of questions on Mass.gov that compares a 1A divorce with the other types.
 
   [**G.L. c. 208, § 1A**](https://malegislature.gov/Laws/GeneralLaws/PartII/TitleIII/Chapter208/Section1a)
+  The Massachusetts law that sets the rules for a 1A divorce.
+---
+template: what_is_a_separation_agreement
+subject: |
+  What is a separation agreement?
+content: |
+  A separation agreement is a written agreement between you and your spouse
+  that settles the issues in your divorce: property, debts, alimony, and, if
+  you have children, custody, parenting time, and child support.
+
+  The divorce itself is the court's judgment that ends the marriage. At the
+  hearing, the judge reviews your separation agreement and, if it is approved,
+  it becomes part of the divorce.
 ---
 comment: |
   The three statements are collected as one checkbox list so they render as a
