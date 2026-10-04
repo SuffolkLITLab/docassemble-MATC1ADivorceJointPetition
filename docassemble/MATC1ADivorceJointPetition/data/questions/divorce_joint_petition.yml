@@ -185,6 +185,10 @@ terms:
     A form summarizing a party's estimated income and expenses, assets, liabilities, and health insurance, etc. 
   joint petition: |
     The court form you and your spouse file together to ask for a 1A divorce.
+  motion: |
+    A written request asking the judge to do something, for example to accept your marriage certificate after you file.
+  penalty of perjury: |
+    Signing "under the penalties of perjury" means you swear the information is true. Knowingly giving false information is a crime.
   divorce absolute: |
     The date a divorce becomes final
   both: |
@@ -272,7 +276,7 @@ fields:
       - "File it with the court later": later
       - "Upload a copy now": upload
     help: |
-      If you file it later, this interview also prepares a motion asking the
+      If you file it later, this interview also prepares a {motion} asking the
       court for more time to file it.
   - "Upload marriage certificate": marriage_certificate_upload
     datatype: file
@@ -540,11 +544,15 @@ subquestion: |
   Because you have {children of the marriage}, the court requires a completed
   [Child Support Guidelines Worksheet (CJD 304)](https://www.mass.gov/info-details/probate-and-family-court-2025-child-support-guidelines-worksheet-cjd-304),
   even if you agree to waive child support. The worksheet uses the {child support guidelines} to calculate a weekly support amount.
+
+  You and your spouse can agree on a different amount than the worksheet
+  shows. If you do, the court needs to know why, and this interview helps you
+  explain it later.
 fields:
   - "How would you like to handle the worksheet?": csg_worksheet_path
     input type: radio
     choices:
-      - "Fill out the worksheet using this interview tool": interview
+      - "Fill out the worksheet now": interview
       - "Upload my completed worksheet now": upload
       - "File it with the court registry later": wait
 ---
@@ -862,6 +870,8 @@ fields:
   - "Attorney phone number": attorneys[0].phone_number
     datatype: tel
   - "Board of Bar Overseers (BBO) Number": attorneys[0].bbo_number
+    help: |
+      Every Massachusetts lawyer has a BBO registration number. Your lawyer can give it to you.
 ---
 id: Attorney information Party B
 sets: 
@@ -879,6 +889,8 @@ fields:
   - "Attorney phone number": attorneys[1].phone_number
     datatype: tel
   - "Board of Bar Overseers (BBO) Number": attorneys[1].bbo_number
+    help: |
+      Every Massachusetts lawyer has a BBO registration number. Your lawyer can give it to you.
 ---
 id: Children of the Marriage
 question: |
