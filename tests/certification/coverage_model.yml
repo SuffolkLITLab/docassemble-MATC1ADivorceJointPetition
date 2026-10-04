@@ -111,7 +111,7 @@ default_variables:
   children[i].has_gal: false
   children[i].gals.target_number: 0
   children[i].address.country: USA
-  children[i].address.start_date: '2024'
+  children[i].lived_here_since: '2024'
 
 # These are the finite path archetypes. Each entry is a complete modeled path:
 # the generator overlays it on default_variables and the runtime ledger proves
@@ -652,6 +652,8 @@ modeled_paths:
     family: agreement
     overrides:
       separation_agreement_format: interview
+      # One spouse will cover the other, and they have not agreed how.
+      health_insurance_self_responsible: false
       health_insurance_custom_terms_adult: false
     required_screen_ids:
       - health insurance no agreement exit
