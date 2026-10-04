@@ -828,6 +828,11 @@ subquestion: |
 
   Any portion of a separation agreement related to the care and custody of minor children (e.g. child custody, visitation, and child support) will always merge. 
 
+  **In plain terms:** if a part of your agreement merges, either of you can
+  later ask the court to change it if your lives change a lot, for example if
+  one of you loses a job. If a part survives, it stays a contract between the
+  two of you, and the court will not change it later.
+
   **Do you want your separation agreement to merge, survive, or {both}?**
   
 fields:
@@ -843,12 +848,16 @@ id: Additional requests
 question: |
   Additional requests
 subquestion: | 
-  Do you have any additonal requests for the court that you would like to add to your joint petition? This is _**rare**_.
+  Do you have any additional requests for the court that you would like to add
+  to your joint petition?
+
+  Most people answer **No**. Use this only for something you need the court to
+  decide that is not already covered by your petition or your separation
+  agreement.
 
 fields: 
   - "Do you have any additional requests for the court?": additional_request
     datatype: yesnoradio
-    hint: This is unlikely unless...
   - "Additonal request detail": additonal_request_detail
     maxlength: 84
     required: False
