@@ -207,6 +207,13 @@ validation code: |
       field="acknowledged_information_use",
     )
 ---
+interview help:
+  heading: If a screen seems stuck
+  content: |
+    If a screen keeps loading for more than a minute, refresh the page in your
+    browser. Your answers up to the last screen you finished are saved, so you
+    will not lose them.
+---
 id: who is here today
 question: |
   Spouses filling this out
