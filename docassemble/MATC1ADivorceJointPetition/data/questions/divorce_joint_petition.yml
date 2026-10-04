@@ -886,6 +886,10 @@ question: |
 subquestion: |
   Were any children born to or adopted by ${ users[0] } and ${ users[1] } during
   the marriage? These are your {children of the marriage}.
+
+  Only count children of the marriage here. This divorce decides custody and
+  support only for them. If either of you has children from another
+  relationship, the financial statement asks about them later.
 fields:
   - no label: children_of_marriage
     datatype: yesnoradio
@@ -900,6 +904,10 @@ question: |
   Who the children live with
 subquestion: |
   How many of the {children of the marriage} live with each of you?
+
+  If a child spends about the same time with each of you, count the child with
+  one of you, so each child is counted once. Your parenting schedule goes in
+  the separation agreement.
 fields:
   - "Living with ${ users[0] }": users1_number_of_custodial_children
     datatype: integer
