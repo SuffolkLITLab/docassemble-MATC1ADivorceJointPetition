@@ -113,9 +113,11 @@ code: |
   nav.set_section("party_information")
 
   if ask_party_a_address:
+    spouse_address_known(0)
     users[0].address.address
   users[0].phone_number
   if ask_party_b_address:
+    spouse_address_known(1)
     users[1].address.address
   users[1].phone_number
 
@@ -711,6 +713,31 @@ subquestion: |
 fields:
   - code: |
       users[0].address_fields(show_county=True)
+---
+comment: |
+  A spouse who is not here today may live somewhere the other spouse does not
+  know. Ask first, and if the address is unknown leave it blank on the forms;
+  the "still needed" list at the end tells them to fill it in.
+code: |
+  def spouse_address_known(index):
+    spouse = users[index]
+    if showifdef("absent_spouse_index") != index:
+      spouse.address_known = True
+    if not spouse.address_known:
+      for attr in ("address", "unit", "city", "state", "zip", "county"):
+        setattr(spouse.address, attr, "")
+    return spouse.address_known
+---
+id: absent spouse address known
+generic object: ALIndividual
+question: |
+  Address: ${ x }
+subquestion: |
+  ${ x } is not here today. If you do not know their current address, the
+  forms will leave it blank and we will remind you to add it before you file.
+fields:
+  - "Do you know ${ x.familiar() }'s current address?": x.address_known
+    datatype: yesnoradio
 ---
 id: Party B home address
 sets:

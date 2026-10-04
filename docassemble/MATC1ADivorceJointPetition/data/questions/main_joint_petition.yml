@@ -193,6 +193,8 @@ code: |
   still_needed_items = [f"{still_needed_spouse}'s signature on each document"]
   if not showifdef(still_needed_spouse.attr_name("birthdate")):
     still_needed_items.append(f"{still_needed_spouse}'s date of birth")
+  if showifdef(still_needed_spouse.attr_name("address_known"), True) is False:
+    still_needed_items.append(f"{still_needed_spouse}'s current address")
   if not showifdef(still_needed_spouse.attr_name("phone_number")):
     still_needed_items.append(f"{still_needed_spouse}'s phone number")
   if showifdef("include_r408"):
