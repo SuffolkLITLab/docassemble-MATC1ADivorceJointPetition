@@ -769,6 +769,9 @@ fields:
       children[i].name_fields()
   - Birthdate: children[i].birthdate
     datatype: date
+validation code: |
+  if children[i].birthdate > today():
+    validation_error("A child's date of birth can't be in the future. Check the year.", field=children[i].attr_name("birthdate"))
 ---
 comment: |
   Search only the venue address worked out in divorce_joint_petition.yml.

@@ -834,6 +834,8 @@ fields:
     datatype: yesnoradio
   - "How many children came from the marriage between ${ users[0].familiar() } and ${ users[1].familiar() }?": children_of_marriage_number
     datatype: integer
+    min: 1
+    max: 20
     show if: children_of_marriage
 ---
 id: Custodial children
@@ -859,6 +861,9 @@ fields:
       children[i].name_fields()  
   - "birthdate": children[i].birthdate
     datatype: date
+validation code: |
+  if children[i].birthdate > today():
+    validation_error("A child's date of birth can't be in the future. Check the year.", field=children[i].attr_name("birthdate"))
 ---
 ####### Interview Order Curating Line #####
 ---
