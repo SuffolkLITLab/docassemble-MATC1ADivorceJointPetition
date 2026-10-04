@@ -429,15 +429,28 @@ subquestion: |
   In a 1A divorce, you tell the court how you will handle the issues in your
   divorce, such as:
 
-  * Child support
-  * Parenting time
-  * Child custody
-  * Alimony
-  * Dividing shared property (marital assets)
+  * {Child support}
+  * {Parenting time}
+  * {Child custody}
+  * {Alimony}
+  * Dividing shared property ({marital assets})
   * Health insurance
 
   Do ${ users[0].name_full() } and ${ users[1].name_full() } agree on how to
   handle all of them? You do not need to have written anything down yet.
+terms:
+  child support: |
+    Money one parent pays the other to help pay for the children's needs.
+  parenting time: |
+    The schedule for when the children are with each parent.
+  child custody: |
+    Legal custody is the right to make major decisions for a child, such as
+    about school and health care. Physical custody is about where the child lives.
+  alimony: |
+    Money one spouse pays the other for support after the divorce.
+  marital assets: |
+    Property that either of you owns, such as a home, cars, bank accounts, and
+    retirement accounts.
 fields:
   - no label: separation_agreement_reached
     datatype: yesnoradio
@@ -533,8 +546,8 @@ question: |
 subquestion: |
   You have indicated that you will file your notarized separation agreement later. Confirm that you understand:
   
-  * You must file a separation agreement within 90 days of filing a joint petition for divorce (1A)
-  * Your separation agreement must be notarized
+  * You must file a {separation agreement} within 90 days of filing a {joint petition} for divorce (1A)
+  * Your separation agreement must be {notarized}
   * Your separation agreement should address all issues such as property division, child custody, and child support
 ---
 id: child support guidelines worksheet status
@@ -1290,6 +1303,8 @@ subquestion: |
 
   If this is not where you want to file, use **Undo** to go back and change your
   answers.
+
+  [Find this court's hours and contact information](https://www.mass.gov/orgs/probate-and-family-court/locations)
 ---
 id: divorce joint petition review screen
 event: review_divorcejointpetition
