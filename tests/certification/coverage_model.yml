@@ -368,6 +368,8 @@ modeled_paths:
     family: financial
     overrides:
       financial_statement_scope: spouse_1_only
+      # A represented spouse sees the financial statement's attorney page.
+      users[0].has_attorney: true
       users[0].gross_annual_income: 74999
       users[0].has_self_employment_income: false
       users[0].has_rental_income: false
@@ -680,6 +682,9 @@ modeled_paths:
     family: presence
     overrides:
       spouses_present: spouse_1
+      # Spouse 1 lives at the marital home and does not know spouse 2's address.
+      who_lives_at_marital_home: party_a
+      x.address_known: false
       financial_statement_scope: spouse_1_only
       users[0].gross_annual_income: 74999
       users[0].has_self_employment_income: false
@@ -694,6 +699,7 @@ modeled_paths:
       users2_name_last_at_birth: ''
     required_screen_ids:
       - who is here today
+      - absent spouse address known
       - sign party A
       - still needed from absent spouse
     forbidden_screen_ids:
