@@ -43,22 +43,22 @@
     "docassemble.MATCFinancialStatement": {
       "repository": "SuffolkLITLab/docassemble-MATCFinancialStatement",
       "directory": "docassemble-MATCFinancialStatement",
-      "sha": "899241f504df1b3eec647e8ff4a2517a3ba0f9b3"
+      "sha": "ee518d06cdd8d443c2b685daf742da225b13d4c6"
     },
     "docassemble.MATCSeparationAgreement": {
       "repository": "SuffolkLITLab/docassemble-MATCSeparationAgreement",
       "directory": "docassemble-MATCSeparationAgreement",
-      "sha": "d0f5bf521e3b53d1813145084f8c27730caf5149"
+      "sha": "d97a56e31b96435caad218474e7ba185eceb857c"
     },
     "docassemble.MATCChildCareOrCustodyDisclosureAffidavit": {
       "repository": "SuffolkLITLab/docassemble-MATCChildCareOrCustodyDisclosureAffidavit",
       "directory": "docassemble-MATCChildCareOrCustodyDisclosureAffidavit",
-      "sha": "26549dfa503b8d6120ad3df4d71fda933dcf5d23"
+      "sha": "39c8cc4c86a79eef3c4d1d991b5cead80df3c481"
     },
     "docassemble.MATCCSGWorksheet": {
       "repository": "SuffolkLITLab/docassemble-MATCCSGWorksheet",
       "directory": "docassemble-MATCCSGWorksheet",
-      "sha": "96589474face58e0bbb18a067f4710e8e50e3d5a"
+      "sha": "0212706739e86f79e882d2f267587acd1bb307d9"
     },
     "docassemble.matcfindingsanddeterminations": {
       "repository": "SuffolkLITLab/docassemble-MATCFindingsAndDeterminations",

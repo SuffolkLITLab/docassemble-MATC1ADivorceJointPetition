@@ -112,6 +112,9 @@ default_variables:
   children[i].gals.target_number: 0
   children[i].address.country: USA
   children[i].lived_here_since: '2024'
+  # The agreement requires a set fallback schedule (8+ words).
+  parenting_time_description: The children live with Alex. Bailey has them every other weekend from Friday to Sunday.
+  parenting_time_fallback: If the parents cannot agree, Bailey has the children every other weekend from Friday at 5 p.m. to Sunday at 5 p.m.
 
 # These are the finite path archetypes. Each entry is a complete modeled path:
 # the generator overlays it on default_variables and the runtime ledger proves
@@ -363,6 +366,42 @@ modeled_paths:
         expected_id: divorce joint petition review screen
       - event: review_cjd_305
         expected_id: review cjd_305
+
+  - name: agreement with a child age 19 still eligible for support
+    family: children
+    overrides:
+      children_of_marriage: true
+      children_of_marriage_number: 2
+      csg_worksheet_path: interview
+      separation_agreement_format: interview
+      child_support_deviation: false
+      children[0].birthdate: '2007-03-01'
+      children[0].sa_support_continues: true
+    required_screen_ids:
+      - child support eligibility
+      - child support payment method
+
+  - name: agreement with only an adult child, no child support
+    family: children
+    overrides:
+      children_of_marriage: true
+      children_of_marriage_number: 1
+      csg_worksheet_path: interview
+      separation_agreement_format: interview
+      children[0].birthdate: '2001-01-15'
+    required_screen_ids:
+      - no children eligible for child support
+    forbidden_screen_ids:
+      - child support eligibility
+      - child support payment method
+
+  - name: agreement with a represented spouse
+    family: agreement
+    overrides:
+      separation_agreement_format: interview
+      users[0].has_attorney: true
+    forbidden_screen_ids:
+      - separation agreement counsel
 
   - name: only party A short financial statement
     family: financial
