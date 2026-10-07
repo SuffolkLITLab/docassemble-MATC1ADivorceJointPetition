@@ -113,9 +113,11 @@ code: |
   nav.set_section("party_information")
 
   if ask_party_a_address:
+    spouse_address_known(0)
     users[0].address.address
   users[0].phone_number
   if ask_party_b_address:
+    spouse_address_known(1)
     users[1].address.address
   users[1].phone_number
 
@@ -181,6 +183,12 @@ terms:
    The last residential address shared by divorcing parties
   financial statement: |
     A form summarizing a party's estimated income and expenses, assets, liabilities, and health insurance, etc. 
+  joint petition: |
+    The court form you and your spouse file together to ask for a 1A divorce.
+  motion: |
+    A written request asking the judge to do something, for example to accept your marriage certificate after you file.
+  penalty of perjury: |
+    Signing "under the penalties of perjury" means you swear the information is true. Knowingly giving false information is a crime.
   divorce absolute: |
     The date a divorce becomes final
   both: |
@@ -191,7 +199,9 @@ continue button field: divorcejointpetition_intro
 question: |
    **Joint petition for divorce under [G.L. c. 208, § 1A](https://malegislature.gov/Laws/GeneralLaws/PartII/TitleIII/Chapter208/Section1a)**
 subquestion: |
-    This interview helps both spouses prepare a packet for a joint divorce. This is called a 1A divorce.
+    This interview helps you and your spouse prepare the papers for an
+    uncontested joint divorce, called a 1A divorce. You both need to take part:
+    you both sign the petition and the separation agreement.
 
     It asks about your marriage, your agreement, and any children.
 
@@ -200,11 +210,17 @@ subquestion: |
     1. A copy of your marriage certificate, if you have one
     2. Your separation agreement, if you have one
     3. Names, birth dates, and addresses for both spouses and any children under 18
-    4. Pay stubs and details about your income and costs, if you want financial forms
+    4. Information about your property and debts, such as your home, cars, bank
+       accounts, retirement accounts, and loans
+    5. Pay stubs and recent bills, if you will fill out financial statements here.
+       We explain the financial statements later, and you can skip them for now.
 
     **At the end**
 
-    You can download your papers. The last screen tells you what to do before you file.
+    You download a packet of court forms: the joint petition and the other forms
+    that fit your situation. You print and sign them, and you file them with the
+    Probate and Family Court yourself. The last screen tells you what to do
+    before you file, and the court then schedules a hearing.
 
 ---
 id: Party B name
@@ -260,7 +276,7 @@ fields:
       - "File it with the court later": later
       - "Upload a copy now": upload
     help: |
-      If you file it later, this interview also prepares a motion asking the
+      If you file it later, this interview also prepares a {motion} asking the
       court for more time to file it.
   - "Upload marriage certificate": marriage_certificate_upload
     datatype: file
@@ -323,9 +339,11 @@ id: Divorce type
 question: |
   Is a 1A divorce right for you?
 subquestion: |
-  A joint petition, or "1A," is a no-fault divorce that both spouses file
-  together. It asks you to file a notarized {separation agreement}, either when
+  A {joint petition}, or "1A," is a no-fault divorce that both spouses file
+  together. It asks you to file a {notarized} {separation agreement}, either when
   you file or within 90 days.
+
+  ${ collapse_template(what_is_a_separation_agreement) }
 
   **All three statements below must be true to file a 1A divorce.** Check each
   one that is true for ${ users[0].familiar() } and ${ users[1].familiar() }.
@@ -340,8 +358,22 @@ fields:
     none of the above: False
 under: |
   [**Which type of divorce should I file?**](https://www.mass.gov/decision-tree/which-type-of-divorce-should-i-file)
+  A short set of questions on Mass.gov that compares a 1A divorce with the other types.
 
   [**G.L. c. 208, § 1A**](https://malegislature.gov/Laws/GeneralLaws/PartII/TitleIII/Chapter208/Section1a)
+  The Massachusetts law that sets the rules for a 1A divorce.
+---
+template: what_is_a_separation_agreement
+subject: |
+  What is a separation agreement?
+content: |
+  A separation agreement is a written agreement between you and your spouse
+  that settles the issues in your divorce: property, debts, alimony, and, if
+  you have children, custody, parenting time, and child support.
+
+  The divorce itself is the court's judgment that ends the marriage. At the
+  hearing, the judge reviews your separation agreement and, if it is approved,
+  it becomes part of the divorce.
 ---
 comment: |
   The three statements are collected as one checkbox list so they render as a
@@ -397,15 +429,28 @@ subquestion: |
   In a 1A divorce, you tell the court how you will handle the issues in your
   divorce, such as:
 
-  * Child support
-  * Parenting time
-  * Child custody
-  * Alimony
-  * Dividing shared property (marital assets)
+  * {Child support}
+  * {Parenting time}
+  * {Child custody}
+  * {Alimony}
+  * Dividing shared property ({marital assets})
   * Health insurance
 
   Do ${ users[0].name_full() } and ${ users[1].name_full() } agree on how to
   handle all of them? You do not need to have written anything down yet.
+terms:
+  child support: |
+    Money one parent pays the other to help pay for the children's needs.
+  parenting time: |
+    The schedule for when the children are with each parent.
+  child custody: |
+    Legal custody is the right to make major decisions for a child, such as
+    about school and health care. Physical custody is about where the child lives.
+  alimony: |
+    Money one spouse pays the other for support after the divorce.
+  marital assets: |
+    Property that either of you owns, such as a home, cars, bank accounts, and
+    retirement accounts.
 fields:
   - no label: separation_agreement_reached
     datatype: yesnoradio
@@ -501,8 +546,8 @@ question: |
 subquestion: |
   You have indicated that you will file your notarized separation agreement later. Confirm that you understand:
   
-  * You must file a separation agreement within 90 days of filing a joint petition for divorce (1A)
-  * Your separation agreement must be notarized
+  * You must file a {separation agreement} within 90 days of filing a {joint petition} for divorce (1A)
+  * Your separation agreement must be {notarized}
   * Your separation agreement should address all issues such as property division, child custody, and child support
 ---
 id: child support guidelines worksheet status
@@ -512,11 +557,15 @@ subquestion: |
   Because you have {children of the marriage}, the court requires a completed
   [Child Support Guidelines Worksheet (CJD 304)](https://www.mass.gov/info-details/probate-and-family-court-2025-child-support-guidelines-worksheet-cjd-304),
   even if you agree to waive child support. The worksheet uses the {child support guidelines} to calculate a weekly support amount.
+
+  You and your spouse can agree on a different amount than the worksheet
+  shows. If you do, the court needs to know why, and this interview helps you
+  explain it later.
 fields:
   - "How would you like to handle the worksheet?": csg_worksheet_path
     input type: radio
     choices:
-      - "Fill out the worksheet using this interview tool": interview
+      - "Fill out the worksheet now": interview
       - "Upload my completed worksheet now": upload
       - "File it with the court registry later": wait
 ---
@@ -615,7 +664,11 @@ fields:
   - "Briefly explain what caused the marriage breakdown": marriage_breakdown_justification
     input type: area
     maxlength: 810
-    help: Keep your summary brief. You do not need to go into specific detail but make it clear to the court why you want a divorce.
+    help: |
+      The wording already filled in is the standard language for a 1A divorce.
+      In plain terms, it means the marriage no longer works and cannot be repaired.
+      You can keep it as it is, or add a sentence or two in your own words. You do
+      not need to give details or say who is at fault.
     default: |
       Irreconcilable differences have led to an irretrievable breakdown of the marriage.
 
@@ -712,6 +765,31 @@ fields:
   - code: |
       users[0].address_fields(show_county=True)
 ---
+comment: |
+  A spouse who is not here today may live somewhere the other spouse does not
+  know. Ask first, and if the address is unknown leave it blank on the forms;
+  the "still needed" list at the end tells them to fill it in.
+code: |
+  def spouse_address_known(index):
+    spouse = users[index]
+    if showifdef("absent_spouse_index") != index:
+      spouse.address_known = True
+    if not spouse.address_known:
+      for attr in ("address", "unit", "city", "state", "zip", "county"):
+        setattr(spouse.address, attr, "")
+    return spouse.address_known
+---
+id: absent spouse address known
+generic object: ALIndividual
+question: |
+  Address: ${ x }
+subquestion: |
+  ${ x } is not here today. If you do not know their current address, the
+  forms will leave it blank and we will remind you to add it before you file.
+fields:
+  - "Do you know ${ x.familiar() }'s current address?": x.address_known
+    datatype: yesnoradio
+---
 id: Party B home address
 sets:
   - users[1].address.address
@@ -750,6 +828,11 @@ subquestion: |
 
   Any portion of a separation agreement related to the care and custody of minor children (e.g. child custody, visitation, and child support) will always merge. 
 
+  **In plain terms:** if a part of your agreement merges, either of you can
+  later ask the court to change it if your lives change a lot, for example if
+  one of you loses a job. If a part survives, it stays a contract between the
+  two of you, and the court will not change it later.
+
   **Do you want your separation agreement to merge, survive, or {both}?**
   
 fields:
@@ -765,12 +848,16 @@ id: Additional requests
 question: |
   Additional requests
 subquestion: | 
-  Do you have any additonal requests for the court that you would like to add to your joint petition? This is _**rare**_.
+  Do you have any additional requests for the court that you would like to add
+  to your joint petition?
+
+  Most people answer **No**. Use this only for something you need the court to
+  decide that is not already covered by your petition or your separation
+  agreement.
 
 fields: 
   - "Do you have any additional requests for the court?": additional_request
     datatype: yesnoradio
-    hint: This is unlikely unless...
   - "Additonal request detail": additonal_request_detail
     maxlength: 84
     required: False
@@ -805,6 +892,8 @@ fields:
   - "Attorney phone number": attorneys[0].phone_number
     datatype: tel
   - "Board of Bar Overseers (BBO) Number": attorneys[0].bbo_number
+    help: |
+      Every Massachusetts lawyer has a BBO registration number. Your lawyer can give it to you.
 ---
 id: Attorney information Party B
 sets: 
@@ -822,6 +911,8 @@ fields:
   - "Attorney phone number": attorneys[1].phone_number
     datatype: tel
   - "Board of Bar Overseers (BBO) Number": attorneys[1].bbo_number
+    help: |
+      Every Massachusetts lawyer has a BBO registration number. Your lawyer can give it to you.
 ---
 id: Children of the Marriage
 question: |
@@ -829,11 +920,17 @@ question: |
 subquestion: |
   Were any children born to or adopted by ${ users[0] } and ${ users[1] } during
   the marriage? These are your {children of the marriage}.
+
+  Only count children of the marriage here. This divorce decides custody and
+  support only for them. If either of you has children from another
+  relationship, the financial statement asks about them later.
 fields:
   - no label: children_of_marriage
     datatype: yesnoradio
   - "How many children came from the marriage between ${ users[0].familiar() } and ${ users[1].familiar() }?": children_of_marriage_number
     datatype: integer
+    min: 1
+    max: 20
     show if: children_of_marriage
 ---
 id: Custodial children
@@ -841,6 +938,10 @@ question: |
   Who the children live with
 subquestion: |
   How many of the {children of the marriage} live with each of you?
+
+  If a child spends about the same time with each of you, count the child with
+  one of you, so each child is counted once. Your parenting schedule goes in
+  the separation agreement.
 fields:
   - "Living with ${ users[0] }": users1_number_of_custodial_children
     datatype: integer
@@ -859,6 +960,9 @@ fields:
       children[i].name_fields()  
   - "birthdate": children[i].birthdate
     datatype: date
+validation code: |
+  if children[i].birthdate > today():
+    validation_error("A child's date of birth can't be in the future. Check the year.", field=children[i].attr_name("birthdate"))
 ---
 ####### Interview Order Curating Line #####
 ---
@@ -1208,6 +1312,8 @@ subquestion: |
 
   If this is not where you want to file, use **Undo** to go back and change your
   answers.
+
+  [Find this court's hours and contact information](https://www.mass.gov/orgs/probate-and-family-court/locations)
 ---
 id: divorce joint petition review screen
 event: review_divorcejointpetition

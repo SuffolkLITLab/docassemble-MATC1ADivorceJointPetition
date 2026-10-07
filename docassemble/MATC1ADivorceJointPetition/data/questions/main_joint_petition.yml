@@ -166,15 +166,64 @@ sections:
 code: |
   github_repo_name =  'docassemble-MATC1ADivorceJointPetition'
 ---
+comment: |
+  Replaces the AssemblyLine intro so step 3 says to file the papers with the
+  court, not just "deliver" them.
+id: joint petition basic questions intro
+question: |
+  ${interview_short_title}: ${ AL_ORGANIZATION_TITLE}
+subquestion: |
+  ${ AL_ORGANIZATION_TITLE } can help you complete and download your divorce papers in 3 steps:
+
+  **Step 1.** Answer questions that fill in your forms for you.<br>
+  **Step 2.** Preview the completed forms.<br>
+  **Step 3.** Download and print the forms, sign them, and **file** them with the
+  Registry of the Probate and Family Court. This site does not file them for you.
+
+  This site is not a lawyer. If you would like a lawyer, find [your local
+  legal aid provider](https://www.lsc.gov/what-legal-aid/find-legal-aid).
+
+  Tap the {green words} in any screen for a definition or more information.
+
+  % if chat_partners_available().help:
+  Live help is currently available in this interview. Click the speech bubble
+  (:comment-alt:) in the navigation bar to connect to a live advocate for help.
+  % endif
+fields:
+  - note: |
+      ${ display_template(al_terms_of_use, scrollable=True) }
+      To continue, you must accept our terms of use
+  - I accept the terms of use: acknowledged_information_use
+    datatype: yesnowide
+    grid: 8
+continue button field: al_intro_screen
+terms:
+  green words: |
+    Green words are legal terms or a short way of referring to something that needs more explanation. The definition or explanation pops up when you tap the green words.
+validation code: |
+  if not acknowledged_information_use:
+    validation_error(
+      "You must accept the terms of use to continue.",
+      field="acknowledged_information_use",
+    )
+---
+interview help:
+  heading: If a screen seems stuck
+  content: |
+    If a screen keeps loading for more than a minute, refresh the page in your
+    browser. Your answers up to the last screen you finished are saved, so you
+    will not lose them.
+---
 id: who is here today
 question: |
-  Who is here today?
+  Spouses filling this out
 subquestion: |
   If one spouse is not here, you can still prepare the documents. That spouse
   signs the printed documents later, and you can leave blank anything only they
   know. We will list what is still needed before you finish.
 fields:
-  - no label: spouses_present
+  - Who is here today?: spouses_present
+    label above field: True
     datatype: radio
     choices:
       - Both of us: both
@@ -193,6 +242,8 @@ code: |
   still_needed_items = [f"{still_needed_spouse}'s signature on each document"]
   if not showifdef(still_needed_spouse.attr_name("birthdate")):
     still_needed_items.append(f"{still_needed_spouse}'s date of birth")
+  if showifdef(still_needed_spouse.attr_name("address_known"), True) is False:
+    still_needed_items.append(f"{still_needed_spouse}'s current address")
   if not showifdef(still_needed_spouse.attr_name("phone_number")):
     still_needed_items.append(f"{still_needed_spouse}'s phone number")
   if showifdef("include_r408"):
@@ -561,7 +612,7 @@ content: |
 
   Best practice is to file a signed financial statement for each spouse before your case is scheduled.
 
-  Financial statements are signed under penalty of perjury, so accuracy matters. The court relies on these forms when making decisions. If your circumstances change, you must file an updated financial statement accordingly.
+  Financial statements are signed under {penalty of perjury}, so accuracy matters. The court relies on these forms when making decisions. If your circumstances change, you must file an updated financial statement accordingly.
 
   Under **Supplemental Probate and Family Court Rule 401**, each party in a divorce must file a signed financial statement within **45 days after service of summons**, or sooner if a hearing or pretrial conference is scheduled.
 ---
@@ -769,6 +820,9 @@ fields:
       children[i].name_fields()
   - Birthdate: children[i].birthdate
     datatype: date
+validation code: |
+  if children[i].birthdate > today():
+    validation_error("A child's date of birth can't be in the future. Check the year.", field=children[i].attr_name("birthdate"))
 ---
 comment: |
   Search only the venue address worked out in divorce_joint_petition.yml.

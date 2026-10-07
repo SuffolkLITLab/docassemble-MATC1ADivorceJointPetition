@@ -47,6 +47,9 @@ dimensions:
   custody_case_participation: [no cases, know of, participated]
 
 default_variables:
+  # The late marriage certificate motion requires a real plan (8+ words).
+  marriage_proof_delay_reason: We have not received our certified marriage certificate yet.
+  marriage_proof_delay_action_plan: We requested a certified copy from the city clerk and will file it when it arrives.
   has_existing_1b_action: false
   financial_statement_scope: neither
   legal_marriage: true
@@ -108,7 +111,7 @@ default_variables:
   children[i].has_gal: false
   children[i].gals.target_number: 0
   children[i].address.country: USA
-  children[i].address.start_date: '2024'
+  children[i].lived_here_since: '2024'
 
 # These are the finite path archetypes. Each entry is a complete modeled path:
 # the generator overlays it on default_variables and the runtime ledger proves
@@ -365,6 +368,8 @@ modeled_paths:
     family: financial
     overrides:
       financial_statement_scope: spouse_1_only
+      # A represented spouse sees the financial statement's attorney page.
+      users[0].has_attorney: true
       users[0].gross_annual_income: 74999
       users[0].has_self_employment_income: false
       users[0].has_rental_income: false
@@ -649,6 +654,8 @@ modeled_paths:
     family: agreement
     overrides:
       separation_agreement_format: interview
+      # One spouse will cover the other, and they have not agreed how.
+      health_insurance_self_responsible: false
       health_insurance_custom_terms_adult: false
     required_screen_ids:
       - health insurance no agreement exit
@@ -675,6 +682,9 @@ modeled_paths:
     family: presence
     overrides:
       spouses_present: spouse_1
+      # Spouse 1 lives at the marital home and does not know spouse 2's address.
+      who_lives_at_marital_home: party_a
+      x.address_known: false
       financial_statement_scope: spouse_1_only
       users[0].gross_annual_income: 74999
       users[0].has_self_employment_income: false
@@ -689,6 +699,7 @@ modeled_paths:
       users2_name_last_at_birth: ''
     required_screen_ids:
       - who is here today
+      - absent spouse address known
       - sign party A
       - still needed from absent spouse
     forbidden_screen_ids:
