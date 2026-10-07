@@ -230,6 +230,9 @@ question: |
   Spouse name
 subquestion: |
   Who is married to ${  users[0].name_full()  }?
+
+  If they have two middle names or two last names, enter both in the same
+  box, the way they appear on your marriage certificate.
 fields:
   - code: |
       users[1].name_fields()  
