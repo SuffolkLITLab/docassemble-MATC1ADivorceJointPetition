@@ -700,7 +700,8 @@ code: |
   if not children_of_marriage or csg_worksheet_path == "wait" or separation_agreement_format == "wait":
     include_findings_and_determinations = False
   elif separation_agreement_format == "interview":
-    include_findings_and_determinations = child_support_deviation
+    # No child support section when no child is eligible under G.L. c. 208, § 28.
+    include_findings_and_determinations = bool(sa_support_children) and child_support_deviation
   else:
     include_findings_and_determinations = (
       uploaded_agreement_addresses_child_support
@@ -808,6 +809,16 @@ code: |
     petition_request_merge_agreement = request_merge_agreement
     petition_request_survive_agreement = request_survive_agreement
   set_petition_merger_survival_values = True
+---
+comment: |
+  The separation agreement says whether each party has a lawyer. The petition
+  has already collected each lawyer in attorneys[i], so reuse those answers
+  instead of asking again.
+code: |
+  users[i].sa_attorney_name = attorneys[i].name.full()
+---
+code: |
+  users[i].sa_attorney_address = attorneys[i].address.on_one_line()
 ---
 # The care-or-custody package also ships a standalone list-collect definition
 # for children[i].name.first. In the combined interview, the spouses already
