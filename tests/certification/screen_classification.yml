@@ -107,9 +107,9 @@ proven_unreachable:
   "docassemble.MATC1ADivorceJointPetition:data/questions/joint-motion-to-file-marriage-certificate-late.yml#ae51796e43d670d1": *parent_packet_flow
 
   # Child Support Guidelines worksheet shared setup and standalone closing.
-  "docassemble.MATCCSGWorksheet:data/questions/child_support_guidelines_worksheet_core.yml#0a006fdd52b9d629": *parent_shared_data
+  "docassemble.MATCCSGWorksheet:data/questions/child_support_guidelines_worksheet_core.yml#1ac7efa4147e69fe": *parent_shared_data
   "docassemble.MATCCSGWorksheet:data/questions/child_support_guidelines_worksheet_core.yml#86fda9848bd8873c": *parent_shared_data
-  "docassemble.MATCCSGWorksheet:data/questions/child_support_guidelines_worksheet_core.yml#99a807fe38dbbdc6": *parent_shared_data
+  "docassemble.MATCCSGWorksheet:data/questions/child_support_guidelines_worksheet_core.yml#12cb4c0006933ce4": *parent_shared_data
   "docassemble.MATCCSGWorksheet:data/questions/child_support_guidelines_worksheet_core.yml#c9c120378700af5b": *parent_packet_flow
   "docassemble.MATCCSGWorksheet:data/questions/child_support_guidelines_worksheet_core.yml#ddfabc90dbd0aebd": *parent_packet_flow
 
@@ -118,7 +118,7 @@ proven_unreachable:
   "docassemble.MATCChildCareOrCustodyDisclosureAffidavit:data/questions/affidavit_disclosing_care_or_custody.yml#05ecfc224445ea7f": *commented_branch
   "docassemble.MATCChildCareOrCustodyDisclosureAffidavit:data/questions/affidavit_disclosing_care_or_custody.yml#5a621f07192da4e2": *shadowed_question
   "docassemble.MATCChildCareOrCustodyDisclosureAffidavit:data/questions/affidavit_disclosing_care_or_custody.yml#0cc03cd5f72c5347": *commented_branch
-  "docassemble.MATCChildCareOrCustodyDisclosureAffidavit:data/questions/affidavit_disclosing_care_or_custody.yml#d8c99e574773d6e1": *shadowed_question
+  "docassemble.MATCChildCareOrCustodyDisclosureAffidavit:data/questions/affidavit_disclosing_care_or_custody.yml#0a838c662d94826c": *shadowed_question
   "docassemble.MATCChildCareOrCustodyDisclosureAffidavit:data/questions/affidavit_disclosing_care_or_custody.yml#4d2b1b686fab003b": *parent_packet_flow
   "docassemble.MATCChildCareOrCustodyDisclosureAffidavit:data/questions/affidavit_disclosing_care_or_custody.yml#4463c5deeba823fd": *parent_shared_data
   "docassemble.MATCChildCareOrCustodyDisclosureAffidavit:data/questions/affidavit_disclosing_care_or_custody.yml#54a3031b34d05320": *parent_shared_data
@@ -140,9 +140,9 @@ proven_unreachable:
   # main_joint_petition.yml answers financial_statement_person_role: whose
   # statements to prepare is already known from financial_statement_scope.
   "docassemble.MATCFinancialStatement:data/questions/financial_statement.yml#f9a67e16aa398021": *parent_shared_data
-  "docassemble.MATCFinancialStatement:data/questions/financial_statement_long.yml#0de307d26492d8eb": *not_in_active_order
-  "docassemble.MATCFinancialStatement:data/questions/financial_statement_long.yml#368765e0433375d7": *not_in_active_order
-  "docassemble.MATCFinancialStatement:data/questions/financial_statement_long.yml#f00d2c2a79e08249": *not_in_active_order
+  "docassemble.MATCFinancialStatement:data/questions/financial_statement_long.yml#7a41e307ade5a5a2": *not_in_active_order
+  "docassemble.MATCFinancialStatement:data/questions/financial_statement_long.yml#5ea501a0115cf108": *not_in_active_order
+  "docassemble.MATCFinancialStatement:data/questions/financial_statement_long.yml#6f28f5853f9f9256": *not_in_active_order
   "docassemble.MATCFinancialStatement:data/questions/financial_statement_shared.yml#0c569da329ef58a4": *not_in_active_order
   "docassemble.MATCFinancialStatement:data/questions/financial_statement_shared.yml#1faabcf0c011d2ab": *not_in_active_order
   "docassemble.MATCFinancialStatement:data/questions/financial_statement_shared.yml#4b5f276d09a26cdf": *parent_shared_data
@@ -152,8 +152,8 @@ proven_unreachable:
   "docassemble.MATCFinancialStatement:data/questions/financial_statement_shared.yml#e8ba96f8a7c7b645": *parent_shared_data
   "docassemble.MATCFinancialStatement:data/questions/financial_statement_shared.yml#f5fd95b133a5b45c": *parent_shared_data
   "docassemble.MATCFinancialStatement:data/questions/financial_statement_shared.yml#f9963ec4a5881e99": *parent_shared_data
-  "docassemble.MATCFinancialStatement:data/questions/financial_statement_short.yml#0742d74ad131b22b": *not_in_active_order
-  "docassemble.MATCFinancialStatement:data/questions/financial_statement_short.yml#dfb337ffb6f24598": *not_in_active_order
+  "docassemble.MATCFinancialStatement:data/questions/financial_statement_short.yml#3413652e55e41d84": *not_in_active_order
+  "docassemble.MATCFinancialStatement:data/questions/financial_statement_short.yml#56b45a1c97f1b788": *not_in_active_order
 
   # The parent-owned motion order seeks each concrete field directly; the child
   # interview's grouped intake screens therefore cannot be selected.
@@ -174,13 +174,15 @@ proven_unreachable:
   "docassemble.MATCSeparationAgreement:data/questions/separation_agreement_core.yml#3664c572c0c899ea": *parent_packet_flow
   "docassemble.MATCSeparationAgreement:data/questions/separation_agreement_core.yml#3d589c5a75083b18": *parent_shared_data
   "docassemble.MATCSeparationAgreement:data/questions/separation_agreement_core.yml#3d749219f47e43b9": *parent_packet_flow
-  "docassemble.MATCSeparationAgreement:data/questions/separation_agreement_core.yml#55e8c2e720c4e493": *parent_shared_data
-  "docassemble.MATCSeparationAgreement:data/questions/separation_agreement_core.yml#50a25fc1cbfd99ab": *parent_shared_data
+  # Counsel: 1A asks users[i].has_attorney before the agreement order and supplies sa_attorney_name/address from attorneys[i].
+  "docassemble.MATCSeparationAgreement:data/questions/separation_agreement_core.yml#40a59d5cc7a4a330": *parent_shared_data
+  "docassemble.MATCSeparationAgreement:data/questions/separation_agreement_core.yml#71dc309b7f5a0900": *parent_shared_data
+  "docassemble.MATCSeparationAgreement:data/questions/separation_agreement_core.yml#48d0f8eb0330a017": *parent_shared_data
   "docassemble.MATCSeparationAgreement:data/questions/separation_agreement_core.yml#793184e3d6263830": *parent_shared_data
   "docassemble.MATCSeparationAgreement:data/questions/separation_agreement_core.yml#99c8c7fc7f50dcd6": *shadowed_question
-  "docassemble.MATCSeparationAgreement:data/questions/separation_agreement_core.yml#a34dedb78eab9f43": *parent_packet_flow
+  "docassemble.MATCSeparationAgreement:data/questions/separation_agreement_core.yml#a068ea5ff0835c81": *parent_packet_flow
   "docassemble.MATCSeparationAgreement:data/questions/separation_agreement_core.yml#a36e929349389e12": *standalone_wrapper
-  "docassemble.MATCSeparationAgreement:data/questions/separation_agreement_core.yml#b28f9092bc99ea46": *parent_shared_data
+  "docassemble.MATCSeparationAgreement:data/questions/separation_agreement_core.yml#71b1f451ffc7051c": *parent_shared_data
   "docassemble.MATCSeparationAgreement:data/questions/separation_agreement_core.yml#e0275884cf2e978b": *parent_shared_data
   "docassemble.MATCSeparationAgreement:data/questions/separation_agreement_core.yml#f1b5820bf2327706": *parent_packet_flow
   "docassemble.MATCSeparationAgreement:data/questions/separation_agreement_core.yml#f33e860fad6e7f3a": *parent_shared_data
