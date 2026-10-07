@@ -366,6 +366,12 @@ subquestion: |
   If you or your spouse already filed a **1B divorce complaint** with the
   court, and you both now agree to convert it to a joint no-fault 1A
   divorce, we can help you prepare the motion to do that first.
+
+  **Not sure?** Search both of your names in the
+  [MassCourts public case search](https://www.masscourts.org/eservices/home.page)
+  (choose the Probate and Family Court), or call the Probate and Family
+  Court Registry in your county. If you were served with divorce papers, a
+  1B case was filed.
 section: convert_1b_to_1a
 fields:
   - "Do you already have a divorce (1B) action filed with the court?": has_existing_1b_action
@@ -584,6 +590,8 @@ id: choose forms to include
 question: |
   Which financial statement(s) do you want to prepare now?
 subquestion: |
+  Each financial statement takes most people about 20 to 40 minutes.
+
   ${ collapse_template(financial_statement_decision_help) }
 fields:
   - Whose financial statement do you want to prepare now?: financial_statement_scope

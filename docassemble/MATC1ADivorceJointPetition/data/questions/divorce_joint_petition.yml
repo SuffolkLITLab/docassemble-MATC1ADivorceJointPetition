@@ -525,7 +525,7 @@ code: |
     ]
   else:
     separation_agreement_format_options = [
-      {"label": "Create one using this interview tool", "value": "interview"},
+      {"label": "Create one using this interview tool (about 30 to 60 minutes)", "value": "interview"},
       {"label": "File something with the court registry later", "value": "wait"},
     ]
 ---
