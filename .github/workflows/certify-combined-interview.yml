@@ -90,7 +90,7 @@ jobs:
             --workspace "$GITHUB_WORKSPACE" \
             --skip docassemble.MATC1ADivorceJointPetition ${{ matrix.checkout_flags }}
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: combined-static-catalog
           path: docassemble-MATC1ADivorceJointPetition/tests/certification/artifacts
