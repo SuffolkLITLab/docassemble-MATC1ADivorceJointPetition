@@ -46,7 +46,7 @@ jobs:
           python tests/certification/build_catalog.py --workspace "$GITHUB_WORKSPACE"
           python -m unittest discover -s tests/certification -p 'test_*.py' -v
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: combined-static-catalog
           path: docassemble-MATC1ADivorceJointPetition/tests/certification/static_catalog.json
@@ -246,7 +246,7 @@ jobs:
           docker cp "$DA_CONTAINER:/usr/share/docassemble/log" \
             docassemble-MATC1ADivorceJointPetition/tests/certification/artifacts/docassemble-logs
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: combined-runtime-all-paths-${{ matrix.runtime }}
