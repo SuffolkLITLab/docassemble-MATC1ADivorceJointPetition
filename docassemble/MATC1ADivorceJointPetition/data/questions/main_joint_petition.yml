@@ -545,6 +545,21 @@ code: |
     }
   json_response(certification_snapshot)
 ---
+# Quick exit on every screen. It ends the session (deleting its answers, so
+# no one can go Back into them on a shared device) and opens a neutral site.
+# The navigation bar keeps AssemblyLine's language menu, which this
+# replaces.
+default screen parts:
+  navigation bar html: |
+    % if enable_al_language and len(al_interview_languages) > 1:
+    ${ get_language_list_dropdown(al_interview_languages, current=session_local.attr("al_user_language") or al_user_language ) }
+    % endif
+    <a class="btn btn-danger btn-sm ms-2 al-quick-exit" href="${ url_action('quick_exit') }" rel="noreferrer" aria-label="Quick exit: leave this site now and erase your answers">Quick exit</a>
+---
+event: quick_exit
+code: |
+  command('exit', url='https://www.weather.gov')
+---
 code: |
   enable_al_nav_sections = True
 ---
