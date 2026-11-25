@@ -703,6 +703,10 @@ id: Previous action details
 question: |
   Previous action details
 subquestion: |
+  **Why we ask:** the petition must list every earlier court case between the
+  two of you about your marriage, support, or your children, so the judge can
+  see what was already decided.
+
   Petitioners certify that no previous action for divorce, annulment or affirmation of marriage, separate support, desertion, living apart for justifiable cause, or custody of child(ren) has been brought by either party against the other except:
 fields:
   - "List details for all previous actions": previous_action_detail

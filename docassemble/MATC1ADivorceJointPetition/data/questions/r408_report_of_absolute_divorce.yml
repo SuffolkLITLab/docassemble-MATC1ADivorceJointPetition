@@ -88,6 +88,11 @@ if: need_r408_demographics
 question: |
   Details for the R408 report
 subquestion: |
+  **Why we ask:** the court sends the Report of Absolute Divorce (R408) to
+  the state's Registry of Vital Records, which keeps the official record of
+  marriages and divorces. The form asks for each spouse's sex and the last 4
+  digits of each Social Security number.
+
   We only need any R408 details that were not already collected.
   % if showifdef("absent_spouse_index") is not None:
 
@@ -142,6 +147,10 @@ id: r408 prior marriages and birth names
 if: need_r408_marriage_numbers
 question: |
   More details for the R408 report
+subquestion: |
+  **Why we ask:** the R408 report records how many times each of you has been
+  married and each of your last names at birth, even if you gave other names
+  earlier.
 fields:
   - "Number of times ${ users[0] } has been married (including this marriage)": users1_marriage_number
     datatype: integer
