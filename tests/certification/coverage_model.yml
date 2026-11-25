@@ -352,6 +352,22 @@ modeled_paths:
         expected_id: review a divorce agreement
       - event: children.revisit
         expected_id: edit children
+      # Sidebar section reviews (visited sections are clickable).
+      - event: divorce_eligibility
+        expected_id: section review eligibility
+      - event: separation_agreement
+        expected_id: section review separation agreement plan
+      - event: one_a_parties_relationship_children
+        expected_id: section review parties relationship children
+      - event: court_requests
+        expected_id: section review court requests
+      - event: one_a_separation_agreement_terms
+        expected_id: section review agreement terms
+      # Per-form preview on the review-before-signing screen.
+      - event: preview_one_form
+        arguments:
+          preview_index: 0
+        expected_id: preview one form
 
   - name: nine children built worksheet built agreement deviation
     family: children
