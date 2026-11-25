@@ -460,10 +460,37 @@ objects:
   - child_care_or_custody_disclosure_affidavit_next_steps: ALDocument.using(title="Care or custody affidavit instructions", filename="care_or_custody_affidavit_next_steps", has_addendum=False)
   - affidavit_of_care_or_custody_attachment: ALDocument.using(title="Affidavit disclosing care or custody proceedings", filename="affidavit_disclosing_care_or_custody", has_addendum=False)
 ---
+# Uploaded files that belong in the packet. The upload screens and next-steps
+# text tell users their upload is included with their filings.
+objects:
+  - marriage_certificate_document: ALDocumentUpload.using(title="Marriage certificate", filename="marriage_certificate", has_addendum=False)
+  - uploaded_worksheet_document: ALDocumentUpload.using(title="Child Support Guidelines Worksheet (uploaded)", filename="child_support_guidelines_worksheet_uploaded", has_addendum=False)
+  - uploaded_separation_agreement_document: ALDocumentUpload.using(title="Separation agreement (uploaded)", filename="separation_agreement_uploaded", has_addendum=False)
+---
+code: |
+  marriage_certificate_document.file = marriage_certificate_upload
+---
+code: |
+  uploaded_worksheet_document.file = child_support_guidelines_worksheet_upload
+---
+code: |
+  uploaded_separation_agreement_document.file = separation_agreement_upload
+---
+code: |
+  marriage_certificate_document.enabled = bool(marriage_certificate_upload)
+---
+code: |
+  uploaded_worksheet_document.enabled = (
+    children_of_marriage and csg_worksheet_path == "upload"
+  )
+---
+code: |
+  uploaded_separation_agreement_document.enabled = separation_agreement_format == "upload"
+---
 # Bundles group the ALDocuments into separate downloads, such as for court and for the user
 objects:
-  - al_user_bundle: ALDocumentBundle.using(elements=[motion_to_amend_attachment, divorcejointpetition_Post_interview_instructions, divorcejointpetition_attachment, affidavit_attachment, r408_attachment, jointmotiontofilemarriagecertificatelate_attachment, affidavitofindigency_attachment, child_care_or_custody_disclosure_affidavit_next_steps, affidavit_of_care_or_custody_attachment, ma_child_support_guidelines_worksheet_attachment, cjd_305_attachment, users[0].financial_statement_short_attachment, users[0].financial_statement_long_attachment, users[0].financial_statement_schedule_a_attachment, users[0].financial_statement_schedule_b_attachment, users[1].financial_statement_short_attachment, users[1].financial_statement_long_attachment, users[1].financial_statement_schedule_a_attachment, users[1].financial_statement_schedule_b_attachment, a_divorce_agreement_Post_interview_instructions, a_divorce_agreement_attachment], filename="joint_petition_divorce_packet", title="All forms to download for your records", enabled=True)
-  - al_court_bundle: ALDocumentBundle.using(elements=[motion_to_amend_attachment, divorcejointpetition_attachment, affidavit_attachment, r408_attachment, jointmotiontofilemarriagecertificatelate_attachment, affidavitofindigency_attachment, affidavit_of_care_or_custody_attachment, ma_child_support_guidelines_worksheet_attachment, cjd_305_attachment, users[0].financial_statement_short_attachment, users[0].financial_statement_long_attachment, users[0].financial_statement_schedule_a_attachment, users[0].financial_statement_schedule_b_attachment, users[1].financial_statement_short_attachment, users[1].financial_statement_long_attachment, users[1].financial_statement_schedule_a_attachment, users[1].financial_statement_schedule_b_attachment, a_divorce_agreement_attachment], filename="joint_petition_divorce_packet", title="All forms to deliver to court", enabled=True)
+  - al_user_bundle: ALDocumentBundle.using(elements=[motion_to_amend_attachment, divorcejointpetition_Post_interview_instructions, divorcejointpetition_attachment, marriage_certificate_document, affidavit_attachment, r408_attachment, jointmotiontofilemarriagecertificatelate_attachment, affidavitofindigency_attachment, child_care_or_custody_disclosure_affidavit_next_steps, affidavit_of_care_or_custody_attachment, ma_child_support_guidelines_worksheet_attachment, uploaded_worksheet_document, cjd_305_attachment, users[0].financial_statement_short_attachment, users[0].financial_statement_long_attachment, users[0].financial_statement_schedule_a_attachment, users[0].financial_statement_schedule_b_attachment, users[1].financial_statement_short_attachment, users[1].financial_statement_long_attachment, users[1].financial_statement_schedule_a_attachment, users[1].financial_statement_schedule_b_attachment, a_divorce_agreement_Post_interview_instructions, a_divorce_agreement_attachment, uploaded_separation_agreement_document], filename="joint_petition_divorce_packet", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[motion_to_amend_attachment, divorcejointpetition_attachment, marriage_certificate_document, affidavit_attachment, r408_attachment, jointmotiontofilemarriagecertificatelate_attachment, affidavitofindigency_attachment, affidavit_of_care_or_custody_attachment, ma_child_support_guidelines_worksheet_attachment, uploaded_worksheet_document, cjd_305_attachment, users[0].financial_statement_short_attachment, users[0].financial_statement_long_attachment, users[0].financial_statement_schedule_a_attachment, users[0].financial_statement_schedule_b_attachment, users[1].financial_statement_short_attachment, users[1].financial_statement_long_attachment, users[1].financial_statement_schedule_a_attachment, users[1].financial_statement_schedule_b_attachment, a_divorce_agreement_attachment, uploaded_separation_agreement_document], filename="joint_petition_divorce_packet", title="All forms to deliver to court", enabled=True)
 ---
 event: al_user_bundle.save_downloads
 code: |
@@ -1056,6 +1083,15 @@ code: |
         include_separation_agreement,
       ),
       (a_divorce_agreement_attachment, include_separation_agreement),
+      (marriage_certificate_document, bool(marriage_certificate_upload)),
+      (
+        uploaded_worksheet_document,
+        children_of_marriage and csg_worksheet_path == "upload",
+      ),
+      (
+        uploaded_separation_agreement_document,
+        separation_agreement_format == "upload",
+      ),
   ):
     conditional_document.always_enabled = False
     conditional_document.enabled = bool(final_enabled)

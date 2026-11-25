@@ -116,6 +116,21 @@ class ScenarioGenerationTests(unittest.TestCase):
         self.assertTrue(evidence["a_divorce_agreement_attachment"])
         self.assertTrue(evidence["cjd_305_attachment"])
         self.assertFalse(evidence["jointmotiontofilemarriagecertificatelate_attachment"])
+        self.assertTrue(evidence["marriage_certificate_document"])
+        self.assertFalse(evidence["uploaded_worksheet_document"])
+        self.assertFalse(evidence["uploaded_separation_agreement_document"])
+
+    def test_uploaded_documents_join_the_packet(self):
+        evidence = expected_bundle_documents({
+            "children_of_marriage": True,
+            "csg_worksheet_path": "upload",
+            "separation_agreement_format": "upload",
+            "marriage_certificate_upload": "",
+        })
+        self.assertFalse(evidence["marriage_certificate_document"])
+        self.assertTrue(evidence["uploaded_worksheet_document"])
+        self.assertTrue(evidence["uploaded_separation_agreement_document"])
+        self.assertFalse(evidence["a_divorce_agreement_attachment"])
 
     def test_every_dimension_value_appears_in_defaults_or_an_override(self):
         observed = {}
