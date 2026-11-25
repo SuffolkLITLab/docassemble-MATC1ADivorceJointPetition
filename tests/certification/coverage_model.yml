@@ -717,6 +717,20 @@ modeled_paths:
       - taxes no agreement exit
     terminal_assertions: false
 
+  - name: agreement alimony impasse
+    family: agreement
+    overrides:
+      separation_agreement_format: interview
+      health_insurance_custom_terms_adult: true
+      alimony_waived_all: false
+      alimony_payment_agreed: false
+    required_screen_ids:
+      - alimony no agreement exit
+    # Neither waived nor paid: the interview cannot write the alimony term.
+    expected_terminal_ids:
+      - alimony no agreement exit
+    terminal_assertions: false
+
   - name: only spouse 1 present
     family: presence
     overrides:
