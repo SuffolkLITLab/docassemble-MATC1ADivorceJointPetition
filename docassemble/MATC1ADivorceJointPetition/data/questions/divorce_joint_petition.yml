@@ -1008,7 +1008,25 @@ subquestion: |
   % endif
 
   ${ lawyer_review_note }
-continue button field: divorcejointpetition_preview_question    
+
+  **Preview your forms.** Open any form to check it before you sign. These
+  previews don't have your signatures.
+
+  % for preview_index, preview_document in enumerate(al_court_bundle.enabled_documents()):
+  * [${ preview_document.title }](${ url_action('preview_one_form', preview_index=preview_index) })
+  % endfor
+continue button field: divorcejointpetition_preview_question
+---
+id: preview one form
+event: preview_one_form
+question: |
+  Preview: ${ al_court_bundle.enabled_documents()[action_argument('preview_index')].title }
+subquestion: |
+  This preview doesn't have your signatures. Go back to fix any answers.
+
+  ${ al_court_bundle.enabled_documents()[action_argument('preview_index')].as_pdf(key='preview') }
+buttons:
+  - Back to review: refresh    
 ---
 code: |
   signature_fields = [
