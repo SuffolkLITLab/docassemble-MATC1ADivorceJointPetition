@@ -706,16 +706,14 @@ default screen parts:
     % endif
     <a class="btn btn-danger btn-sm ms-2 al-quick-exit" href="${ url_action('quick_exit') }" rel="noreferrer" aria-label="Quick exit: leave this site now and erase your answers">Quick exit</a>
     <span id="al-idle-settings" data-minutes="20" data-exit="${ url_action('quick_exit') }" hidden></span>
-  # On every screen, below the question: the private way out and the privacy
-  # summary. AssemblyLine's own post part (its testing hooks) is kept.
-  post: |
-    ${ alkiln_trigger_html }
-    ${ alkiln_proxy_html }
-    <p class="al-help-links small mt-3">
-    <a href="${ url_action('get_help_now') }">I feel pressured or want to stop</a>
-    &middot;
-    <a href="${ url_action('privacy_summary_screen') }">What happens to your information</a>
-    </p>
+  # The footer keeps AssemblyLine's Share, About and Feedback links and adds,
+  # on every screen, the private way out and the privacy summary.
+  footer: |
+    [:life-ring: I feel pressured or want to stop](${ url_action('get_help_now') })
+    [:lock: What happens to your information](${ url_action('privacy_summary_screen') })
+    [:share-alt-square: Share](${ url_ask([{'undefine': ['al_sharing_type','al_how_share_link']}, 'al_share_form_screen', {'recompute': ['al_did_share_form']}, 'al_share_results']) })
+    [:info-circle: About](${ url_action('about_this_interview') })
+    [:comment-dots: Feedback](${ feedback_link(current_context(), i=feedback_form, github_repo=github_repo_name, github_user=github_user, package_version=package_version_number) } ){:target="_blank"}
 ---
 # Shared-device idle time-out (1A #213): 20 minutes without activity shows a
 # warning, and one more minute without an answer ends the session through the
@@ -723,6 +721,8 @@ default screen parts:
 features:
   javascript:
     - idle_timeout.js
+  css:
+    - footer_links.css
 ---
 event: quick_exit
 code: |
