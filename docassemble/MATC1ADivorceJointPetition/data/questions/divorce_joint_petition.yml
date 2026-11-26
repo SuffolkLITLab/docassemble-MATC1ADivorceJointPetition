@@ -180,7 +180,7 @@ code: |
 ---
 terms:
   separation agreement: |
-    A written document listing all things the parties agree on in their divorce, like child support, taxes, parenting time, and property division
+    A written document listing everything you and your spouse agree on in your divorce, like child support, taxes, parenting time, and property division
   notary: |
     A notary public is authorized by the Commonwealth of Massachusetts to witness signatures, among other duties.
   legally married: |
@@ -1662,7 +1662,7 @@ event: divorcejointpetition_download
 question: |
   All done
 subquestion: |
-  Thank you ${users}. Your form is ready to download and deliver.
+  Thank you ${users}. Your forms are ready to download and file.
   
   View, download and send your form below.
 
