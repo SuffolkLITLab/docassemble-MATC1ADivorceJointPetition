@@ -703,6 +703,10 @@ id: Previous action details
 question: |
   Previous action details
 subquestion: |
+  **Why we ask:** the petition must list every earlier court case between the
+  two of you about your marriage, support, or your children, so the judge can
+  see what was already decided.
+
   Petitioners certify that no previous action for divorce, annulment or affirmation of marriage, separate support, desertion, living apart for justifiable cause, or custody of child(ren) has been brought by either party against the other except:
 fields:
   - "List details for all previous actions": previous_action_detail
@@ -985,6 +989,14 @@ fields:
 ---
 ####### Question Editing Line ######
 ---
+template: lawyer_review_note
+content: |
+  **Have a lawyer look before you sign.** Your separation agreement becomes
+  part of the court's judgment, and parts of it may also be a binding
+  contract that is hard to change later. We strongly suggest that a lawyer
+  review your papers before you sign them. [Find legal
+  aid](https://www.lsc.gov/what-legal-aid/find-legal-aid).
+---
 id: review before signing divorce joint petition
 question: |
   Review your answers before you sign
@@ -998,7 +1010,35 @@ subquestion: |
   % if separation_agreement_format == "interview":
   **Before filing your separation agreement:** Each spouse must sign it in front of a notary public. The signatures you enter in this online interview do not replace notarization.
   % endif
-continue button field: divorcejointpetition_preview_question    
+
+  ${ lawyer_review_note }
+
+  **Preview your forms.** Open any form to check it before you sign. These
+  previews don't have your signatures.
+
+  % for preview_index, preview_document in enumerate(al_court_bundle.enabled_documents()):
+  * [${ preview_document.title }](${ url_action('preview_one_form', preview_index=preview_index) })
+  % endfor
+continue button field: divorcejointpetition_preview_question
+---
+# The link's index is only available while the action runs, so store it and
+# show the preview from the stored value (a refresh or an API client reads
+# the screen in a later request).
+event: preview_one_form
+code: |
+  preview_form_index = int(action_argument('preview_index') or 0)
+  force_ask('show_preview_one_form')
+---
+id: preview one form
+event: show_preview_one_form
+question: |
+  Preview: ${ al_court_bundle.enabled_documents()[preview_form_index].title }
+subquestion: |
+  This preview doesn't have your signatures. Go back to fix any answers.
+
+  ${ al_court_bundle.enabled_documents()[preview_form_index].as_pdf(key='preview') }
+buttons:
+  - Back to review: refresh    
 ---
 code: |
   signature_fields = [
@@ -1573,6 +1613,8 @@ subquestion: |
   Thank you ${users}. Your form is ready to download and deliver.
   
   View, download and send your form below.
+
+  ${ lawyer_review_note }
   
   ${ al_user_bundle.download_list_html(use_previously_cached_files=True, include_full_pdf=True) }
   

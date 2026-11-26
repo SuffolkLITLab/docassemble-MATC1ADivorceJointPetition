@@ -163,6 +163,115 @@ sections:
       - fee_waiver: Fee waiver
   - review_and_sign: Review, sign, and download
 ---
+# Clicking a visited top-level section in the sidebar opens its review screen
+# (Docassemble's default "progressive" sections: only visited sections are
+# clickable). Items whose variables are not defined yet are not shown.
+id: section review eligibility
+event: divorce_eligibility
+section: divorce_eligibility
+question: |
+  Eligibility
+subquestion: |
+  Tap an answer to change it. Choose **Back to where I was** when you're done.
+review:
+  - Edit: legal_marriage
+    button: |
+      **Legally married to each other**: ${ word(yesno(legal_marriage)) }
+  - Edit: marriage_certificate_plan
+    button: |
+      **Marriage certificate**: ${ "uploaded now" if marriage_certificate_plan == "upload" else "file with the court later" }
+  - Edit: massachusetts_residency
+    button: |
+      **Massachusetts residency**: ${ word(yesno(massachusetts_residency)) }
+  - Edit: divorce_affirm
+    button: |
+      **Joint, no-fault divorce confirmed**: ${ word(yesno(divorce_affirm)) }
+resume button label: Back to where I was
+---
+id: section review separation agreement plan
+event: separation_agreement
+section: separation_agreement
+question: |
+  Separation agreement plan
+subquestion: |
+  Tap an answer to change it. Changing a plan may bring up new questions.
+  Choose **Back to where I was** when you're done.
+review:
+  - Edit: csg_worksheet_path
+    button: |
+      **Child Support Guidelines worksheet**: ${ csg_worksheet_path }
+  - Edit: separation_agreement_format
+    button: |
+      **Separation agreement**: ${ {"interview": "write it in this interview", "upload": "upload a signed agreement", "wait": "file it later"}.get(separation_agreement_format, separation_agreement_format) }
+resume button label: Back to where I was
+---
+id: section review parties relationship children
+event: one_a_parties_relationship_children
+section: one_a_parties_relationship_children
+question: |
+  Parties, relationship, and children
+subquestion: |
+  Tap an answer to change it. Choose **Back to where I was** when you're done.
+review:
+  - Edit: users.revisit
+    button: |
+      **Spouses**: ${ users }
+  - Edit: marriage_date
+    button: |
+      **Date of marriage**: ${ marriage_date }
+  - Edit: last_living_together_date
+    button: |
+      **Last lived together**: ${ last_living_together_date }
+  - Edit: marriage_breakdown_date
+    button: |
+      **Marriage breakdown**: ${ marriage_breakdown_date }
+  - Edit: previous_action_detail
+    button: |
+      **Previous court cases**: ${ previous_action_detail or "none listed" }
+resume button label: Back to where I was
+---
+id: section review court requests
+event: court_requests
+section: court_requests
+question: |
+  Court and filing details
+subquestion: |
+  Tap an answer to change it. Choose **Back to where I was** when you're done.
+review:
+  - Edit: trial_court
+    button: |
+      **Court**: ${ trial_court }
+  - Edit: docket_number
+    button: |
+      **Docket number**: ${ docket_number or "none yet" }
+  - Edit: request_merge_agreement
+    show if: separation_agreement_format != "interview"
+    button: |
+      **Ask that the agreement merge**: ${ word(yesno(request_merge_agreement)) }
+  - Edit: request_survive_agreement
+    show if: separation_agreement_format != "interview"
+    button: |
+      **Ask that the agreement survive**: ${ word(yesno(request_survive_agreement)) }
+  - Edit: additional_request
+    button: |
+      **Other requests for the court**: ${ word(yesno(additional_request)) }
+resume button label: Back to where I was
+---
+id: section review agreement terms
+event: one_a_separation_agreement_terms
+section: one_a_separation_agreement_terms
+question: |
+  Separation agreement terms
+subquestion: |
+  % if showifdef("separation_agreement_format") == "interview":
+  ${ action_button_html(url_action('review_a_divorce_agreement'), label='Review and edit the agreement', color='info') }
+  % else:
+  You are not writing the agreement in this interview.
+  % endif
+buttons:
+  - Back to where I was: refresh
+---
+---
 code: |
   github_repo_name =  'docassemble-MATC1ADivorceJointPetition'
 ---
@@ -180,8 +289,13 @@ subquestion: |
   **Step 3.** Download and print the forms, sign them, and **file** them with the
   Registry of the Probate and Family Court. This site does not file them for you.
 
-  This site is not a lawyer. If you would like a lawyer, find [your local
-  legal aid provider](https://www.lsc.gov/what-legal-aid/find-legal-aid).
+  Using this site is voluntary. Either of you can stop at any time, and
+  stopping leaves your other options open, such as a 1B divorce, mediation,
+  or working with a lawyer.
+
+  This site is not a lawyer. It gives general legal information, not legal
+  advice. If you would like a lawyer, find [your local legal aid
+  provider](https://www.lsc.gov/what-legal-aid/find-legal-aid).
 
   Tap the {green words} in any screen for a definition or more information.
 
@@ -460,10 +574,37 @@ objects:
   - child_care_or_custody_disclosure_affidavit_next_steps: ALDocument.using(title="Care or custody affidavit instructions", filename="care_or_custody_affidavit_next_steps", has_addendum=False)
   - affidavit_of_care_or_custody_attachment: ALDocument.using(title="Affidavit disclosing care or custody proceedings", filename="affidavit_disclosing_care_or_custody", has_addendum=False)
 ---
+# Uploaded files that belong in the packet. The upload screens and next-steps
+# text tell users their upload is included with their filings.
+objects:
+  - marriage_certificate_document: ALDocumentUpload.using(title="Marriage certificate", filename="marriage_certificate", has_addendum=False)
+  - uploaded_worksheet_document: ALDocumentUpload.using(title="Child Support Guidelines Worksheet (uploaded)", filename="child_support_guidelines_worksheet_uploaded", has_addendum=False)
+  - uploaded_separation_agreement_document: ALDocumentUpload.using(title="Separation agreement (uploaded)", filename="separation_agreement_uploaded", has_addendum=False)
+---
+code: |
+  marriage_certificate_document.file = marriage_certificate_upload
+---
+code: |
+  uploaded_worksheet_document.file = child_support_guidelines_worksheet_upload
+---
+code: |
+  uploaded_separation_agreement_document.file = separation_agreement_upload
+---
+code: |
+  marriage_certificate_document.enabled = bool(marriage_certificate_upload)
+---
+code: |
+  uploaded_worksheet_document.enabled = (
+    children_of_marriage and csg_worksheet_path == "upload"
+  )
+---
+code: |
+  uploaded_separation_agreement_document.enabled = separation_agreement_format == "upload"
+---
 # Bundles group the ALDocuments into separate downloads, such as for court and for the user
 objects:
-  - al_user_bundle: ALDocumentBundle.using(elements=[motion_to_amend_attachment, divorcejointpetition_Post_interview_instructions, divorcejointpetition_attachment, affidavit_attachment, r408_attachment, jointmotiontofilemarriagecertificatelate_attachment, affidavitofindigency_attachment, child_care_or_custody_disclosure_affidavit_next_steps, affidavit_of_care_or_custody_attachment, ma_child_support_guidelines_worksheet_attachment, cjd_305_attachment, users[0].financial_statement_short_attachment, users[0].financial_statement_long_attachment, users[0].financial_statement_schedule_a_attachment, users[0].financial_statement_schedule_b_attachment, users[1].financial_statement_short_attachment, users[1].financial_statement_long_attachment, users[1].financial_statement_schedule_a_attachment, users[1].financial_statement_schedule_b_attachment, a_divorce_agreement_Post_interview_instructions, a_divorce_agreement_attachment], filename="joint_petition_divorce_packet", title="All forms to download for your records", enabled=True)
-  - al_court_bundle: ALDocumentBundle.using(elements=[motion_to_amend_attachment, divorcejointpetition_attachment, affidavit_attachment, r408_attachment, jointmotiontofilemarriagecertificatelate_attachment, affidavitofindigency_attachment, affidavit_of_care_or_custody_attachment, ma_child_support_guidelines_worksheet_attachment, cjd_305_attachment, users[0].financial_statement_short_attachment, users[0].financial_statement_long_attachment, users[0].financial_statement_schedule_a_attachment, users[0].financial_statement_schedule_b_attachment, users[1].financial_statement_short_attachment, users[1].financial_statement_long_attachment, users[1].financial_statement_schedule_a_attachment, users[1].financial_statement_schedule_b_attachment, a_divorce_agreement_attachment], filename="joint_petition_divorce_packet", title="All forms to deliver to court", enabled=True)
+  - al_user_bundle: ALDocumentBundle.using(elements=[motion_to_amend_attachment, divorcejointpetition_Post_interview_instructions, divorcejointpetition_attachment, marriage_certificate_document, affidavit_attachment, r408_attachment, jointmotiontofilemarriagecertificatelate_attachment, affidavitofindigency_attachment, child_care_or_custody_disclosure_affidavit_next_steps, affidavit_of_care_or_custody_attachment, ma_child_support_guidelines_worksheet_attachment, uploaded_worksheet_document, cjd_305_attachment, users[0].financial_statement_short_attachment, users[0].financial_statement_long_attachment, users[0].financial_statement_schedule_a_attachment, users[0].financial_statement_schedule_b_attachment, users[1].financial_statement_short_attachment, users[1].financial_statement_long_attachment, users[1].financial_statement_schedule_a_attachment, users[1].financial_statement_schedule_b_attachment, a_divorce_agreement_Post_interview_instructions, a_divorce_agreement_attachment, uploaded_separation_agreement_document], filename="joint_petition_divorce_packet", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[motion_to_amend_attachment, divorcejointpetition_attachment, marriage_certificate_document, affidavit_attachment, r408_attachment, jointmotiontofilemarriagecertificatelate_attachment, affidavitofindigency_attachment, affidavit_of_care_or_custody_attachment, ma_child_support_guidelines_worksheet_attachment, uploaded_worksheet_document, cjd_305_attachment, users[0].financial_statement_short_attachment, users[0].financial_statement_long_attachment, users[0].financial_statement_schedule_a_attachment, users[0].financial_statement_schedule_b_attachment, users[1].financial_statement_short_attachment, users[1].financial_statement_long_attachment, users[1].financial_statement_schedule_a_attachment, users[1].financial_statement_schedule_b_attachment, a_divorce_agreement_attachment, uploaded_separation_agreement_document], filename="joint_petition_divorce_packet", title="All forms to deliver to court", enabled=True)
 ---
 event: al_user_bundle.save_downloads
 code: |
@@ -512,6 +653,21 @@ code: |
       "mimetype": certification_file.mimetype,
     }
   json_response(certification_snapshot)
+---
+# Quick exit on every screen. It ends the session (deleting its answers, so
+# no one can go Back into them on a shared device) and opens a neutral site.
+# The navigation bar keeps AssemblyLine's language menu, which this
+# replaces.
+default screen parts:
+  navigation bar html: |
+    % if enable_al_language and len(al_interview_languages) > 1:
+    ${ get_language_list_dropdown(al_interview_languages, current=session_local.attr("al_user_language") or al_user_language ) }
+    % endif
+    <a class="btn btn-danger btn-sm ms-2 al-quick-exit" href="${ url_action('quick_exit') }" rel="noreferrer" aria-label="Quick exit: leave this site now and erase your answers">Quick exit</a>
+---
+event: quick_exit
+code: |
+  command('exit', url='https://www.weather.gov')
 ---
 code: |
   enable_al_nav_sections = True
@@ -1056,6 +1212,15 @@ code: |
         include_separation_agreement,
       ),
       (a_divorce_agreement_attachment, include_separation_agreement),
+      (marriage_certificate_document, bool(marriage_certificate_upload)),
+      (
+        uploaded_worksheet_document,
+        children_of_marriage and csg_worksheet_path == "upload",
+      ),
+      (
+        uploaded_separation_agreement_document,
+        separation_agreement_format == "upload",
+      ),
   ):
     conditional_document.always_enabled = False
     conditional_document.enabled = bool(final_enabled)

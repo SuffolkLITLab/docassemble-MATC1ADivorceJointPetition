@@ -85,6 +85,15 @@ def expected_bundle_documents(variables: dict) -> dict[str, bool]:
             "include_separation_agreement"
         ],
         "a_divorce_agreement_attachment": terminal["include_separation_agreement"],
+        # Uploads go into the packet exactly when the route collects them.
+        "marriage_certificate_document": bool(variables.get("marriage_certificate_upload")),
+        "uploaded_worksheet_document": bool(
+            variables.get("children_of_marriage")
+            and variables.get("csg_worksheet_path") == "upload"
+        ),
+        "uploaded_separation_agreement_document": (
+            variables.get("separation_agreement_format") == "upload"
+        ),
     }
     for index, selected in selected_users.items():
         income = variables.get(f"users[{index}].gross_annual_income", 0)
