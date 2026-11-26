@@ -147,7 +147,14 @@ code: |
   if separation_agreement_format != "interview":
     request_merge_agreement
     request_survive_agreement
-  users[0].name_change
+  if users[0].other_last_name == "no":
+    users[0].name_change = False
+  if users[1].other_last_name == "no":
+    users[1].name_change = False
+  if not defined("users[0].name_change"):
+    users[0].name_change
+  if not defined("users[1].name_change"):
+    users[1].name_change
   additional_request
   
   set_progress(80)
@@ -810,19 +817,67 @@ fields:
   - code: |
       users[1].address_fields(show_county=True)
 ---
+id: other last names
+question: |
+  Other last names
+subquestion: |
+  **Why we ask:** the court's R408 report records each spouse's last name at
+  birth or adoption, and a spouse who used another last name can ask the court
+  to restore it.
+fields:
+  - "Has ${ users[0] } ever used a different last name, such as a last name at birth?": users[0].other_last_name
+    input type: radio
+    code: |
+      [{"no": "No"}, {"yes": "Yes"}] + ([{"unknown": "I don't know"}] if showifdef("absent_spouse_index") == 0 else [])
+  - "${ users[0] }'s last name at birth or adoption": users[0].birth_last_name
+    maxlength: 48
+    show if:
+      variable: users[0].other_last_name
+      is: "yes"
+  - "Has ${ users[1] } ever used a different last name, such as a last name at birth?": users[1].other_last_name
+    input type: radio
+    code: |
+      [{"no": "No"}, {"yes": "Yes"}] + ([{"unknown": "I don't know"}] if showifdef("absent_spouse_index") == 1 else [])
+  - "${ users[1] }'s last name at birth or adoption": users[1].birth_last_name
+    maxlength: 48
+    show if:
+      variable: users[1].other_last_name
+      is: "yes"
+---
+code: |
+  # Fill the R408's birth surnames from the answers above. "I don't know"
+  # leaves them for the R408 screen, which lets an absent spouse's stay blank.
+  if users[0].other_last_name == "no":
+    users1_name_last_at_birth = users[0].name.last
+  elif users[0].other_last_name == "yes":
+    users1_name_last_at_birth = users[0].birth_last_name
+  if users[1].other_last_name == "no":
+    users2_name_last_at_birth = users[1].name.last
+  elif users[1].other_last_name == "yes":
+    users2_name_last_at_birth = users[1].birth_last_name
+  set_birth_last_names = True
+---
 id: Name change requests
 question: |
   Name change requests
 fields:
   - "Does ${  users[0].familiar()  } want to change their last name to their former last name?": users[0].name_change
     datatype: yesnoradio
+    show if:
+      code: |
+        users[0].other_last_name != "no"
   - "${  users[0].familiar()  }'s last name before marriage": users[0].former_name_last
     maxlength: 48
+    default: ${ showifdef("users[0].birth_last_name") }
     show if: users[0].name_change
   - "Does ${  users[1].familiar()  } want to change their last name to their former last name?": users[1].name_change
     datatype: yesnoradio
-  - "${  users[1]  }'s last name before marriage'": users[1].former_name_last
+    show if:
+      code: |
+        users[1].other_last_name != "no"
+  - "${  users[1].familiar()  }'s last name before marriage": users[1].former_name_last
     maxlength: 48
+    default: ${ showifdef("users[1].birth_last_name") }
     show if: users[1].name_change
 ---
 id: merger survival
