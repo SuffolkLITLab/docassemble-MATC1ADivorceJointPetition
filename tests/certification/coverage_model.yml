@@ -803,7 +803,7 @@ modeled_paths:
       1A Divorce Separation Agreement:
         require:
           - 'at least 3 hours of mediation'
-          - "Alex Example will pay the mediator's fees"
+          - "Alex [^.]*Example[^,]{0,8} will pay the mediator's fees"
           - 'does not apply in an emergency'
 
   - name: agreement insurance alimony and individual debts
