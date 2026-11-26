@@ -639,8 +639,10 @@ modeled_paths:
       users[0].birth_last_name: Okafor
       users[0].name_change: true
       users[0].former_name_last: Okafor
-      # The API can answer a hidden field; a browser hides spouse 2's question.
+      # The API driver also answers fields a browser hides behind show if
+      # code, so state the values those hidden fields must keep.
       users[1].name_change: false
+      users1_name_last_at_birth: Okafor
     required_screen_ids:
       - other last names
       - Name change requests
