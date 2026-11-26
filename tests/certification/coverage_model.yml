@@ -47,6 +47,9 @@ dimensions:
   custody_case_participation: [no cases, know of, participated]
 
 default_variables:
+  # Other last names (1A #206): neither spouse has used another last name.
+  users[0].other_last_name: 'no'
+  users[1].other_last_name: 'no'
   # The late marriage certificate motion requires a real plan (8+ words).
   marriage_proof_delay_reason: We have not received our certified marriage certificate yet.
   marriage_proof_delay_action_plan: We requested a certified copy from the city clerk and will file it when it arrives.
@@ -629,6 +632,25 @@ modeled_paths:
       marriage_certificate_upload:
         $file: docassemble/MATC1ADivorceJointPetition/data/templates/r408.pdf
 
+  - name: spouse 1 asks to restore a birth name
+    family: relationship
+    overrides:
+      users[0].other_last_name: 'yes'
+      users[0].birth_last_name: Okafor
+      users[0].name_change: true
+      users[0].former_name_last: Okafor
+      # The API driver also answers fields a browser hides behind show if
+      # code, so state the values those hidden fields must keep.
+      users[1].name_change: false
+      users1_name_last_at_birth: Okafor
+    required_screen_ids:
+      - other last names
+      - Name change requests
+    # The R408 gets the birth surname. (Its after-divorce name is computed
+    # while the PDF is filled and is not kept in the session.)
+    extra_terminal_evidence:
+      users1_name_last_at_birth: Okafor
+
   - name: international marriage
     family: relationship
     overrides:
@@ -802,6 +824,7 @@ modeled_paths:
       # Facts only the absent spouse may know, left unknown
       users2_gender: unknown
       users2_ssn_last_four: ''
+      users[1].other_last_name: unknown
       users2_name_last_at_birth: ''
     required_screen_ids:
       - who is here today
@@ -825,6 +848,7 @@ modeled_paths:
         rent: true
       users1_gender: unknown
       users1_ssn_last_four: ''
+      users[0].other_last_name: unknown
       users1_name_last_at_birth: ''
     required_screen_ids:
       - who is here today

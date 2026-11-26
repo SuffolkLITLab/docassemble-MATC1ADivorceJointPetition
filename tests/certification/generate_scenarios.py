@@ -171,10 +171,13 @@ def generate(model: dict, output: Path) -> list[Path]:
             "required_screen_ids": path.get("required_screen_ids", []),
             "forbidden_screen_ids": path.get("forbidden_screen_ids", []),
             "terminal_assertions": terminal_assertions,
-            "expected_terminal_evidence": path.get(
-                "expected_terminal_evidence",
-                expected_terminal_evidence(variables) if terminal_assertions else {},
-            ),
+            "expected_terminal_evidence": {
+                **path.get(
+                    "expected_terminal_evidence",
+                    expected_terminal_evidence(variables) if terminal_assertions else {},
+                ),
+                **path.get("extra_terminal_evidence", {}),
+            },
             "expected_bundle_documents": path.get(
                 "expected_bundle_documents",
                 expected_bundle_documents(variables) if terminal_assertions else {},
