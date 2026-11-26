@@ -1000,6 +1000,13 @@ def run_scenario(client: Client, scenario: dict[str, Any], limits: Limits) -> di
                         "include_findings_and_determinations",
                         "needs_late_marriage_certificate_motion",
                     )
+                    # A path may expect more terminal values than the fixed
+                    # packet-route set (extra_terminal_evidence in the model).
+                    evidence_names = evidence_names + tuple(
+                        name
+                        for name in sorted(scenario.get("expected_terminal_evidence", {}))
+                        if name not in evidence_names
+                    )
                     cardinality_paths = {
                         name: concrete_cardinality_paths(
                             probe["variable"], probe["expected"]
