@@ -4,6 +4,7 @@ from unittest.mock import Mock, patch
 import requests
 
 from runtime_driver import (
+    content_assertion_failures,
     Client,
     Limits,
     build_answer,
@@ -90,6 +91,7 @@ class FakeClient:
         values=None,
         counts=None,
         files=None,
+        document_text=None,
     ):
         result = {
             name: self.terminal_variables[name]
@@ -121,6 +123,26 @@ class FakeClient:
 
 
 class RuntimeDriverTests(unittest.TestCase):
+    def test_content_assertions_report_forbidden_and_missing_text(self):
+        rules = {"Agreement": {"forbid": [r"\$ per"], "require": ["Petitioner A", "EXHIBIT H"]}}
+        failures = content_assertion_failures(
+            {"Agreement": "Petitioner A\nChild support of $ per\nWeekly."}, rules
+        )
+        self.assertEqual(len(failures), 2)
+        self.assertTrue(any("forbidden" in failure for failure in failures))
+        self.assertTrue(any("EXHIBIT H" in failure and "missing" in failure for failure in failures))
+
+    def test_content_assertions_pass_and_collapse_line_breaks(self):
+        rules = {"Agreement": {"require": ["at least \\$250,000\\.00, with"]}}
+        self.assertEqual(
+            content_assertion_failures({"Agreement": "at least $250,000.00,\nwith"}, rules), []
+        )
+
+    def test_content_assertions_fail_when_the_document_is_missing(self):
+        failures = content_assertion_failures({}, {"Agreement": {"require": ["x"]}})
+        self.assertEqual(len(failures), 1)
+        self.assertIn("no text returned", failures[0])
+
     def test_generic_object_field_resolves_to_nested_list(self):
         self.assertEqual(
             resolve_generic(

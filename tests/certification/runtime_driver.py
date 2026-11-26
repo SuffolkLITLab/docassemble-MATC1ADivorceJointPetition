@@ -710,6 +710,32 @@ def build_answer(
     return answer
 
 
+
+def content_assertion_failures(texts: Any, rules: dict[str, Any]) -> list[str]:
+    """Check generated document text against per-document regex rules.
+
+    ``rules`` maps a packet document title to ``{"require": [...], "forbid": [...]}``.
+    Whitespace is collapsed before matching, so patterns need not care about line
+    breaks in the DOCX.
+    """
+    failures = []
+    texts = texts if isinstance(texts, dict) else {}
+    for title, rule in sorted(rules.items()):
+        if title not in texts:
+            failures.append(f"{title}: no text returned (is it in the packet?)")
+            continue
+        text = re.sub(r"\s+", " ", str(texts[title]))
+        for pattern in rule.get("forbid", []):
+            match = re.search(pattern, text)
+            if match:
+                start = max(match.start() - 60, 0)
+                failures.append(f"{title}: forbidden /{pattern}/ found: ...{text[start:match.end() + 60]}...")
+        for pattern in rule.get("require", []):
+            if not re.search(pattern, text):
+                failures.append(f"{title}: required /{pattern}/ missing")
+    return failures
+
+
 @dataclass
 class Limits:
     request_timeout: int
@@ -761,6 +787,7 @@ class Client:
         values: list[str] | None = None,
         counts: list[str] | None = None,
         files: list[str] | None = None,
+        document_text: list[str] | None = None,
     ) -> dict[str, Any]:
         """Fetch a compact read-only snapshot without serializing the whole session."""
         payload = self._params(interview, session, secret)
@@ -773,6 +800,7 @@ class Client:
                         "values": values or [],
                         "counts": counts or [],
                         "files": files or [],
+                        "document_text": document_text or [],
                     }
                 ),
             }
@@ -1001,6 +1029,7 @@ def run_scenario(client: Client, scenario: dict[str, Any], limits: Limits) -> di
                             for path in paths
                         ],
                         files=uploaded_variable_names,
+                        document_text=sorted(scenario.get("content_assertions", {})),
                     )
                     result["terminal_evidence"] = {
                         name: terminal_variables[name]
@@ -1074,6 +1103,17 @@ def run_scenario(client: Client, scenario: dict[str, Any], limits: Limits) -> di
                     if bundle_mismatches:
                         result["failure"] = "bundle_document_mismatch"
                         result["bundle_document_mismatches"] = bundle_mismatches
+                        break
+                    content_failures = content_assertion_failures(
+                        terminal_variables.get("document_text", {}),
+                        scenario.get("content_assertions", {}),
+                    )
+                    result["content_assertions_checked"] = sorted(
+                        scenario.get("content_assertions", {})
+                    )
+                    if content_failures:
+                        result["failure"] = "content_assertion_failed"
+                        result["content_assertion_failures"] = content_failures
                         break
                     result["cardinality_evidence"] = {}
                     cardinality_mismatches = {}
