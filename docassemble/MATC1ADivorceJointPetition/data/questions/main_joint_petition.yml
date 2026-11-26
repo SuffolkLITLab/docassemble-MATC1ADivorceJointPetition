@@ -327,6 +327,11 @@ interview help:
     If a screen keeps loading for more than a minute, refresh the page in your
     browser. Your answers up to the last screen you finished are saved, so you
     will not lose them.
+
+    Your answers are tied to this browser. To protect them on a shared
+    device, the session ends after 20 minutes without activity (you get a
+    one-minute warning first), and it ends when you close the browser or use
+    Quick exit.
 ---
 id: who is here today
 question: |
@@ -698,6 +703,14 @@ default screen parts:
     ${ get_language_list_dropdown(al_interview_languages, current=session_local.attr("al_user_language") or al_user_language ) }
     % endif
     <a class="btn btn-danger btn-sm ms-2 al-quick-exit" href="${ url_action('quick_exit') }" rel="noreferrer" aria-label="Quick exit: leave this site now and erase your answers">Quick exit</a>
+    <span id="al-idle-settings" data-minutes="20" data-exit="${ url_action('quick_exit') }" hidden></span>
+---
+# Shared-device idle time-out (1A #213): 20 minutes without activity shows a
+# warning, and one more minute without an answer ends the session through the
+# quick exit. The limit is data-minutes in the navigation bar above.
+features:
+  javascript:
+    - idle_timeout.js
 ---
 event: quick_exit
 code: |
