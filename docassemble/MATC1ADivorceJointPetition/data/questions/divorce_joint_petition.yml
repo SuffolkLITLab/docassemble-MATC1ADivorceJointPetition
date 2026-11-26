@@ -154,13 +154,15 @@ code: |
   if separation_agreement_format != "interview":
     request_merge_agreement
     request_survive_agreement
+  # One question per spouse, only for a spouse who has used another last
+  # name (or whose answer is not known because they are absent).
   if users[0].other_last_name == "no":
     users[0].name_change = False
+  else:
+    users[0].name_change
   if users[1].other_last_name == "no":
     users[1].name_change = False
-  if not defined("users[0].name_change"):
-    users[0].name_change
-  if not defined("users[1].name_change"):
+  else:
     users[1].name_change
   additional_request
   
@@ -866,26 +868,14 @@ code: |
 ---
 id: Name change requests
 question: |
-  Name change requests
+  Name change request: ${ users[i] }
 fields:
-  - "Does ${  users[0].familiar()  } want to change their last name to their former last name?": users[0].name_change
+  - "Does ${ users[i].familiar() } want to change their last name to their former last name?": users[i].name_change
     datatype: yesnoradio
-    show if:
-      code: |
-        users[0].other_last_name != "no"
-  - "${  users[0].familiar()  }'s last name before marriage": users[0].former_name_last
+  - "${ users[i].familiar() }'s last name before marriage": users[i].former_name_last
     maxlength: 48
-    default: ${ showifdef("users[0].birth_last_name") }
-    show if: users[0].name_change
-  - "Does ${  users[1].familiar()  } want to change their last name to their former last name?": users[1].name_change
-    datatype: yesnoradio
-    show if:
-      code: |
-        users[1].other_last_name != "no"
-  - "${  users[1].familiar()  }'s last name before marriage": users[1].former_name_last
-    maxlength: 48
-    default: ${ showifdef("users[1].birth_last_name") }
-    show if: users[1].name_change
+    default: ${ showifdef(users[i].attr_name("birth_last_name")) }
+    show if: users[i].name_change
 ---
 id: merger survival
 question: | 
