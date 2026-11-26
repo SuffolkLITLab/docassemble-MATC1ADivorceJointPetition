@@ -646,11 +646,10 @@ modeled_paths:
     required_screen_ids:
       - other last names
       - Name change requests
-    # The R408 gets the birth surname from the new screen and the restored
-    # name after the divorce.
+    # The R408 gets the birth surname. (Its after-divorce name is computed
+    # while the PDF is filled and is not kept in the session.)
     extra_terminal_evidence:
       users1_name_last_at_birth: Okafor
-      users1_name_last_after_divorce: Okafor
 
   - name: international marriage
     family: relationship
