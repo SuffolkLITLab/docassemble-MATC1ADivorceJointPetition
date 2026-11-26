@@ -1021,14 +1021,22 @@ subquestion: |
   % endfor
 continue button field: divorcejointpetition_preview_question
 ---
-id: preview one form
+# The link's index is only available while the action runs, so store it and
+# show the preview from the stored value (a refresh or an API client reads
+# the screen in a later request).
 event: preview_one_form
+code: |
+  preview_form_index = int(action_argument('preview_index') or 0)
+  force_ask('show_preview_one_form')
+---
+id: preview one form
+event: show_preview_one_form
 question: |
-  Preview: ${ al_court_bundle.enabled_documents()[action_argument('preview_index')].title }
+  Preview: ${ al_court_bundle.enabled_documents()[preview_form_index].title }
 subquestion: |
   This preview doesn't have your signatures. Go back to fix any answers.
 
-  ${ al_court_bundle.enabled_documents()[action_argument('preview_index')].as_pdf(key='preview') }
+  ${ al_court_bundle.enabled_documents()[preview_form_index].as_pdf(key='preview') }
 buttons:
   - Back to review: refresh    
 ---
