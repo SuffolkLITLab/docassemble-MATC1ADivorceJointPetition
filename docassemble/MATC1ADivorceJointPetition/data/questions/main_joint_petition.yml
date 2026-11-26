@@ -574,6 +574,9 @@ objects:
   - child_care_or_custody_disclosure_affidavit_next_steps: ALDocument.using(title="Care or custody affidavit instructions", filename="care_or_custody_affidavit_next_steps", has_addendum=False)
   - affidavit_of_care_or_custody_attachment: ALDocument.using(title="Affidavit disclosing care or custody proceedings", filename="affidavit_disclosing_care_or_custody", has_addendum=False)
 ---
+modules:
+  - .certification_text
+---
 # Uploaded files that belong in the packet. The upload screens and next-steps
 # text tell users their upload is included with their filings.
 objects:
@@ -652,6 +655,17 @@ code: |
       "extension": certification_file.extension,
       "mimetype": certification_file.mimetype,
     }
+  # Plain text of named packet documents (by title), read from the DOCX the
+  # download already generated, for certification's content assertions.
+  certification_snapshot["document_text"] = {}
+  certification_wanted_titles = action_argument("document_text") or []
+  if certification_wanted_titles and defined("al_user_bundle._downloadable_files"):
+    for certification_document in al_user_bundle._downloadable_files[0]:
+      certification_title = str(certification_document.get("title", ""))
+      if certification_title in certification_wanted_titles and "docx" in certification_document:
+        certification_snapshot["document_text"][certification_title] = docx_plain_text(
+          certification_document["docx"].path()
+        )
   json_response(certification_snapshot)
 ---
 # Quick exit on every screen. It ends the session (deleting its answers, so

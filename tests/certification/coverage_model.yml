@@ -248,6 +248,24 @@ modeled_paths:
       separation_agreement_reached: false
       parties_will_negotiate: true
       separation_agreement_format: interview
+    # What the generated agreement must and must not say (1A #212).
+    content_assertions:
+      1A Divorce Separation Agreement:
+        forbid:
+            - MASSACHUSSETTS
+            - '\{\{|\{%|%\}|\}\}'
+            - '\$ per'
+            - '\bNone\b'
+            - 'per (Weekly|Monthly)'
+            - 'and/v\.'
+            - 'Party [AB] shall'
+            - 'Weekly payments are due every Friday and monthly'
+            - 'EXHIBIT H'
+            - 'emancipat'
+            - 'relate to the child'
+        require:
+            - 'Petitioner A'
+            - 'Exhibits A through G'
 
   - name: upload childless agreement
     family: agreement
@@ -345,6 +363,25 @@ modeled_paths:
     cardinalities:
       other_care_custody_proceedings: 1
       proceeding_other_parties: [4]
+    # What the generated agreement must and must not say (1A #212).
+    content_assertions:
+      1A Divorce Separation Agreement:
+        forbid:
+            - MASSACHUSSETTS
+            - '\{\{|\{%|%\}|\}\}'
+            - '\$ per'
+            - '\bNone\b'
+            - 'per (Weekly|Monthly)'
+            - 'and/v\.'
+            - 'Party [AB] shall'
+            - 'Weekly payments are due every Friday and monthly'
+            - 'payable on \.'
+        require:
+            - 'Petitioner A'
+            - 'As used in this Agreement, a child is emancipated at age 18'
+            - 'EXHIBIT H'
+            - 'Child Support Guidelines Worksheet \(CJD 304\)'
+            - 'merged into the Divorce Judgment'
     probe_events:
       - event: review_divorcejointpetition
         expected_id: divorce joint petition review screen

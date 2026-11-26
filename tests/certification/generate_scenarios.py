@@ -185,6 +185,7 @@ def generate(model: dict, output: Path) -> list[Path]:
                 if terminal_assertions
                 else {},
             ),
+            "content_assertions": path.get("content_assertions", {}),
             "probe_events": path.get(
                 "probe_events", model.get("default_probe_events", [])
             ),
