@@ -943,11 +943,6 @@ code: |
   else:
     plaintiff_index = 0
   defendant_index = 1 - plaintiff_index
-  # Birth and other last names, asked once (1A #206). The R408 skips its
-  # birth-surname fields for any spouse answered here, and the name-change
-  # question appears only for a spouse who has used another last name.
-  users[0].other_last_name
-  set_birth_last_names
 
   trial_court.division
   docket_number

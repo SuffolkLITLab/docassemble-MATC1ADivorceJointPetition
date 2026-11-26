@@ -124,6 +124,13 @@ code: |
   users.gather()
   set_parts(subtitle=str(users))
 
+  # Birth and other last names, asked once (1A #206), before the R408. The
+  # R408 skips its birth-surname fields for any spouse answered here, and the
+  # name-change question appears only for a spouse who has used another last
+  # name. Any 1B name swap has already happened by now.
+  users[0].other_last_name
+  set_birth_last_names
+
   # Collect counsel information only for the represented spouse or spouses.
   # Attorney signatures are handled separately from this packet intake flow.
   users[0].has_attorney
