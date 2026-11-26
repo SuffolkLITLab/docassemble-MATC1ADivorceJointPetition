@@ -577,6 +577,26 @@ objects:
 modules:
   - .certification_text
 ---
+# Plain "needs review" messages in place of docassemble's generic ones
+# (1A #211). Each says what to check.
+default validation messages:
+  required: |
+    Needs review: answer this question to go on.
+  multiple choice required: |
+    Needs review: choose one of the options.
+  combobox required: |
+    Needs review: choose an option from the list, or type one.
+  checkboxes required: |
+    Needs review: check at least one box. If none fit, choose "None of the above".
+  date: |
+    Needs review: enter a date, like 06/15/2026.
+  email: |
+    Needs review: enter an email address, like name@example.com.
+  number: |
+    Needs review: enter a number with digits only, like 1200.
+  file: |
+    Needs review: choose a file to upload.
+---
 # Uploaded files that belong in the packet. The upload screens and next-steps
 # text tell users their upload is included with their filings.
 objects:
