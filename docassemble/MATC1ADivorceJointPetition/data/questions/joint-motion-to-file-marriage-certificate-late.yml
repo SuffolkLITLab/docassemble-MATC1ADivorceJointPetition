@@ -307,7 +307,7 @@ event: jointmotiontofilemarriagecertificatelate_download
 question: |
   All done
 subquestion: |
-  Thank you ${users}. Your form is ready. Please download it and deliver it.
+  Thank you ${users}. Your form is ready. Download it and file it with the court.
   
   View, download and send your form below. Click the "Edit answers" button to fix any mistakes.
 
