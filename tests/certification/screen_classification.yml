@@ -41,6 +41,7 @@ proven_unreachable:
   # Affidavit of Indigency: the combined parent starts at ask_affidavit_questions
   # after fixing case, parties, fees, and docket data.
   "docassemble.ALAffidavitOfIndigency:data/questions/affidavit_body.yml#2b5cb98539a4596c": *parent_packet_flow
+  "docassemble.ALAffidavitOfIndigency:data/questions/affidavit_body.yml#0a0f92add9d11545": *shadowed_question
   "docassemble.ALAffidavitOfIndigency:data/questions/affidavit_body.yml#3ecad6457d8dcd58": *fixed_fee_defaults
   "docassemble.ALAffidavitOfIndigency:data/questions/affidavit_body.yml#63c96bf68b827d30": *standalone_wrapper
   "docassemble.ALAffidavitOfIndigency:data/questions/affidavit_body.yml#743064ddc50a0468": *standalone_wrapper

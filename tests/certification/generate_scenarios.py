@@ -67,8 +67,11 @@ def expected_bundle_documents(variables: dict) -> dict[str, bool]:
         ],
         # This modeled fee-waiver route uses the harness's low-income answers
         # and must finish with an indigency form in the packet.
+        # The packet has an affidavit only when the other spouse may also
+        # qualify, since a joint-petition waiver needs both spouses.
         "affidavitofindigency_attachment": bool(
             variables.get("ask_if_qualifies_for_fee_waiver")
+            and variables.get("other_spouse_may_qualify", "yes") != "no"
             and variables.get("fee_waiver_qualifies", True)
         ),
         "child_care_or_custody_disclosure_affidavit_next_steps": terminal[
