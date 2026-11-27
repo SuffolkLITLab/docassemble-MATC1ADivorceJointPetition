@@ -57,6 +57,11 @@ default_variables:
   safety_concern: 'no'
   dispute_resolution_clause: false
   alimony_ends_on_cohabitation: true
+  # Parenting: a common pattern fills in the description (which the model
+  # still states); holidays and school vacations alternate.
+  parenting_schedule_pattern: eow
+  sa_holiday_plan: alternate
+  sa_vacation_plan: alternate
   # Agreement property: none unless a path says so.
   no_real_estate: true
   sa_have_vehicles: false
