@@ -52,6 +52,7 @@ default_variables:
   # Safety screen: no concern reported.
   safety_concern: 'no'
   dispute_resolution_clause: false
+  alimony_ends_on_cohabitation: true
   # Other last names (1A #206): neither spouse has used another last name.
   users[0].other_last_name: 'no'
   users[1].other_last_name: 'no'
@@ -778,9 +779,27 @@ modeled_paths:
       children_of_marriage: true
       children_of_marriage_number: 2
       csg_worksheet_path: interview
-      users[0].gross_weekly_income_amount: 9000
-      users[1].gross_weekly_income_amount: 1000
+      # Monthly pay converts to weekly: 39,000 x 12 / 52 = 9,000.
+      users[0].gross_income_amount: 39000
+      users[0].gross_income_frequency: '12'
+      users[1].gross_income_amount: 4333
+      users[1].gross_income_frequency: '12'
     required_screen_ids:
+      - child support worksheet caution
+
+  - name: worksheet yearly income converts to weekly
+    family: children
+    overrides:
+      children_of_marriage: true
+      children_of_marriage_number: 1
+      csg_worksheet_path: interview
+      # 300,000 + 100,000 a year is about 7,692 a week, under the 8,654 limit.
+      # Read as weekly amounts, the caution would show.
+      users[0].gross_income_amount: 300000
+      users[0].gross_income_frequency: '1'
+      users[1].gross_income_amount: 100000
+      users[1].gross_income_frequency: '1'
+    forbidden_screen_ids:
       - child support worksheet caution
 
   - name: agreement alimony with child support and dispute clause
@@ -795,6 +814,16 @@ modeled_paths:
       dispute_resolution_clause: true
       dispute_mediation_hours: 3
       dispute_mediation_cost: party_a
+      alimony_ends_on_cohabitation: true
+      parenting_communication_methods:
+        phone: true
+        text: true
+        email: false
+        app: false
+        in_person: false
+      personal_property_already_divided: true
+      personal_property_removal_days: 30
+      personal_property_title_days: 60
     required_screen_ids:
       - alimony and child support caution
       - dispute resolution
@@ -805,6 +834,10 @@ modeled_paths:
           - 'at least 3 hours of mediation'
           - "Alex\\b.{0,30}Example.{0,8} will pay the mediator's fees"
           - 'does not apply in an emergency'
+          - 'common household with another person for a continuous period of at least three months'
+          - 'communicate with each other about the child\(ren\) by phone calls and text messages'
+          - 'within 30 days of the Court.s approval of this Agreement, after giving the other party advance notice'
+          - 'transfer titles, such as a motor vehicle.s title, within 60 days'
 
   - name: agreement insurance alimony and individual debts
     family: agreement
