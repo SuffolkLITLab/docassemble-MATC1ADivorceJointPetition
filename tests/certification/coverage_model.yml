@@ -45,8 +45,13 @@ dimensions:
   uploaded_agreement_child_support_deviation: [false, true]
   child_support_deviation: [false, true]
   custody_case_participation: [no cases, know of, participated]
+  safety_concern: ['no', 'yes', rather_not_say]
+  dispute_resolution_clause: [false, true]
 
 default_variables:
+  # Safety screen: no concern reported.
+  safety_concern: 'no'
+  dispute_resolution_clause: false
   # Other last names (1A #206): neither spouse has used another last name.
   users[0].other_last_name: 'no'
   users[1].other_last_name: 'no'
@@ -133,6 +138,27 @@ modeled_paths:
     forbidden_screen_ids:
       - sign attorney for party A
       - sign attorney for party B
+
+  - name: safety concern reported
+    family: eligibility
+    overrides:
+      safety_concern: 'yes'
+    required_screen_ids:
+      - safety warning
+    probe_events:
+      - event: review_divorcejointpetition
+        expected_id: divorce joint petition review screen
+      - event: get_help_now
+        expected_id: get help now
+      - event: privacy_summary_screen
+        expected_id: privacy summary screen
+
+  - name: safety rather not say
+    family: eligibility
+    overrides:
+      safety_concern: rather_not_say
+    required_screen_ids:
+      - safety warning
 
   - name: legal marriage warning
     family: eligibility
@@ -731,6 +757,54 @@ modeled_paths:
       users[1].address.city: Salem
       users[1].address.county: Essex
       users[1].address.zip: '01970'
+
+  - name: affidavit safety reason for a private address
+    family: children
+    overrides:
+      children_of_marriage: true
+      children_of_marriage_number: 1
+      confidential_address_reasons:
+        has_209a: true
+        dv_shelter: false
+        danger_abuse: false
+        child_danger_abuse: false
+        other_reason: false
+    required_screen_ids:
+      - affidavit safety warning
+
+  - name: worksheet income above the guidelines
+    family: children
+    overrides:
+      children_of_marriage: true
+      children_of_marriage_number: 2
+      csg_worksheet_path: interview
+      users[0].gross_weekly_income_amount: 9000
+      users[1].gross_weekly_income_amount: 1000
+    required_screen_ids:
+      - child support worksheet caution
+
+  - name: agreement alimony with child support and dispute clause
+    family: agreement
+    overrides:
+      children_of_marriage: true
+      children_of_marriage_number: 2
+      csg_worksheet_path: interview
+      separation_agreement_format: interview
+      alimony_waived_all: false
+      alimony_payment_agreed: true
+      dispute_resolution_clause: true
+      dispute_mediation_hours: 3
+      dispute_mediation_cost: party_a
+    required_screen_ids:
+      - alimony and child support caution
+      - dispute resolution
+      - sa before you sign
+    content_assertions:
+      1A Divorce Separation Agreement:
+        require:
+          - 'at least 3 hours of mediation'
+          - "Alex\\b.{0,30}Example.{0,8} will pay the mediator's fees"
+          - 'does not apply in an emergency'
 
   - name: agreement insurance alimony and individual debts
     family: agreement

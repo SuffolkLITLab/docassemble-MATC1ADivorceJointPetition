@@ -299,6 +299,8 @@ subquestion: |
 
   Tap the {green words} in any screen for a definition or more information.
 
+  ${ collapse_template(privacy_summary) }
+
   % if chat_partners_available().help:
   Live help is currently available in this interview. Click the speech bubble
   (:comment-alt:) in the navigation bar to connect to a live advocate for help.
@@ -704,6 +706,14 @@ default screen parts:
     % endif
     <a class="btn btn-danger btn-sm ms-2 al-quick-exit" href="${ url_action('quick_exit') }" rel="noreferrer" aria-label="Quick exit: leave this site now and erase your answers">Quick exit</a>
     <span id="al-idle-settings" data-minutes="20" data-exit="${ url_action('quick_exit') }" hidden></span>
+  # The footer keeps AssemblyLine's Share, About and Feedback links and adds,
+  # on every screen, the private way out and the privacy summary.
+  footer: |
+    [:life-ring: I feel pressured or want to stop](${ url_action('get_help_now') })
+    [:lock: What happens to your information](${ url_action('privacy_summary_screen') })
+    [:share-alt-square: Share](${ url_ask([{'undefine': ['al_sharing_type','al_how_share_link']}, 'al_share_form_screen', {'recompute': ['al_did_share_form']}, 'al_share_results']) })
+    [:info-circle: About](${ url_action('about_this_interview') })
+    [:comment-dots: Feedback](${ feedback_link(current_context(), i=feedback_form, github_repo=github_repo_name, github_user=github_user, package_version=package_version_number) } ){:target="_blank"}
 ---
 # Shared-device idle time-out (1A #213): 20 minutes without activity shows a
 # warning, and one more minute without an answer ends the session through the
@@ -711,10 +721,156 @@ default screen parts:
 features:
   javascript:
     - idle_timeout.js
+  css:
+    - footer_links.css
 ---
 event: quick_exit
 code: |
   command('exit', url='https://www.weather.gov')
+---
+template: safety_resources
+content: |
+  * **In danger now:** call 911.
+  * **SafeLink**, Massachusetts' domestic violence hotline, free and open 24
+    hours: [(877) 785-2020](tel:+18777852020)
+  * **Court Service Centers** give free help with court forms and procedures:
+    [Court Service Centers](https://www.mass.gov/orgs/court-service-centers)
+  * **Legal aid:** [find a legal aid provider](https://www.lsc.gov/what-legal-aid/find-legal-aid)
+---
+id: safety check
+question: |
+  Before you start
+subquestion: |
+  A joint (1A) divorce works when both of you can decide freely.
+
+  * Has either of you been hurt, threatened, or pressured by the other to
+    agree to this divorce or its terms?
+  * Is there a restraining order (209A) between you, now or in the past?
+fields:
+  - no label: safety_concern
+    datatype: radio
+    choices:
+      - "No": "no"
+      - "Yes": "yes"
+      - I'd rather not say: rather_not_say
+---
+id: safety warning
+continue button field: safety_warning_reviewed
+question: |
+  % if safety_concern == "yes":
+  Thank you for telling us
+  % else:
+  Help is here if you need it
+  % endif
+subquestion: |
+  % if safety_concern == "yes":
+  Because of what you shared, we suggest you talk with a lawyer or a Court
+  Service Center before you go on.
+  % else:
+  If either of you is not sure it is safe to decide this together, talk with a
+  lawyer or a Court Service Center before you go on.
+  % endif
+  You can still continue, and you can stop at any time.
+
+  ${ safety_resources }
+
+  **Quick exit** at the top of every screen leaves this site right away and
+  erases your answers.
+continue button label: Keep going
+action buttons:
+  - label: Leave this site now
+    action: quick_exit
+    color: danger
+---
+id: affidavit safety warning
+continue button field: affidavit_safety_warning_reviewed
+question: |
+  Help is here if you need it
+subquestion: |
+  You said an address needs to stay private for safety. We suggest you talk
+  with a lawyer or a Court Service Center before you go on. You can still
+  continue, and you can stop at any time.
+
+  ${ safety_resources }
+
+  **Quick exit** at the top of every screen leaves this site right away and
+  erases your answers.
+continue button label: Keep going
+action buttons:
+  - label: Leave this site now
+    action: quick_exit
+    color: danger
+---
+id: get help now
+event: get_help_now
+question: |
+  You do not have to finish this
+subquestion: |
+  If you feel pressured, or you want to stop, you can stop now. Stopping does
+  not close off other options, such as a 1B divorce, mediation, or working
+  with a lawyer.
+
+  ${ safety_resources }
+
+  **Quick exit** leaves this site right away and erases your answers.
+buttons:
+  - Back to where I was: refresh
+action buttons:
+  - label: Leave this site now
+    action: quick_exit
+    color: danger
+---
+template: privacy_summary
+subject: |
+  What happens to your information
+content: |
+  * This site collects what you type and upload so it can fill in your court
+    forms. That includes names, addresses, children's information, financial
+    details, and the last four digits of each spouse's Social Security number
+    for the court's R-408 form.
+  * Nothing goes to the court unless you file it. This site does not file
+    anything for you.
+  * Your answers are tied to this browser. No one else, including your spouse
+    or the clinic, can see them unless you share the forms you download. LIT
+    Lab server administrators can access stored sessions.
+  * Your session ends after 20 minutes without activity, when you close your
+    browser, or when you use Quick exit. The server deletes old sessions
+    automatically after a period set by its administrators.
+  * When you finish, the site keeps one record for statistics: the first
+    spouse's ZIP code and that the interview was completed.
+---
+id: privacy summary screen
+event: privacy_summary_screen
+question: |
+  ${ privacy_summary.subject }
+subquestion: |
+  ${ privacy_summary.content }
+buttons:
+  - Back to where I was: refresh
+---
+id: child support worksheet caution
+continue button field: child_support_worksheet_caution_reviewed
+question: |
+  Your situation may need more help than this tool gives
+subquestion: |
+  % if has_additional_available_income:
+  Your combined available income is more than the Child Support Guidelines
+  cover, which is $450,000 a year. For income above that, the court decides
+  how much more child support to order.
+
+  % endif
+  % if substantial_hardship_deviation:
+  Your worksheet shows a possible substantial hardship for the parent who pays.
+  The court may set a different amount, and it will want an explanation.
+
+  % endif
+  You can keep going. We suggest you talk with a lawyer or a Court Service
+  Center before you sign.
+continue button label: Keep going
+action buttons:
+  - label: I want to get help first
+    action: get_help_now
+    color: secondary
 ---
 code: |
   enable_al_nav_sections = True
@@ -867,6 +1023,12 @@ code: |
     nav.set_section("care_or_custody_affidavit_addresses")
     interview_order_affidavit_disclosing_care_or_custody_addresses
     trigger_aff_care_or_custody_computed_variables
+    if (
+        safety_concern == "no"
+        and defined("confidential_address_reasons")
+        and confidential_address_reasons.any_true("has_209a", "dv_shelter", "danger_abuse", "child_danger_abuse")
+    ):
+      affidavit_safety_warning_reviewed
 
   include_child_support_guidelines_worksheet = (
     children_of_marriage and csg_worksheet_path == "interview"
@@ -878,6 +1040,8 @@ code: |
     interview_order_ma_child_support_guidelines_worksheet
     set_child_support_defaults_from_guidelines
     child_support_guidelines_result_reviewed
+    if has_additional_available_income or substantial_hardship_deviation:
+      child_support_worksheet_caution_reviewed
 
   include_separation_agreement = separation_agreement_format == "interview"
 
@@ -1137,6 +1301,9 @@ mandatory: True
 code: |
   al_intro_screen
   divorcejointpetition_intro
+  safety_concern
+  if safety_concern != "no":
+    safety_warning_reviewed
   joint_petition_interview_order
   nav.set_section("review_and_sign")
   signature_date
@@ -1148,6 +1315,8 @@ code: |
           "reached_interview_end": True,
       },
   )
+  if include_separation_agreement:
+    sa_before_you_sign_reviewed
   divorcejointpetition_preview_question
   # Several included child interviews define the global signature_fields
   # variable. Set the combined packet's signer matrix at the point of use so
