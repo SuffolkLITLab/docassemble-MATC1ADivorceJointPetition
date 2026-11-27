@@ -583,6 +583,7 @@ objects:
 ---
 modules:
   - .certification_text
+  - .analytics
 ---
 # Plain "needs review" messages in place of docassemble's generic ones
 # (1A #211). Each says what to check.
@@ -836,8 +837,9 @@ content: |
   * Your session ends after 20 minutes without activity, when you close your
     browser, or when you use Quick exit. The server deletes old sessions
     automatically after a period set by its administrators.
-  * When you finish, the site keeps one record for statistics: the first
-    spouse's ZIP code and that the interview was completed.
+  * The site keeps one record for statistics: which sections you reached and
+    how long each took, whether you finished, and, if you finish, the first
+    spouse's ZIP code. It does not include names or your other answers.
 ---
 id: privacy summary screen
 event: privacy_summary_screen
@@ -987,11 +989,13 @@ id: joint petition interview order
 code: |
   combined_bundle_documents_normalized
   nav.set_section("convert_1b_to_1a")
+  note_section("convert_1b_to_1a")
   has_existing_1b_action
   if has_existing_1b_action:
     combined_interview_order_motion_to_amend
 
   nav.set_section("packet_options")
+  note_section("packet_options")
   spouses_present
   if absent_spouse_index is not None:
     # Lets the financial statement's date of birth be left blank for them.
@@ -1001,6 +1005,7 @@ code: |
   interview_order_divorcejointpetition
 
   nav.set_section("court_requests")
+  note_section("court_requests")
   trial_court
   # Always show the court, even when the venue rules left no choice to make.
   trial_court_confirmed
@@ -1017,10 +1022,13 @@ code: |
   if include_care_or_custody_affidavit:
     set_care_or_custody_affidavit_defaults
     nav.set_section("care_or_custody_affidavit_children")
+    note_section("care_or_custody_affidavit_children")
     interview_order_affidavit_disclosing_care_or_custody_children
     nav.set_section("care_or_custody_affidavit_cases")
+    note_section("care_or_custody_affidavit_cases")
     interview_order_affidavit_disclosing_care_or_custody_cases
     nav.set_section("care_or_custody_affidavit_addresses")
+    note_section("care_or_custody_affidavit_addresses")
     interview_order_affidavit_disclosing_care_or_custody_addresses
     trigger_aff_care_or_custody_computed_variables
     if (
@@ -1036,6 +1044,7 @@ code: |
   if include_child_support_guidelines_worksheet:
     set_child_support_guidelines_defaults
     nav.set_section("child_support_guidelines")
+    note_section("child_support_guidelines")
     ma_child_support_guidelines_worksheet_intro
     interview_order_ma_child_support_guidelines_worksheet
     set_child_support_defaults_from_guidelines
@@ -1047,6 +1056,7 @@ code: |
 
   if include_financial_statement:
     nav.set_section("financial_statement")
+    note_section("financial_statement")
     financial_statement_court_division = trial_court.division
     interview_order_financial_statement
 
@@ -1078,10 +1088,12 @@ code: |
   if include_findings_and_determinations:
     set_findings_and_determinations_defaults
     nav.set_section("child_support_findings")
+    note_section("child_support_findings")
     cjd_305_intro
     interview_order_cjd_305
 
   nav.set_section("fee_waiver")
+  note_section("fee_waiver")
   set_indigency_defaults
   ask_if_qualifies_for_fee_waiver
   if ask_if_qualifies_for_fee_waiver:
@@ -1306,14 +1318,17 @@ code: |
     safety_warning_reviewed
   joint_petition_interview_order
   nav.set_section("review_and_sign")
+  note_section("review_and_sign")
   signature_date
-  # Store anonymous data for analytics / statistics
+  # Store anonymous data for analytics / statistics: section times, the first
+  # spouse's ZIP code, and that the interview reached the end.
   store_variables_snapshot(
       persistent=True,
-      data={
-          "zip": showifdef("users[0].address.zip"),
-          "reached_interview_end": True,
-      },
+      key="statistics",
+      data=statistics_data(
+          zip=showifdef("users[0].address.zip"),
+          reached_interview_end=True,
+      ),
   )
   if include_separation_agreement:
     sa_before_you_sign_reviewed
