@@ -47,8 +47,8 @@ metadata:
   landing_page_url: >-
     https://www.mass.gov/guides/get-a-no-fault-1a-divorce
   maturity: production
-  estimated_completion_minutes: 30
-  estimated_completion_delta: 5
+  estimated_completion_minutes: 90
+  estimated_completion_delta: 30
   LIST_topics:
     - "FA-00-00-00-00"
     - "FA-06-00-00-00"
@@ -294,8 +294,8 @@ subquestion: |
   or working with a lawyer.
 
   This site is not a lawyer. It gives general legal information, not legal
-  advice. If you would like a lawyer, find [your local legal aid
-  provider](https://www.lsc.gov/what-legal-aid/find-legal-aid).
+  advice. If you would like a lawyer, the [Massachusetts Legal Resource
+  Finder](https://masslrf.org) lists free legal help programs.
 
   Tap the {green words} in any screen for a definition or more information.
 
@@ -517,7 +517,7 @@ code: |
   r408_attachment.enabled = defined("include_r408") and include_r408
 ---
 code: |
-  affidavitofindigency_attachment.enabled = ask_if_qualifies_for_fee_waiver and is_indigent
+  affidavitofindigency_attachment.enabled = ask_if_qualifies_for_fee_waiver and other_spouse_may_qualify != "no" and is_indigent
 ---
 code: |
   child_care_or_custody_disclosure_affidavit_next_steps.enabled = (
@@ -736,7 +736,7 @@ content: |
     hours: [(877) 785-2020](tel:+18777852020)
   * **Court Service Centers** give free help with court forms and procedures:
     [Court Service Centers](https://www.mass.gov/orgs/court-service-centers)
-  * **Legal aid:** [find a legal aid provider](https://www.lsc.gov/what-legal-aid/find-legal-aid)
+  * **Legal aid:** the [Massachusetts Legal Resource Finder](https://masslrf.org) lists free legal help programs
 ---
 id: safety check
 question: |
@@ -1097,6 +1097,10 @@ code: |
   set_indigency_defaults
   ask_if_qualifies_for_fee_waiver
   if ask_if_qualifies_for_fee_waiver:
+    other_spouse_may_qualify
+  if ask_if_qualifies_for_fee_waiver and other_spouse_may_qualify == "no":
+    fee_waiver_needs_both
+  elif ask_if_qualifies_for_fee_waiver:
     ask_affidavit_questions
     if not is_indigent:
       # The standalone affidavit wrapper explains this outcome, but the
@@ -1298,13 +1302,58 @@ id: getting help with court fees
 question: |
   Getting help with court fees
 subquestion: |
-  It costs $215 to file for divorce in Massachusetts. You may qualify for a fee waiver. If you do, you will need to tell the court about your income.
+  It costs $215 to file for divorce in Massachusetts. On a joint petition,
+  you can ask the court to waive the fees if both of you can't afford them.
+  Each of you files your own affidavit of indigency.
 
   Do you want to find out if you qualify?
 field: ask_if_qualifies_for_fee_waiver
 buttons:
-  - Find out if I qualify: True
+  - Find out if we qualify: True
   - Skip: False
+---
+id: other spouse fee waiver
+question: |
+  Does ${ users[1] } also qualify?
+subquestion: |
+  On a joint petition, Mass.gov says you can ask for a fee waiver if both of
+  you are indigent. ${ users[1] } may qualify if at least one of these is true:
+
+  * They get TAFDC, EAEDC, SSI, MassHealth, or Massachusetts veterans'
+    benefits.
+  * Their income after taxes is at or below 125% of the federal poverty line.
+  * Paying the fees would mean going without food, shelter, or clothing.
+
+  The next questions are about ${ users[0] }. ${ users[1] } prepares their own
+  affidavit separately.
+field: other_spouse_may_qualify
+choices:
+  - "Yes": "yes"
+  - "No": "no"
+  - "Not sure": unsure
+---
+id: fee waiver needs both spouses
+question: |
+  Plan to pay the filing fee
+subquestion: |
+  On a joint petition, Mass.gov says you can ask for a fee waiver if both of
+  you are indigent. Because ${ users[1] } does not qualify, plan to pay $215:
+  a $200 filing fee and a $15 surcharge.
+
+  If paying would be a hardship, a [Court Service
+  Center](https://www.mass.gov/orgs/court-service-centers) can explain your
+  options.
+continue button field: fee_waiver_needs_both
+---
+id: other spouse files their own affidavit
+question: |
+  ${ users[1] } files their own affidavit of indigency
+subquestion: |
+  The next questions prepare ${ users[0] }'s affidavit. ${ users[1] } needs
+  their own affidavit too. They can prepare it for free with the [Affidavit of
+  Indigency interview](https://apps.suffolklitlab.org/start/indigency/), then
+  file it with your petition.
+continue button field: explain_separate_affidavits
 ---
 ###################### Main order ######################
 comment: |
@@ -1375,7 +1424,9 @@ code: |
       (r408_attachment, include_r408),
       (
         affidavitofindigency_attachment,
-        ask_if_qualifies_for_fee_waiver and is_indigent,
+        ask_if_qualifies_for_fee_waiver
+        and other_spouse_may_qualify != "no"
+        and is_indigent,
       ),
       (
         child_care_or_custody_disclosure_affidavit_next_steps,

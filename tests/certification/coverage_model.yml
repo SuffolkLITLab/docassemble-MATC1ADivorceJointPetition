@@ -123,6 +123,7 @@ default_variables:
   marital_home.state: MA
   marital_home.zip: '02108'
   ask_if_qualifies_for_fee_waiver: false
+  other_spouse_may_qualify: "yes"
   fee_waiver_qualifies: true
   health_insurance_custom_terms_adult: true
   health_insurance_self_responsible: true
@@ -665,6 +666,18 @@ modeled_paths:
     family: fee_waiver
     overrides:
       ask_if_qualifies_for_fee_waiver: true
+    required_screen_ids:
+      - other spouse fee waiver
+      - other spouse files their own affidavit
+
+  - name: fee waiver other spouse does not qualify
+    family: fee_waiver
+    overrides:
+      ask_if_qualifies_for_fee_waiver: true
+      other_spouse_may_qualify: "no"
+    required_screen_ids:
+      - other spouse fee waiver
+      - fee waiver needs both spouses
 
   - name: uploaded marriage certificate
     family: documents
