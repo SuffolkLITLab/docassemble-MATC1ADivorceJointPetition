@@ -8,6 +8,9 @@ include:
   #- Financial statement interview
   #- Separation agreement interview
 ---
+modules:
+  - .analytics
+---
 code: |
   # This controls the default country and list of states in address field questions
   AL_DEFAULT_COUNTRY = "US"
@@ -34,6 +37,7 @@ code: |
   user_ask_role = "plaintiff"
   
   nav.set_section("divorce_eligibility")
+  note_section("divorce_eligibility")
   legal_marriage
   if legal_marriage == False: 
     cautionary_message_divorce
@@ -61,6 +65,7 @@ code: |
     cautionary_message_divorce_type
 
   nav.set_section("separation_agreement")
+  note_section("separation_agreement")
   # The worksheet path must be settled before the separation agreement
   # format: an agreement built in this tool needs a guideline amount, so
   # that option is hidden when the worksheet is not done yet.
@@ -88,6 +93,7 @@ code: |
       uploaded_agreement_addresses_child_support
 
   nav.set_section("relationship_background")
+  note_section("relationship_background")
   marriage_date
   set_marriage_location
   # Only one of state and country is asked, but the late marriage certificate
@@ -111,6 +117,7 @@ code: |
   copy_marital_address_fields
 
   nav.set_section("party_information")
+  note_section("party_information")
 
   if ask_party_a_address:
     spouse_address_known(0)
@@ -141,6 +148,7 @@ code: |
     attorneys[1].name.first
   
   nav.set_section("children_information")
+  note_section("children_information")
   if children_of_marriage:
     # The combined interview asks for an exact count before gathering. Set the
     # list target here, where gather() consumes it, so included standalone
@@ -151,6 +159,7 @@ code: |
     set_parts(subtitle=str(children))
     users1_number_of_custodial_children
   nav.set_section("court_requests")  
+  note_section("court_requests")
   if separation_agreement_format != "interview":
     request_merge_agreement
     request_survive_agreement
@@ -169,10 +178,12 @@ code: |
   set_progress(80)
  
   nav.set_section("additional_circumstances_and_filings")
+  note_section("additional_circumstances_and_filings")
 
 
   set_progress(90)
   nav.set_section("review_and_sign")
+  note_section("review_and_sign")
 
   set_default_petition_values
   
