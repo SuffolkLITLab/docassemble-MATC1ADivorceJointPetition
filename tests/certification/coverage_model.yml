@@ -46,6 +46,10 @@ dimensions:
   child_support_deviation: [false, true]
   custody_case_participation: [no cases, know of, participated]
   safety_concern: ['no', 'yes', rather_not_say]
+  no_real_estate: [false, true]
+  sa_properties[i].plan: [keep, sell, together, other]
+  sa_have_vehicles: [false, true]
+  sa_equalization_agreed: [false, true]
   dispute_resolution_clause: [false, true]
 
 default_variables:
@@ -53,6 +57,10 @@ default_variables:
   safety_concern: 'no'
   dispute_resolution_clause: false
   alimony_ends_on_cohabitation: true
+  # Agreement property: none unless a path says so.
+  no_real_estate: true
+  sa_have_vehicles: false
+  sa_equalization_agreed: false
   # Other last names (1A #206): neither spouse has used another last name.
   users[0].other_last_name: 'no'
   users[1].other_last_name: 'no'
@@ -839,6 +847,116 @@ modeled_paths:
           - 'within 30 days of the Court.s approval of this Agreement, after giving the other party advance notice'
           - 'transfer titles, such as a motor vehicle.s title, within 60 days'
 
+  - name: agreement property kept with loans, a vehicle and a balancing payment
+    family: agreement
+    overrides:
+      separation_agreement_format: interview
+      no_real_estate: false
+      sa_properties.there_is_another:
+        $sequence: [false]
+      sa_properties[0].address: 48 Linden Street, Quincy, MA 02169
+      sa_properties[0].loan_types:
+        first: true
+        second: false
+        heloc: true
+      sa_properties[0].plan: keep
+      sa_properties[0].buyout_amount: 45000
+      sa_have_vehicles: true
+      sa_vehicles.there_is_another:
+        $sequence: [false]
+      sa_vehicles[0].description: 2018 Honda Civic
+      sa_vehicles[0].vin: 2HGFC2F59JH512345
+      sa_vehicles[0].has_loan: true
+      sa_equalization_agreed: true
+      sa_equalization_amount: 12000
+    cardinalities:
+      sa_properties: 1
+      sa_vehicles: 1
+    required_screen_ids:
+      - real estate keep
+      - vehicle details
+      - equalization
+    content_assertions:
+      1A Divorce Separation Agreement:
+        require:
+          - 'will be the sole owner of the property'
+          - 'subject to a first mortgage and a home equity loan or line of credit'
+          - 'from all loans on the property'
+          - '\$45,000\.00 for'
+          - 'will keep the 2018 Honda Civic \(VIN 2HGFC2F59JH512345\) and will pay any loan on it'
+          - 'To balance the division of property, .{0,40} will pay .{0,40} \$12,000\.00 by'
+        forbid:
+          - 'The parties own no real estate'
+          - 'The parties own no motor vehicles'
+    probe_events:
+      - event: review_divorcejointpetition
+        expected_id: divorce joint petition review screen
+      - event: review_a_divorce_agreement
+        expected_id: review a divorce agreement
+      - event: sa_properties.revisit
+        expected_id: edit properties
+      - event: sa_vehicles.revisit
+        expected_id: edit vehicles
+
+  - name: agreement two properties, one sold and one kept together
+    family: agreement
+    overrides:
+      separation_agreement_format: interview
+      no_real_estate: false
+      sa_properties.there_is_another:
+        $sequence: [true, false]
+      sa_properties[0].address: 48 Linden Street, Quincy, MA 02169
+      sa_properties[0].loan_types:
+        first: true
+        second: false
+        heloc: false
+      sa_properties[0].plan: sell
+      sa_properties[0].sale_costs_payer: both
+      sa_properties[0].sale_share_a: 60
+      sa_properties[1].address: 12 Shore Road, Wellfleet, MA 02667
+      sa_properties[1].loan_types:
+        first: false
+        second: false
+        heloc: false
+      sa_properties[1].plan: together
+      sa_properties[1].own_share_a: 50
+      sa_properties[1].own_costs_payer: a
+      sa_properties[1].sale_when: when the youngest child finishes high school
+    cardinalities:
+      sa_properties: 2
+    required_screen_ids:
+      - real estate sell
+      - real estate together
+      - another property
+    content_assertions:
+      1A Divorce Separation Agreement:
+        require:
+          - 'list the property for sale by'
+          - 'will receive 60% and .{0,40} will receive 40% of the proceeds'
+          - '12 Shore Road, Wellfleet'
+          - 'continue to own the property together, with .{0,40} holding a 50% share'
+          - 'sold when the youngest child finishes high school'
+        forbid:
+          - 'home equity'
+
+  - name: agreement property with another plan
+    family: agreement
+    overrides:
+      separation_agreement_format: interview
+      no_real_estate: false
+      sa_properties.there_is_another:
+        $sequence: [false]
+      sa_properties[0].plan: other
+      sa_properties[0].other_description: One spouse keeps the cottage and rents it out; the other may use it two weeks each August.
+    cardinalities:
+      sa_properties: 1
+    required_screen_ids:
+      - real estate other
+    content_assertions:
+      1A Divorce Separation Agreement:
+        require:
+          - 'The parties agree that: One spouse keeps the cottage'
+
   - name: agreement insurance alimony and individual debts
     family: agreement
     overrides:
@@ -965,6 +1083,8 @@ modeled_paths:
       - sign party A
 
 cardinality_classes:
+  sa_properties: [0, 1, 2]
+  sa_vehicles: [0, 1]
   users: [2]
   children: [0, 1, 2, 4, 5, 9]
   other_care_custody_proceedings: [0, 1, 2]
@@ -976,6 +1096,12 @@ cardinality_classes:
   financial_liabilities: [0, 1, 2]
 
 cardinality_probes:
+  sa_properties:
+    variable: sa_properties
+    default_count: 0
+  sa_vehicles:
+    variable: sa_vehicles
+    default_count: 0
   users:
     variable: users
     fixed_count: 2
